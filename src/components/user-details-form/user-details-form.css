@@ -1,0 +1,107 @@
+.user-details-form-container {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2vh;
+}
+
+.user-details-form {
+    width: calc(100% - 2vw);
+
+    padding: 2vh 1vw;
+    background-color: var(--backgroundColor);
+    border-radius: 10px;
+
+}
+
+.user-details-form>h4 {
+    margin: 0;
+
+
+    color: white;
+
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.user-details-form>.sep {
+    width: 100%;
+    height: 1px;
+    background-color: var(--light-color-gray);
+
+    margin: 2vh 0;
+}
+
+.user-details-form>.form-content-container {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+
+    gap: 2vh;
+}
+
+.user-details-form>.form-content-container>div {
+    display: flex;
+    flex-direction: column;
+
+    gap: .5vh;
+}
+
+.user-details-form>.form-content-container>div>label {
+    color: var(--light-color-gray);
+    font-size: 0.8rem;
+
+    text-transform: uppercase;
+
+    margin: 0;
+}
+
+.user-details-form>.form-content-container>div>input,
+.user-details-form>.form-content-container>div>select {
+
+    padding: 1vh 1vw;
+
+    background-color: #404040;
+    border: 1px solid var(--light-color-gray);
+    border-radius: 5px;
+
+    color: white;
+
+    font-size: 1rem;
+}
+
+.user-details-form>.form-content-container>div>input:focus,
+.user-details-form>.form-content-container>div>select:focus {
+    outline: none;
+    border-color: white;
+}
+
+.user-details-form>.form-content-container>div>.user-form-error {
+    color: #d63f3b;
+    font-size: 0.8rem;
+
+    margin: 0;
+    padding: 0;
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .user-details-form>.form-content-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(7, 1fr);
+    }
+
+    .user-details-form>.form-content-container>div {
+        width: 100%;
+    }
+
+    .user-details-form>.form-content-container>div>input {
+        width: calc(100% - 2vw);
+    }
+}

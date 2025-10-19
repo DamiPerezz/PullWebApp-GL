@@ -1,0 +1,23 @@
+.events-container {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.events-container h2 {
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0;
+}

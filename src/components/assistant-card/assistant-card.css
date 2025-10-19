@@ -1,0 +1,137 @@
+.assistant-card {
+  width: 100%;
+  height: 40px;
+  background-color: var(--backgroundColor);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+}
+
+.assistant-card.pending_add {
+  border-left: 4px solid #ffa500;
+  background-color: color-mix(in srgb, var(--backgroundColor) 85%, #ffa500 15%);
+}
+
+.assistant-card.pending_remove {
+  border-left: 4px solid #ff6b6b;
+  background-color: color-mix(in srgb, var(--backgroundColor) 85%, #ff6b6b 15%);
+  opacity: 0.8;
+}
+
+.assistant-card.unpaid {
+  border-left: 4px solid var(--blue-button-color);
+  background-color: color-mix(
+    in srgb,
+    var(--backgroundColor) 85%,
+    var(--blue-button-color) 15%
+  );
+}
+
+.assistant-name-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0 1vw;
+}
+
+.assistant-card > p,
+.assistant-name-section > p {
+  color: var(--light-color-gray);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;
+}
+
+.status-badge.pending-add {
+  background: #ffa500;
+}
+
+.status-badge.pending-remove {
+  background: #ff6b6b;
+}
+
+.status-badge.unpaid {
+  background: var(--blue-button-color);
+}
+
+.assistant-card > div > button {
+  width: 40px;
+  height: 40px;
+  background-color: var(--blue-button-color);
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.options {
+  display: flex;
+}
+
+.options > .delete {
+  background-color: #d63f3b !important;
+}
+
+.options > .restore {
+  background-color: #28a745 !important;
+}
+
+.payment-container {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: default;
+}
+
+.payment-container.unpaid-status {
+  background-color: var(--blue-button-color);
+  cursor: pointer;
+}
+
+.payment-container.paid-status {
+  background-color: transparent;
+}
+
+.status-container {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: default;
+}
+
+.status-container.pending-add-status {
+  background-color: #ffa500;
+}
+
+.status-container.pending-remove-status {
+  background-color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+  .status-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+
+  .assistant-name-section {
+    gap: 4px;
+  }
+}

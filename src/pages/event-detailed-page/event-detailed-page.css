@@ -1,0 +1,260 @@
+.detailed-event-page {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.detailed-event-page>.event-header-info {
+    width: 50%;
+    height: auto;
+
+    padding: 1vh 0;
+
+    display: flex;
+
+    gap: 2vw;
+}
+
+.detailed-event-page>.event-header-info>.header-details {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.detailed-event-page>.event-header-info>.header-details>h1 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.detailed-event-page>.event-header-info>.header-details>p {
+    color: var(--light-color-gray);
+    font-size: 1.1rem;
+    font-weight: 400;
+
+    margin: 0;
+    padding: 0.5vh 0;
+}
+
+.detailed-event-page>.event-header-info>.header-details>.event-date {
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.detailed-event-page>.event-header-info>.header-details>.event-date>span {
+    color: var(--light-color-gray);
+}
+
+.detailed-event-page>.header-bar {
+    width: 50%;
+    margin: 0;
+    padding: 1vh 0;
+
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    position: sticky;
+    top: 6vh;
+    z-index: 10;
+    background-color: rgb(16, 16, 16, .9);
+}
+
+.header-details>.restrictions {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+
+    margin-top: 2vh;
+
+}
+
+.detailed-event-page>.event-header-info>.header-details>.restrictions>p {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+
+    margin: 0;
+    padding: 0;
+
+    color: #101010;
+
+    padding: 2px 7px;
+    background-color: rgb(136, 136, 136, 0.6);
+
+    border-radius: 5px;
+
+
+    font-size: .9rem;
+    font-weight: 400;
+
+
+    width: fit-content;
+}
+
+.detailed-event-page>.types-of-tickets {
+    display: flex;
+    flex-direction: column;
+
+    width: 50%;
+
+    gap: 2vh;
+}
+
+.detailed-event-page>.types-of-tickets>h2 {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+
+    margin: 0;
+    padding: 0.5vh 0;
+
+    width: 50%;
+    text-align: start;
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .detailed-event-page>.event-header-info {
+        width: 90%;
+
+        align-items: center;
+    }
+
+    .detailed-event-page>.header-bar {
+        width: 90%;
+
+        top: 0vh
+    }
+
+    .event-header-info>img {
+        min-width: 100px;
+        height: fit-content;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>h1 {
+        font-size: 1.4rem;
+        margin: .5vh 0;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>p,
+    .detailed-event-page>.event-header-info>.header-details>.event-date>span {
+        font-size: 0.9rem;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>.event-date {
+        font-size: 1rem;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 0.3vh;
+    }
+
+    .detailed-event-page>.types-of-tickets {
+        width: 90%;
+    }
+
+    .detailed-event-page>.types-of-tickets>h2 {
+        width: 90%;
+        font-size: 1.1rem;
+    }
+}
+
+/* Móviles grandes */
+@media (min-width: 481px) and (max-width: 600px) {
+    .detailed-event-page>.event-header-info {
+        width: 90%;
+    }
+
+    .detailed-event-page>.header-bar {
+        width: 90%;
+    }
+
+    .event-header-info>img {
+        min-width: 120px;
+        height: fit-content;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>h1 {
+        font-size: 1.4rem;
+        margin: .5vh 0;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>p,
+    .detailed-event-page>.event-header-info>.header-details>.event-date>span {
+        font-size: 0.9rem;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>.event-date {
+        font-size: 1rem;
+    }
+
+    .detailed-event-page>.types-of-tickets {
+        width: 90%;
+    }
+
+    .detailed-event-page>.types-of-tickets>h2 {
+        width: 90%;
+        font-size: 1.1rem;
+    }
+}
+
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .detailed-event-page>.event-header-info {
+        width: 75%;
+    }
+
+    .detailed-event-page>.header-bar {
+        width: 75%;
+    }
+
+    .event-header-info>img {
+        min-width: 140px;
+        height: auto;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>h1 {
+        font-size: 1.6rem;
+        margin: .5vh 0;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>p,
+    .detailed-event-page>.event-header-info>.header-details>.event-date>span {
+        font-size: 1rem;
+    }
+
+    .detailed-event-page>.event-header-info>.header-details>.event-date {
+        font-size: 1.1rem;
+    }
+
+    .detailed-event-page>.types-of-tickets {
+        width: 75%;
+    }
+
+    .detailed-event-page>.types-of-tickets>h2 {
+        width: 75%;
+        font-size: 1.2rem;
+    }
+
+}

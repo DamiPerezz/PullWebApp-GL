@@ -1,0 +1,33 @@
+.post-payment-container {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.qr-codes-section {
+    width: 50%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.post-payment-container>.payment-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--light-color-gray);
+    margin: 0;
+}

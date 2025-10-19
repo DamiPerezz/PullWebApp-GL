@@ -1,0 +1,164 @@
+.pre-payment-container {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.pre-payment-container>.selection-ticket-container {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options {
+    width: 70%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+.pre-payment-container>.selection-ticket-container>.payment-container {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 1vh;
+
+    width: 100%;
+
+    padding: 2vh 0;
+
+    background-color: var(--backgroundColor);
+
+    border-radius: 10px;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>p {
+    color: var(--light-color-gray);
+    font-size: 1rem;
+    font-weight: 500;
+
+    margin: 0;
+
+    text-transform: uppercase;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+    margin: 1vh 0;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options>p {
+    color: var(--light-color-gray);
+    font-size: 1.4rem;
+    font-weight: 500;
+
+    margin: 0;
+
+    text-transform: uppercase;
+
+    width: 7%;
+
+    text-align: center;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options>button {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 100%;
+
+    background-color: #101010;
+
+    border: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options>button:hover {
+    background-color: #0c0c0c;
+    cursor: pointer;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options>button:disabled {
+    cursor: auto !important;
+    background-color: #10101099;
+}
+
+.pre-payment-container>.selection-ticket-container>.ticket-options>.quantity-selector>.quantity-options>button>svg {
+    stroke-width: 4;
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+
+    .pre-payment-container>.selection-ticket-container {
+        width: 90%;
+        flex-direction: column;
+
+        gap: 2vh;
+    }
+
+    .pre-payment-container>.selection-ticket-container>.ticket-options {
+        width: 100%;
+    }
+
+    .pre-payment-container>.selection-ticket-container>.payment-container {
+        width: 100%;
+    }
+}
+
+/* Móviles grandes */
+@media (min-width: 481px) and (max-width: 600px) {
+    .pre-payment-container>.selection-ticket-container {
+        width: 90%;
+        flex-direction: column;
+
+        gap: 2vh;
+    }
+
+    .pre-payment-container>.selection-ticket-container>.ticket-options {
+        width: 100%;
+    }
+
+    .pre-payment-container>.selection-ticket-container>.payment-container {
+        width: 100%;
+    }
+}
+
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .pre-payment-container>.selection-ticket-container {
+        width: 75%;
+    }
+}

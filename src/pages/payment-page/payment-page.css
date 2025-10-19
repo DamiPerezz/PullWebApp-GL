@@ -1,0 +1,80 @@
+.payment-page-container {
+  width: 100%;
+
+  min-height: 85vh;
+
+  background-color: #101010;
+
+  padding: 2vh 0;
+
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+
+  gap: 2vh;
+}
+
+.payment-page-container > .payment-user-details {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  gap: 1vw;
+}
+
+.payment-user-details > .user-details {
+  width: 70%;
+}
+
+.super-receipt-container {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .payment-page-container > .payment-user-details {
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2vh;
+  }
+
+  .super-receipt-container {
+    width: 100%;
+  }
+
+  .payment-user-details > .user-details {
+    width: 100%;
+  }
+}
+
+/* Móviles grandes */
+@media (min-width: 481px) and (max-width: 600px) {
+  .payment-page-container > .payment-user-details {
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2vh;
+  }
+
+  .super-receipt-container {
+    width: 100%;
+  }
+
+  .payment-user-details > .user-details {
+    width: 100%;
+  }
+}
+
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .payment-page-container > .payment-user-details {
+    width: 75%;
+  }
+}

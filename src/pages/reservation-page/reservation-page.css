@@ -1,0 +1,39 @@
+.reservation-page-container {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 2vh;
+}
+
+.reservation-user-details {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+}
+
+.reservation-user-details>.form-details {
+    width: 70%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+.reservation-user-details>.booking-details {
+    width: 30%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}

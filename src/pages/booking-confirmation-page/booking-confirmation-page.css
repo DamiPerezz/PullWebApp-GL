@@ -1,0 +1,91 @@
+.confirmed-booking-layout {
+    width: 100%;
+
+    min-height: 85vh;
+
+    background-color: #101010;
+
+    padding: 2vh 0;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 2vh;
+}
+
+.message-container {
+    width: calc(50% - 4vw);
+
+    background-color: var(--backgroundColor);
+
+    padding: 2vh 2vw;
+
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.message-container>h3 {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.message-container>p {
+    color: white;
+    font-size: 1rem;
+}
+
+.important-notice {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.5vh 2vw;
+    margin: 1vh 0;
+    border-left: 4px solid #4CAF50;
+    width: 95%;
+}
+
+.important-notice p {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 1vh;
+    font-weight: bold;
+}
+
+.important-notice ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.important-notice li {
+    color: white;
+    font-size: 0.95rem;
+    padding: 0.5vh 0;
+    padding-left: 2vw;
+    position: relative;
+    text-align: left;
+}
+
+.important-notice li::before {
+    content: "⚠️";
+    position: absolute;
+    left: 0;
+    color: #FFC107;
+}
+
+.closing-message {
+    color: white;
+    font-size: 1.1rem;
+    margin-top: 1vh;
+    font-style: italic;
+}

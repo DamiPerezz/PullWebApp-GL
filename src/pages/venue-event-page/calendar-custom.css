@@ -1,0 +1,114 @@
+.custom-day-picker {
+    --rdp-cell-size: 42px;
+    --rdp-accent-color: rgba(168, 85, 247, 0.9);
+    --rdp-background-color: rgba(168, 85, 247, 0.15);
+    --rdp-selected-color: #ffffff;
+    --rdp-outline: 2px solid rgba(168, 85, 247, 0.5);
+    --rdp-outline-selected: 2px solid rgba(168, 85, 247, 0.8);
+    
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.06) 0%, 
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    
+    padding: 1.5rem;
+    
+    color: rgba(255, 255, 255, 0.9);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.custom-day-picker .rdp-caption {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.custom-day-picker .rdp-caption_label {
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.custom-day-picker .rdp-head_cell {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.custom-day-picker .rdp-day {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+}
+
+.custom-day-picker .rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected) {
+    background-color: rgba(168, 85, 247, 0.15);
+    color: white;
+}
+
+.custom-day-picker .rdp-day_selected {
+    background: linear-gradient(135deg, 
+        rgba(168, 85, 247, 0.9), 
+        rgba(147, 51, 234, 0.8)
+    );
+    color: white;
+    font-weight: 500;
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+}
+
+.custom-day-picker .rdp-day_today:not(.rdp-day_selected) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-day-picker .rdp-day_disabled {
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+.custom-day-picker .rdp-day:focus-visible {
+    outline: 2px solid rgba(168, 85, 247, 0.6);
+    outline-offset: 2px;
+}
+
+.rdp-nav {
+    width: fit-content;
+}
+
+.rdp-nav_button {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+}
+
+.rdp-nav_button:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: white;
+}
+
+.rdp-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    padding-top: 1rem;
+    margin-top: 1rem;
+    
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    font-weight: 300;
+}
