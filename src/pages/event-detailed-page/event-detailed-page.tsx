@@ -1,3 +1,4 @@
+// event-detailed-page.tsx (TU DISEÑO - SOLO CORREGIDO BACKEND)
 import { useEffect, useState } from 'react';
 import { Layout } from '../../components/layout/layout';
 import { TicketTypeCard } from '../../components/ticket-type-card/ticket-type-card';
@@ -5,7 +6,8 @@ import { DivTicketTypeCard } from '../../components/ticket-type-card/div-ticket-
 import { Calendar, Clock, MapPin, ChevronLeft, Plus, Shirt, Wine, CheckCircle, Users } from 'lucide-react';
 import type { EventDetailedInfo, TicketType } from '../../types/types';
 import './event-detailed-page.css';
-import { getEventDetailedInfo, getEventTicketsTypes } from '../../controller/purchase-pages-controller';
+import { getEventDetailedInfo } from '../../controller/event-controller'; // CORREGIDO
+import { getTicketTypes } from '../../controller/event-controller'; // CORREGIDO
 import { useParams, useNavigate } from 'react-router-dom';
 
 export const EventDetailedPage = () => {
@@ -30,7 +32,7 @@ export const EventDetailedPage = () => {
                 console.error("Error fetching event details:", error);
             });
 
-        getEventTicketsTypes(eventId)
+        getTicketTypes(eventId) // CORREGIDO
             .then(data => {
                 setTicketTypes(data);
                 setIsLoading(false);
@@ -47,10 +49,14 @@ export const EventDetailedPage = () => {
 
     const handleViewMap = () => {
         // Use event coordinates if available, otherwise use a default location
-        const lat = eventDetailedInfo?.latitude || 40.4531;
-        const lng = eventDetailedInfo?.longitude || -3.6883;
+        const lat = eventDetailedInfo?.custome_location?.latitude || 40.4531; // CORREGIDO
+        const lng = eventDetailedInfo?.custome_location?.longitude || -3.6883; // CORREGIDO
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
         window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleVIPClick = () => {
+        navigate(`/event/${eventId}/vip/setup`); // AGREGADO
     };
 
     if (loading) {
@@ -178,38 +184,40 @@ export const EventDetailedPage = () => {
                                 <div className="event-detailed-tickets-section">
                                     <h2 className="event-detailed-tickets-title">Available Tickets</h2>
                                     <div className="event-detailed-tickets-grid">
-                                        <div className="event-detailed-vip-section">
-                                            <div className="event-detailed-vip-content">
-                                                <div className="event-detailed-vip-header">
-                                                    <Wine />
-                                                    <h3 className="event-detailed-vip-title">VIP Table Service</h3>
+                                        {eventDetailedInfo?.vip_enabled && ( // CORREGIDO - Solo mostrar si VIP está habilitado
+                                            <div className="event-detailed-vip-section" onClick={handleVIPClick}>
+                                                <div className="event-detailed-vip-content">
+                                                    <div className="event-detailed-vip-header">
+                                                        <Wine />
+                                                        <h3 className="event-detailed-vip-title">VIP Table Service</h3>
+                                                    </div>
+
+                                                    <p className="event-detailed-vip-description">
+                                                        Reserve an exclusive table with premium bottle service. Perfect for groups looking for a VIP experience.
+                                                    </p>
+
+                                                    <ul className="event-detailed-vip-features">
+                                                        <li className="event-detailed-vip-feature">
+                                                            <CheckCircle />
+                                                            <span>Premium bottle service</span>
+                                                        </li>
+                                                        <li className="event-detailed-vip-feature">
+                                                            <CheckCircle />
+                                                            <span>Dedicated VIP area</span>
+                                                        </li>
+                                                        <li className="event-detailed-vip-feature">
+                                                            <CheckCircle />
+                                                            <span>Easy group payment split</span>
+                                                        </li>
+                                                    </ul>
+
+                                                    <button className="event-detailed-vip-button">
+                                                        <Users />
+                                                        View Table Options
+                                                    </button>
                                                 </div>
-
-                                                <p className="event-detailed-vip-description">
-                                                    Reserve an exclusive table with premium bottle service. Perfect for groups looking for a VIP experience.
-                                                </p>
-
-                                                <ul className="event-detailed-vip-features">
-                                                    <li className="event-detailed-vip-feature">
-                                                        <CheckCircle />
-                                                        <span>Premium bottle service</span>
-                                                    </li>
-                                                    <li className="event-detailed-vip-feature">
-                                                        <CheckCircle />
-                                                        <span>Dedicated VIP area</span>
-                                                    </li>
-                                                    <li className="event-detailed-vip-feature">
-                                                        <CheckCircle />
-                                                        <span>Easy group payment split</span>
-                                                    </li>
-                                                </ul>
-
-                                                <button className="event-detailed-vip-button">
-                                                    <Users />
-                                                    View Table Options
-                                                </button>
                                             </div>
-                                        </div>
+                                        )}
 
                                         {ticketTypes.map(ticket => {
                                             if (ticket.ticket_quantity === 0) {

@@ -285,6 +285,12 @@
     color: rgb(239, 68, 68);
 }
 
+.event-detailed-requirement.dress-code {
+    background: rgba(232, 121, 249, 0.15);
+    border: 1px solid rgba(232, 121, 249, 0.4);
+    color: rgb(232, 121, 249);
+}
+
 .event-detailed-requirement.dress-code svg {
     color: rgb(232, 121, 249);
 }
@@ -551,7 +557,7 @@
 
 @media (max-width: 640px) {
     .event-detailed-container {
-        padding: 1.75rem 1.1rem 2.5rem;
+        padding: 1.75rem 1.25rem 2.5rem;
     }
 
     .event-detailed-back-button {

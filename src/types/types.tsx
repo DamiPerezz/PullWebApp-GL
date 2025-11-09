@@ -1,4 +1,4 @@
-// types.tsx - Tipos completos corregidos
+// types.tsx - Tipos completos con sistema VIP
 
 export type VenueInfo = {
   id: string;
@@ -27,6 +27,7 @@ export type EventInfo = {
   custome_location: VenueInfo;
   event_img: string;
   requirements: Requirements[];
+  vip_enabled: boolean;
 };
 
 export type VenueEventInfo = {
@@ -53,6 +54,8 @@ export type EventDetailedInfo = {
   close_time: string;
   location: string;
   requirements: Requirements[];
+  vip_enabled: boolean;
+  custome_location?: VenueInfo;
 };
 
 export type TicketType = {
@@ -80,35 +83,25 @@ export type TicketResponse = {
   order_id: string;
 };
 
-// ✅ Tipo COMPLETO para información de tickets comprados
 export type PurchasedTicketInfo = {
-  // Información del titular
   owner_full_name: string;
   owner_email: string;
-  
-  // Información del evento
   event_name: string;
   event_date: string;
   start_time: string;
   location?: string;
-  
-  // Información del ticket
   qr_token: string;
   ticket_type?: string;
   benefits?: string;
-  
-  // Puede venir de la estructura de supabase
   public_users?: {
     name: string;
     surname: string;
     email: string;
   };
-  
   ticket_types?: {
     name: string;
     benefits?: string;
   };
-  
   orders?: {
     id: number;
     created_at: string;
@@ -132,155 +125,188 @@ export type UsuarioFormData = {
   assistants?: string[];
 };
 
-export type ReservationData = {
-  user: {
-    name: string;
-    surname: string;
-    email: string;
-    dpi: string;
-  };
-  booking: {
-    venueId: string;
-    date: string;
-    startTime?: string;
-    endTime?: string;
-    guests?: number;
-    table: boolean;
-    paymentTerm: number;
-  };
-  guestNames?: string[];
+// ============================================================
+// VIP TABLE TYPES
+// ============================================================
+
+export interface VIPTable {
+  id: string;
+  venue_id: string;
+  table_number: string;
+  zone: string;
+  zone_type: 'vip-premium' | 'vip' | 'standard';
+  capacity: number;
+  min_spend: number;
+  is_active: boolean;
+  is_available?: boolean;
+  created_at: string;
+}
+
+export type VIPBottle = {
+  id: string;
+  venue_id: string;
+  name: string;
+  brand?: string;
+  type?: string;
+  price: number;
+  is_available: boolean;
+  image?: string;
+  description?: string;
+  created_at: string;
+  generic_bottle_id?: string;
 };
 
-export interface ReservationDetails {
-  id: string;
-  venueId: string;
-  venueName: string;
-  venueAddress: string;
-  customerName: string;
-  email: string;
-  guests: number;
-  totalAmount: number;
-  status: string;
-  type: string;
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  assistants: Assistant[];
-  paymentSummary: PaymentSummary;
-}
-
-export interface Assistant {
+export type GenericBottle = {
   id: string;
   name: string;
-  email?: string;
-  paidAt: string | null;
-  status: string;
-  isRegisteredUser: boolean;
-  isCreator: boolean;
-}
+  brand?: string;
+  type?: string;
+  image?: string;
+  description?: string;
+  typical_price: number;
+  is_active: boolean;
+  created_at: string;
+};
 
-export interface PaymentSummary {
-  totalPaid: number;
-  totalPending: number;
-  totalAmount: number;
-  paymentProgress: number;
-}
+export type VIPMixer = {
+  id: string;
+  venue_id: string;
+  name: string;
+  is_available: boolean;
+  created_at: string;
+};
 
-export interface ReservationDetailsResponse {
-  success: boolean;
-  booking: ReservationDetails;
-}
+export type VIPPerk = {
+  id: string;
+  venue_id: string;
+  threshold: number;
+  perk_description: string;
+  is_active: boolean;
+  created_at: string;
+};
 
-export interface AuthenticationResponse {
-  success: boolean;
-  message: string;
-  token: string;
-  user: {
-    name: string;
-    email: string;
-  };
-}
+export type VIPReservationStatus = 'pending' | 'active' | 'completed' | 'cancelled' | 'expired';
+export type VIPGuestStatus = 'pending' | 'paid' | 'cancelled';
 
-export interface AuthenticationError {
-  error: string;
-}
+export type VIPGuest = {
+  id: string;
+  reservation_id: string;
+  user_id?: string;
+  name: string;
+  last_name: string;
+  email: string;
+  gender?: string;
+  status: VIPGuestStatus;
+  amount_due: number;
+  paid_at?: string;
+  is_organizer: boolean;
+  stripe_payment_intent?: string;
+  created_at: string;
+  updated_at: string;
+};
 
-export interface GuestChange {
-  action: "add" | "delete" | "restore";
-  guestId?: string;
-  guestName?: string;
-}
+export type VIPReservation = {
+  id: string;
+  event_id: string;
+  table_id: string;
+  organizer_id: string;
+  bottle_id: string;
+  status: VIPReservationStatus;
+  guest_count: number;
+  total_amount: number;
+  paid_amount: number;
+  management_code: string;
+  payment_link_code: string;
+  deadline_at: string;
+  created_at: string;
+  updated_at: string;
+  cancelled_at?: string;
+  completed_at?: string;
+  metadata?: Record<string, any>;
+};
 
-export interface ModifyGuestsResponse {
-  success: boolean;
-  message: string;
-  data: {
-    reservationStatus: string;
-    changes: string[];
-    note: string;
-  };
-}
-
-// ============================================================
-// TIPOS PARA SISTEMA DE GENERACIÓN DE PDFs
-// ============================================================
-
-export interface TicketPurchaseResponse {
-  tickets: PurchasedTicketInfo[];
-}
-
-export interface QrCardProps {
-  info: PurchasedTicketInfo;
-  onDownload?: () => void;
-}
-
-export interface PostPaymentParams {
-  orderId: string;
-  eventId: string;
-}
-
-export interface PDFTicketData {
-  qr_token: string;
-  owner_full_name: string;
-  owner_email: string;
+export type VIPReservationDetails = {
+  reservation_id: string;
+  management_code: string;
+  payment_link_code: string;
+  guest_count: number;
+  total_amount: number;
+  paid_amount: number;
+  deadline_at: string;
+  created_at: string;
+  status_name: VIPReservationStatus;
   event_name: string;
+  event_image: string;
   event_date: string;
   start_time: string;
-  location: string;
-  benefits?: string;
-  event_img?: string;
-}
+  end_time: string;
+  venue_name: string;
+  venue_location: string;
+  table_number: string;
+  table_zone: string;
+  table_capacity: number;
+  min_spend: number;
+  bottle_name: string;
+  bottle_brand: string;
+  bottle_price: number;
+  organizer_name: string;
+  organizer_surname: string;
+  organizer_email: string;
+  paid_guests_count: number;
+  total_paid: number;
+  payment_progress: number;
+  guests: VIPGuest[];
+  perks_achieved: VIPPerk[];
+  available_perks: VIPPerk[];
+};
 
-export interface QRCodeOptions {
-  errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H';
-  margin: number;
-  color: {
-    dark: string;
-    light: string;
+export type CreateVIPReservationRequest = {
+  event_id: string;
+  table_id: string;
+  bottle_id: string;
+  organizer: {
+    name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    phone_prefix?: string;
+    gender?: string;
   };
-  scale: number;
-  width?: number;
-}
+  guests: Array<{
+    name: string;
+    last_name: string;
+    email: string;
+    gender?: string;
+  }>;
+};
 
-export interface Html2CanvasOptions {
-  scale: number;
-  useCORS: boolean;
-  backgroundColor: string;
-  allowTaint: boolean;
-  logging?: boolean;
-  width?: number;
-  height?: number;
-}
+export type CreateVIPReservationResponse = {
+  success: boolean;
+  reservation_id: string;
+  management_code: string;
+  payment_link: string;
+  deadline_minutes: number;
+};
 
-export interface JsPDFOptions {
-  orientation: 'p' | 'portrait' | 'l' | 'landscape';
-  unit: 'pt' | 'px' | 'in' | 'mm' | 'cm' | 'ex' | 'em' | 'pc';
-  format: string | [number, number];
-  compress?: boolean;
-}
+export type VIPGuestPaymentRequest = {
+  payment_link_code: string;
+  guest_id: string;
+};
+
+export type VIPManagementAction = {
+  management_code: string;
+  action: 'add_guest' | 'remove_guest' | 'cancel_reservation';
+  guest_data?: {
+    name: string;
+    last_name: string;
+    email: string;
+    gender?: string;
+  };
+  guest_id?: string;
+};
 
 // ============================================================
-// CONSTANTES
+// CONSTANTS
 // ============================================================
 
 export const GENDER_OPTIONS = [
@@ -301,124 +327,38 @@ export const PHONE_PREFIX_OPTIONS = [
   { value: "+507", label: "+507 (Panamá)", flag: "🇵🇦" },
 ] as const;
 
-// ============================================================
-// DECLARACIONES DE MÓDULOS PARA LIBRERÍAS SIN TIPOS
-// ============================================================
-
-declare module 'qrcode' {
-  export function toDataURL(
-    text: string,
-    options?: Partial<QRCodeOptions>
-  ): Promise<string>;
-  
-  export function toCanvas(
-    canvas: HTMLCanvasElement,
-    text: string,
-    options?: Partial<QRCodeOptions>
-  ): Promise<void>;
-  
-  export function toString(
-    text: string,
-    options?: Partial<QRCodeOptions>
-  ): Promise<string>;
-}
-
-declare module 'html2canvas' {
-  interface Html2CanvasOptions {
-    scale?: number;
-    useCORS?: boolean;
-    backgroundColor?: string;
-    allowTaint?: boolean;
-    logging?: boolean;
-    width?: number;
-    height?: number;
-    x?: number;
-    y?: number;
-  }
-  
-  function html2canvas(
-    element: HTMLElement,
-    options?: Html2CanvasOptions
-  ): Promise<HTMLCanvasElement>;
-  
-  export = html2canvas;
-}
-
-declare module 'jspdf' {
-  export interface jsPDFOptions {
-    orientation?: 'p' | 'portrait' | 'l' | 'landscape';
-    unit?: 'pt' | 'px' | 'in' | 'mm' | 'cm' | 'ex' | 'em' | 'pc';
-    format?: string | [number, number];
-    compress?: boolean;
-    precision?: number;
-    userUnit?: number;
-  }
-
-  export default class jsPDF {
-    constructor(options?: jsPDFOptions);
-    
-    addImage(
-      imageData: string | HTMLImageElement | HTMLCanvasElement | Uint8Array,
-      format: string,
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      alias?: string,
-      compression?: 'NONE' | 'FAST' | 'MEDIUM' | 'SLOW',
-      rotation?: number
-    ): jsPDF;
-    
-    save(filename: string): void;
-    
-    output(type: 'blob'): Blob;
-    output(type: 'bloburi'): string;
-    output(type: 'datauristring'): string;
-    output(type: 'datauri'): void;
-    output(type?: string): any;
-    
-    text(
-      text: string | string[],
-      x: number,
-      y: number,
-      options?: {
-        align?: 'left' | 'center' | 'right' | 'justify';
-        baseline?: 'alphabetic' | 'ideographic' | 'bottom' | 'top' | 'middle' | 'hanging';
-        angle?: number;
-        maxWidth?: number;
-      }
-    ): jsPDF;
-    
-    setFontSize(size: number): jsPDF;
-    setFont(fontName: string, fontStyle?: string): jsPDF;
-    setTextColor(r: number, g?: number, b?: number): jsPDF;
-    setTextColor(color: string): jsPDF;
-    
-    addPage(format?: string | [number, number], orientation?: 'p' | 'l'): jsPDF;
-    
-    internal: {
-      pageSize: {
-        width: number;
-        height: number;
-        getWidth(): number;
-        getHeight(): number;
-      };
-    };
-  }
-}
+export const VIP_DEADLINE_MINUTES = 30;
 
 // ============================================================
-// EXTENSIONES DE TIPOS GLOBALES
+// HELPER TYPES
 // ============================================================
 
-declare global {
-  interface Navigator {
-    share?: (data: ShareData) => Promise<void>;
-  }
-  
-  interface ShareData {
-    title?: string;
-    text?: string;
-    url?: string;
-  }
-}
+export type ZoneType = 'vip-premium' | 'vip' | 'standard';
+
+export type ZoneColorConfig = {
+  border: string;
+  background: string;
+  text: string;
+  label: string;
+};
+
+export const ZONE_COLORS: Record<ZoneType, ZoneColorConfig> = {
+  'vip-premium': {
+    border: 'rgb(236, 72, 153)',
+    background: 'rgba(236, 72, 153, 0.2)',
+    text: 'rgb(251, 113, 133)',
+    label: 'VIP Premium',
+  },
+  'vip': {
+    border: 'rgb(139, 92, 246)',
+    background: 'rgba(139, 92, 246, 0.2)',
+    text: 'rgb(196, 181, 253)',
+    label: 'VIP',
+  },
+  'standard': {
+    border: 'rgb(59, 130, 246)',
+    background: 'rgba(59, 130, 246, 0.2)',
+    text: 'rgb(147, 197, 253)',
+    label: 'Standard',
+  },
+};
