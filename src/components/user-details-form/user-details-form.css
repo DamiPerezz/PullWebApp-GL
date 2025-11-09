@@ -1,107 +1,396 @@
+/* User Details Form - Modern Design */
 .user-details-form-container {
     width: 100%;
-
     display: flex;
     flex-direction: column;
-
-    gap: 2vh;
+    gap: 1.5rem;
 }
 
 .user-details-form {
-    width: calc(100% - 2vw);
-
-    padding: 2vh 1vw;
-    background-color: var(--backgroundColor);
-    border-radius: 10px;
-
+    width: 100%;
+    padding: 1.5rem;
+    background: rgba(15, 15, 21, 0.5);
+    backdrop-filter: blur(48px);
+    border-radius: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
 }
 
-.user-details-form>h4 {
-    margin: 0;
-
-
+.user-details-form > h4 {
+    margin: 0 0 1.25rem 0;
     color: white;
-
-    font-size: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.user-details-form>.sep {
+.user-details-form-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+    border: 1.5px solid rgba(139, 92, 246, 0.4);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgb(196, 181, 253);
+}
+
+.user-details-form > .sep {
     width: 100%;
     height: 1px;
-    background-color: var(--light-color-gray);
-
-    margin: 2vh 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+    margin: 0 0 1.5rem 0;
 }
 
-.user-details-form>.form-content-container {
+.user-details-form > .form-content-container {
     width: 100%;
-
     display: grid;
-
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-
-    gap: 2vh;
+    gap: 1.25rem;
+    box-sizing: border-box;
 }
 
-.user-details-form>.form-content-container>div {
+.form-field {
     display: flex;
     flex-direction: column;
-
-    gap: .5vh;
+    gap: 0.5rem;
+    box-sizing: border-box;
 }
 
-.user-details-form>.form-content-container>div>label {
-    color: var(--light-color-gray);
-    font-size: 0.8rem;
-
-    text-transform: uppercase;
-
+.form-field > label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    font-weight: 500;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.user-details-form>.form-content-container>div>input,
-.user-details-form>.form-content-container>div>select {
+.form-field-required {
+    color: rgb(248, 113, 113);
+    font-size: 0.75rem;
+}
 
-    padding: 1vh 1vw;
-
-    background-color: #404040;
-    border: 1px solid var(--light-color-gray);
-    border-radius: 5px;
-
+.form-field > input,
+.form-field > select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.625rem;
     color: white;
-
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
 }
 
-.user-details-form>.form-content-container>div>input:focus,
-.user-details-form>.form-content-container>div>select:focus {
+.form-field > input:focus,
+.form-field > select:focus {
     outline: none;
-    border-color: white;
+    border-color: rgba(139, 92, 246, 0.6);
+    background: rgba(139, 92, 246, 0.08);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
-.user-details-form>.form-content-container>div>.user-form-error {
-    color: #d63f3b;
-    font-size: 0.8rem;
+.form-field > input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
 
+.form-field > input[type="date"] {
+    color-scheme: dark;
+    position: relative;
+}
+
+.form-field > input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.form-field > input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+.form-field > select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23A78BFA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.form-field > select option {
+    background: #1a1a1a;
+    color: white;
+    padding: 0.75rem;
+}
+
+/* Phone Input with Prefix */
+.phone-input-container {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.phone-prefix-select > select {
+    width: 100%;
+    padding: 0.875rem 0.5rem 0.875rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.625rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23A78BFA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 1.75rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.phone-prefix-select > select:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.6);
+    background-color: rgba(139, 92, 246, 0.08);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.phone-prefix-select > select option {
+    background: #1a1a1a;
+    color: white;
+    padding: 0.5rem;
+}
+
+.phone-number-input > input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.625rem;
+    color: white;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.phone-number-input > input:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.6);
+    background: rgba(139, 92, 246, 0.08);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.phone-number-input > input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* Gender Selection - Compact Pills */
+.gender-selection {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.gender-option {
+    position: relative;
+    flex: 1;
+}
+
+.gender-option > input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.gender-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.gender-option > input[type="radio"]:checked + .gender-label {
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+    border-color: rgba(139, 92, 246, 0.6);
+    color: white;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+}
+
+.gender-label:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Error Messages */
+.user-form-error {
+    color: rgb(248, 113, 113);
+    font-size: 0.8125rem;
+    font-weight: 400;
     margin: 0;
     padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
 }
 
-/* Móviles pequeños */
-@media (max-width: 480px) {
-    .user-details-form>.form-content-container {
+.user-form-error::before {
+    content: "⚠";
+    font-size: 0.875rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .user-details-form {
+        padding: 1.25rem;
+    }
+
+    .user-details-form > h4 {
+        font-size: 1.125rem;
+    }
+
+    .user-details-form > .form-content-container {
+        gap: 1rem;
+    }
+
+    .form-field > input,
+    .form-field > select,
+    .phone-number-input > input,
+    .phone-prefix-select > select {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    .phone-input-container {
+        grid-template-columns: 90px 1fr;
+        gap: 0.625rem;
+    }
+
+    .phone-prefix-select > select {
+        font-size: 0.8125rem;
+        padding-right: 1.5rem;
+    }
+
+    .gender-selection {
+        gap: 0.5rem;
+    }
+
+    .gender-label {
+        padding: 0.625rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .user-details-form-container {
+        gap: 1.25rem;
+    }
+
+    .user-details-form {
+        padding: 1rem;
+    }
+
+    .user-details-form > h4 {
+        font-size: 1rem;
+    }
+
+    .user-details-form > .form-content-container {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(7, 1fr);
+        gap: 1rem;
     }
 
-    .user-details-form>.form-content-container>div {
-        width: 100%;
+    .form-field > label {
+        font-size: 0.8125rem;
     }
 
-    .user-details-form>.form-content-container>div>input {
-        width: calc(100% - 2vw);
+    .form-field > input,
+    .form-field > select,
+    .phone-number-input > input,
+    .phone-prefix-select > select {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    .phone-input-container {
+        grid-template-columns: 100px 1fr;
+    }
+
+    .gender-selection {
+        gap: 0.5rem;
+    }
+
+    .gender-label {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .user-details-form {
+        padding: 0.875rem;
+    }
+
+    .user-details-form > h4 {
+        font-size: 0.9375rem;
+    }
+
+    .user-details-form-number {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.6875rem;
+    }
+
+    .user-details-form > .form-content-container {
+        gap: 0.875rem;
+    }
+
+    .form-field > label {
+        font-size: 0.75rem;
+    }
+
+    .form-field > input,
+    .form-field > select,
+    .phone-number-input > input,
+    .phone-prefix-select > select {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .phone-input-container {
+        grid-template-columns: 85px 1fr;
+        gap: 0.5rem;
+    }
+
+    .phone-prefix-select > select {
+        font-size: 0.75rem;
+        padding: 0.625rem 0.375rem 0.625rem 0.5rem;
+        padding-right: 1.25rem;
     }
 }

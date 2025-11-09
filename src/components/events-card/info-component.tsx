@@ -1,8 +1,8 @@
 export const InfoComponent = ({ icon, text }: { icon: any, text: string }) => {
     return (
-        <p>
+        <p className="event-card-detail-item">
             {icon}
-            {text}
+            <span>{text}</span>
         </p>
     )
 }

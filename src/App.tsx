@@ -11,6 +11,9 @@ import { PostPaymentPage } from "./pages/post-payment/post-payment";
 import { ReservationPage } from "./pages/reservation-page/reservation-page";
 import { BookingConfirmationPage } from "./pages/booking-confirmation-page/booking-confirmation-page";
 import { ManageBookingPage } from "./pages/manage-booking-page/manage-booking-page";
+import { NotFoundPage } from "./pages/not-found-page/not-found-page";
+import { PaymentSuccessPage } from "./pages/payment-success/payment-success";
+import { PaymentCancelPage } from "./pages/payment-cancel/payment-cancel";
 
 export default function App() {
   return (
@@ -41,11 +44,18 @@ export default function App() {
           path="/event/:eventId/tickets/:ticketTypeId/:quantity"
           element={<PaymentPage />}
         />
+        
+        {/* Stripe Checkout Routes */}
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
+        <Route path="/payment-cancel" element={<PaymentCancelPage />} />
+        
+        {/* Post Payment / Wallet Routes */}
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/wallet/:orderId/:eventId" element={<PostPaymentPage />} />
+        
         <Route path="/aboutUs" element={<AboutUsPage />} />
         <Route path="/signIn" element={<h1>Sign In Page</h1>} />
-        <Route path="*" element={<h1>404 Not Found</h1>} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

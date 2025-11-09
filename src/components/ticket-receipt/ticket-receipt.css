@@ -1,217 +1,326 @@
+/* Ticket Receipt - Modern Design */
 .ticket-receipt {
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-    gap: 1vh;
-
     position: sticky;
-    top: 7vh;
-    z-index: 10;
+    top: 1.5rem;
 }
 
-.ticket-receipt>.receipt-container {
-    width: calc(100% - 2vw);
+.ticket-receipt-card {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 15, 21, 0.5);
+    backdrop-filter: blur(48px);
+}
 
-    padding: 2vh 1vw;
-
-    background-color: var(--backgroundColor);
-    border-radius: 10px;
-
+/* Header */
+.ticket-receipt-header {
     display: flex;
-    flex-direction: column;
-    gap: 1vh;
-
-}
-
-.ticket-receipt>.receipt-container>.title {
-    margin: 0;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-
-    text-transform: uppercase;
-}
-
-.ticket-receipt>.receipt-container>.separator {
-    width: 100%;
-
-    height: 1px;
-    background-color: var(--light-color-gray);
-}
-
-.ticket-receipt>.receipt-container>.receipt-details {
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    gap: .5vh;
-
-}
-
-.ticket-receipt>.receipt-container>.receipt-details>div {
-    width: 100%;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
 }
 
-.ticket-receipt>.receipt-container>.receipt-details>div>p {
-    margin: 0;
-    color: var(--light-color-gray);
-    font-size: .8rem;
+.ticket-receipt-title {
+    font-size: 1.25rem;
     font-weight: 500;
-
-    text-transform: uppercase;
-
-    max-width: 70%;
+    color: white;
+    margin: 0;
+    letter-spacing: -0.01em;
 }
 
-.ticket-receipt>.receipt-container>.receipt-details>div>p:first-child {
-    font-weight: 600;
+.ticket-receipt-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgb(167, 139, 250);
 }
 
+/* Items */
+.ticket-receipt-items {
+    margin-bottom: 1.5rem;
+}
 
-.receipt-total {
-    width: 100%;
-
+.ticket-receipt-item {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
     align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.receipt-total>p {
-    margin: 0;
+.ticket-receipt-item-info {
+    flex: 1;
+}
+
+.ticket-receipt-item-name {
+    font-size: 0.875rem;
+    font-weight: 500;
     color: white;
-    font-size: 1rem;
-    font-weight: 600;
-
-    text-transform: uppercase;
+    margin-bottom: 0.25rem;
 }
 
-.ticket-receipt>a,
-.ticket-receipt>button {
+.ticket-receipt-item-quantity {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticket-receipt-item-price {
+    text-align: right;
+}
+
+.ticket-receipt-item-amount {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+}
+
+.ticket-receipt-item-label {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Divider */
+.ticket-receipt-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin-bottom: 1.5rem;
+}
+
+/* Totals */
+.ticket-receipt-totals {
+    margin-bottom: 1.5rem;
+}
+
+.ticket-receipt-subtotal,
+.ticket-receipt-fee {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.ticket-receipt-subtotal span:first-child,
+.ticket-receipt-fee span:first-child {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.ticket-receipt-subtotal span:last-child,
+.ticket-receipt-fee span:last-child {
+    font-weight: 500;
+    color: white;
+}
+
+.ticket-receipt-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-receipt-total span:first-child {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+}
+
+.ticket-receipt-total-amount {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: transparent;
+    background: linear-gradient(to right, rgb(167, 139, 250), rgb(232, 121, 249));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Button */
+.ticket-receipt-button {
     width: 100%;
-
-    text-align: center;
-    text-decoration: none;
+    padding: 1rem 1.75rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(217, 70, 239, 0.3));
+    border: 1px solid rgba(139, 92, 246, 0.5);
     color: white;
     font-size: 1rem;
-    font-weight: 600;
-    background-color: #2c3a5a;
-
-    padding: .7vh 0;
-    margin: 0;
-
-    border-radius: 10px;
-
-    border: none;
-
-    transition: all 0.2s ease-in-out;
-}
-
-.ticket-receipt>a:hover,
-.ticket-receipt>button:hover {
-    background-color: #2c3a5a99;
+    font-weight: 500;
     cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
-/* Móviles pequeños */
-@media (max-width: 480px) {
+.ticket-receipt-button:hover {
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.4), rgba(217, 70, 239, 0.4));
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.ticket-receipt-button-icon {
+    width: 1rem;
+    height: 1rem;
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.ticket-receipt-button:hover .ticket-receipt-button-icon {
+    transform: rotate(180deg) translateX(0.25rem);
+}
+
+/* Badge */
+.ticket-receipt-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticket-receipt-badge-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: rgb(52, 211, 153);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
     .ticket-receipt {
-        gap: 2vh;
-    }
-
-    .ticket-receipt>.receipt-container {
-        width: calc(100% - 3vw);
-
-        padding: 2vh 1.5vw;
-    }
-
-    .ticket-receipt>.receipt-container>.title {
-        font-size: .9rem;
-    }
-
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        font-size: .7rem;
-    }
-
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        margin-bottom: .2vh;
-    }
-
-    .receipt-total>p {
-        font-size: .9rem;
+        position: static;
     }
 }
 
-/* Móviles grandes */
-@media (min-width: 481px) and (max-width: 600px) {
-
-    .ticket-receipt {
-        gap: 2vh;
+@media (max-width: 768px) {
+    .ticket-receipt-card {
+        padding: 1.25rem;
     }
 
-    .ticket-receipt>.receipt-container {
-        width: calc(100% - 3vw);
-
-        padding: 2vh 1.5vw;
+    .ticket-receipt-title {
+        font-size: 1.125rem;
     }
 
-    .ticket-receipt>.receipt-container>.title {
-        font-size: .9rem;
+    .ticket-receipt-item-name {
+        font-size: 0.8125rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        font-size: .7rem;
+    .ticket-receipt-item-amount {
+        font-size: 1rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        margin-bottom: .2vh;
+    .ticket-receipt-total-amount {
+        font-size: 1.375rem;
     }
 
-    .receipt-total>p {
-        font-size: .9rem;
+    .ticket-receipt-button {
+        font-size: 0.9375rem;
+        padding: 0.9375rem 1.5rem;
     }
 }
 
-/* Tablets */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .ticket-receipt>.receipt-container {
-        width: calc(100% - 3vw);
-
-        padding: 2vh 1.5vw;
+@media (max-width: 640px) {
+    .ticket-receipt-card {
+        padding: 1rem;
     }
 
-    .ticket-receipt>.receipt-container>.title {
-        font-size: .9rem;
+    .ticket-receipt-title {
+        font-size: 1rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        font-size: .7rem;
+    .ticket-receipt-item {
+        padding: 0.875rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div {
-        flex-direction: column;
-        align-items: flex-start;
+    .ticket-receipt-item-name {
+        font-size: 0.75rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div>p:last-child {
-        align-self: flex-end;
+    .ticket-receipt-item-amount {
+        font-size: 0.9375rem;
     }
 
-    .ticket-receipt>.receipt-container>.receipt-details>div>p {
-        margin-bottom: .2vh;
+    .ticket-receipt-subtotal,
+    .ticket-receipt-fee {
+        font-size: 0.8125rem;
     }
 
-    .receipt-total>p {
-        font-size: .9rem;
+    .ticket-receipt-total span:first-child {
+        font-size: 1rem;
+    }
+
+    .ticket-receipt-total-amount {
+        font-size: 1.25rem;
+    }
+
+    .ticket-receipt-button {
+        font-size: 0.875rem;
+        padding: 0.875rem 1.25rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .ticket-receipt-card {
+        padding: 0.875rem;
+    }
+
+    .ticket-receipt-title {
+        font-size: 0.9375rem;
+    }
+
+    .ticket-receipt-item {
+        padding: 0.75rem;
+    }
+
+    .ticket-receipt-item-name {
+        font-size: 0.6875rem;
+    }
+
+    .ticket-receipt-item-amount {
+        font-size: 0.875rem;
+    }
+
+    .ticket-receipt-total-amount {
+        font-size: 1.125rem;
+    }
+
+    .ticket-receipt-button {
+        font-size: 0.8125rem;
+        padding: 0.8125rem 1.125rem;
+    }
+
+    .ticket-receipt-badge {
+        font-size: 0.6875rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ticket-receipt-button,
+    .ticket-receipt-button-icon,
+    .ticket-receipt-badge-dot {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .ticket-receipt-button:hover .ticket-receipt-button-icon {
+        transform: rotate(180deg) !important;
     }
 }

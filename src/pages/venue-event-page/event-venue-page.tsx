@@ -1,40 +1,21 @@
 import { Layout } from "../../components/layout/layout";
 import "./event-venue-page.css";
-
 import { EventCard } from "../../components/events-card/events-card";
-import {
-  ClockIcon,
-  CurrentLocationIcon,
-  EmailIcon,
-  LocationIcon,
-} from "../../icons/icons";
+import { ClockIcon, EmailIcon, LocationIcon } from "../../icons/icons";
 import { useEffect, useState } from "react";
-import {
-  getEventsByVenue,
-  getVenueDescription,
-  getVenueInfo,
-} from "../../controller/events-page-controller";
-import { NavLink, useParams } from "react-router-dom";
-import type {
-  EventInfo,
-  VenueDescription,
-  VenueEventInfo,
-} from "../../types/types";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
-import "./calendar-custom.css";
+import { getEventsByVenue, getVenueDescription, getVenueInfo } from "../../controller/events-page-controller";
+import { useParams } from "react-router-dom";
+import type { EventInfo, VenueDescription, VenueEventInfo } from "../../types/types";
+import { Users, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const VenueEventsPage = () => {
   const { venueId } = useParams<{ venueId: string }>();
-
   const [events, setAllEvents] = useState<EventInfo[]>([]);
   const [venueInfo, setVenueInfo] = useState<VenueEventInfo | null>(null);
-  const [venueDescription, setVenueDescription] =
-    useState<VenueDescription | null>(null);
-
+  const [venueDescription, setVenueDescription] = useState<VenueDescription | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
-
-  const [isTable, setIsTable] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const eventsPerPage = 5;
 
   useEffect(() => {
     if (!venueId) {
@@ -69,144 +50,138 @@ export const VenueEventsPage = () => {
       });
   }, [venueId]);
 
-  const [open, setOpen] = useState<string>("");
-  const [close, setClose] = useState<string>("");
+  const open = venueInfo?.open_time?.slice(0, 5) || "";
+  const close = venueInfo?.close_time?.slice(0, 5) || "";
 
-  const [dateSelected, setDateSelected] = useState<Date | undefined>(undefined);
+  const totalPages = Math.ceil(events.length / eventsPerPage);
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
-  useEffect(() => {
-    if (venueInfo) {
-      setOpen(venueInfo.open_time.slice(0, 5));
-      setClose(venueInfo.close_time.slice(0, 5));
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
-  }, [venueInfo]);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <Layout>
-      <div className="event-venue-container">
-        <div className="left-side-container">
-          <img
-            src={venueInfo?.image}
-            alt={venueInfo?.name}
-            width={130}
-            height={130}
-          />
-          <h2>{venueInfo?.name}</h2>
-          <div className="location-info">
-            <p>Capacity: {venueInfo?.capacity}</p>
-            <p>
-              <ClockIcon strokeColor="var(--light-color-gray)" /> {open} -{" "}
-              {close}
-            </p>
-            <p>
-              <EmailIcon strokeColor="var(--light-color-gray)" />{" "}
-              {venueInfo?.email}
-            </p>
-            <p>
-              <LocationIcon strokeColor="var(--light-color-gray)" />
-              {venueInfo?.long_location}
-            </p>
-            {/* TODO: Implementar esto en lugar de hardcodear las variables `https://www.google.com/maps/search/?api=1&query=${lat},${long}` */}
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${40.4531},${-3.6883}`}
-              className="direction-link"
-              target="_blank"
-            >
-              {" "}
-              <CurrentLocationIcon fillColor="white" /> Take me there
-            </a>
+      <div className="venue-page-wrapper">
+        <div className="venue-page-bg-blur" style={{ backgroundImage: `url(${venueInfo?.image || ''})` }} />
+        
+        {loading ? (
+          <div className="venue-page-loading-container">
+            <div className="venue-loading-spinner"></div>
           </div>
-          <div className="more-venue-info">
-            <div className="info-side-header">
-              <p className="title">Venue Information</p>
-              <p>
-                Find out more about the venue, its history, and upcoming events.
-              </p>
+        ) : (
+          <>
+            <div className="venue-banner">
+              <div className="venue-banner-content">
+                <div className="venue-banner-avatar">
+                  <img src={venueInfo?.image} alt={venueInfo?.name} />
+                </div>
+                <div className="venue-banner-info">
+                  <h1 className="venue-banner-title">{venueInfo?.name}</h1>
+                  <div className="venue-banner-location">
+                    <MapPin className="venue-banner-icon" />
+                    <span>{venueInfo?.long_location}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="venue-info">
-              <p className="description">{venueDescription?.description}</p>
-              <p>
-                For more information, visit the official website or contact us
-                via email.
-              </p>
+
+            <div className="venue-page-content">
+              <div className="venue-page-grid">
+                <div className="venue-events-section">
+                  <div className="venue-events-list">
+                    {events.length !== 0 ? (
+                      <>
+                        {currentEvents.map((event) => (
+                          <EventCard key={event.event_id} event={event} isVenueEventPage />
+                        ))}
+                        {totalPages > 1 && (
+                          <div className="venue-pagination">
+                            <button
+                              onClick={handlePrevPage}
+                              disabled={currentPage === 1}
+                              className="venue-pagination-btn"
+                            >
+                              <ChevronLeft />
+                            </button>
+                            <span className="venue-pagination-text">
+                              Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                              onClick={handleNextPage}
+                              disabled={currentPage === totalPages}
+                              className="venue-pagination-btn"
+                            >
+                              <ChevronRight />
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="venue-events-empty">
+                        <p>No events available</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="venue-info-section">
+                  <div className="venue-info-card">
+                    <h3 className="venue-card-title">Information</h3>
+                    <div className="venue-info-stat">
+                      <Users className="venue-info-stat-icon" />
+                      <div className="venue-info-stat-content">
+                        <span className="venue-info-stat-label">Capacity</span>
+                        <span className="venue-info-stat-value">{venueInfo?.capacity}</span>
+                      </div>
+                    </div>
+
+                    <div className="venue-info-divider" />
+
+                    <div className="venue-info-details">
+                      <div className="venue-info-detail-item">
+                        <ClockIcon strokeColor="rgb(34, 211, 238)" />
+                        <span>{open} - {close}</span>
+                      </div>
+                      <div className="venue-info-detail-item">
+                        <EmailIcon strokeColor="rgb(232, 121, 249)" />
+                        <span>{venueInfo?.email}</span>
+                      </div>
+                      <div className="venue-info-detail-item">
+                        <LocationIcon strokeColor="rgb(52, 211, 153)" />
+                        <span>{venueInfo?.long_location}</span>
+                      </div>
+                    </div>
+
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${40.4531},${-3.6883}`}
+                      className="venue-info-directions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Get Directions
+                    </a>
+                  </div>
+
+                  <div className="venue-description-card">
+                    <h3 className="venue-card-title">Description</h3>
+                    <p className="venue-description-text">{venueDescription?.description}</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="middle-container">
-          <h2>Santiago Bernabeu Stadium</h2>
-          {events.length !== 0 && !loading ? (
-            events.map((event) => (
-              <EventCard key={event.event_id} event={event} isVenueEventPage />
-            ))
-          ) : events.length === 0 && !loading ? (
-            <p>No events available</p>
-          ) : (
-            <p>Loading events...</p>
-          )}
-        </div>
-        <div className="right-side-container">
-          <p className="title">Other Reservations Options</p>
-          <div className="reservation-options">
-            <button
-              onClick={() => setIsTable(true)}
-              className={isTable ? "active" : ""}
-            >
-              Table
-            </button>
-            <div className="sep" />
-            <button
-              onClick={() => setIsTable(false)}
-              className={!isTable ? "active" : ""}
-            >
-              Bar
-            </button>
-          </div>
-          <div className="reservation-info-options">
-            {isTable ? (
-              <p className="description">
-                Book a table for your group and enjoy in comfort.
-              </p>
-            ) : (
-              <p className="description">
-                Book a spot at the bar to enjoy drinks and snacks.
-              </p>
-            )}
-          </div>
-          <DayPicker
-            animate
-            mode="single"
-            required={true}
-            selected={dateSelected}
-            onSelect={setDateSelected}
-            disabled={[
-              { before: new Date() },
-              {
-                after: new Date(
-                  new Date().getFullYear(),
-                  new Date().getMonth() + 1,
-                  new Date().getDate() - 1
-                ),
-              },
-              { dayOfWeek: [0, 2] },
-            ]}
-            captionLayout="label"
-            className="custom-day-picker"
-            footer={
-              dateSelected ? (
-                <NavLink
-                  className="reserve-link"
-                  to={`/venue/${venueId}/booking/${
-                    dateSelected.toISOString().split("T")[0]
-                  }?table=${isTable}`}
-                >
-                  Book {isTable ? "Table" : "Bar"}
-                </NavLink>
-              ) : (
-                "Pick a day"
-              )
-            }
-          />
-        </div>
+          </>
+        )}
       </div>
     </Layout>
   );

@@ -12,11 +12,11 @@ export const Footer = () => {
                         © {currentYear} Pull
                     </p>
                     <div className="important-documents">
-                        <span>&bull;</span>
+                        <span>•</span>
                         <a href="/privacy">Privacy</a>
-                        <span>&bull;</span>
+                        <span>•</span>
                         <a href="/terms">Terms</a>
-                        <span>&bull;</span>
+                        <span>•</span>
                         <a href="/cookies">Cookies</a>
                     </div>
                 </div>

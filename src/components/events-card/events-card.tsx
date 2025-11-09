@@ -1,8 +1,8 @@
 import './events-card.css'
 import { CalendarIcon, ClockIcon, LocationIcon, HangerIcon } from '../../icons/icons';
-import { InfoComponent } from './info-component';
 import { NavLink } from 'react-router-dom';
 import type { EventInfo } from '../../types/types';
+import { ArrowRight } from 'lucide-react';
 
 export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVenueEventPage?: boolean }) => {
 
@@ -19,16 +19,56 @@ export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVen
 
     return (
         <NavLink to={`/event/${event.event_slug}`} className={isVenueEventPage ? "event-card venue-event-card" : "event-card"}>
-            <img src={event.event_img} alt={event.event_name} width={126} height={160} />
-            <div className="event-info">
-                <div className="header-info">
-                    <p className='title'>{event.event_name}</p>
-                </div>
-                <p className='date'><CalendarIcon strokeColor='white' /> {event.event_date}</p>
-                <div className="event-extra-info">
-                    <InfoComponent icon={<ClockIcon strokeColor={'var(--light-color-gray)'} />} text={`${open} - ${close}`} />
-                    <InfoComponent icon={<LocationIcon strokeColor={'var(--light-color-gray)'} />} text={event.venue_name} />
-                    <InfoComponent icon={<HangerIcon strokeColor={'var(--light-color-gray)'} />} text={dressCode} />
+            <div className="event-card-inner">
+                <div className="event-card-bg-gradient" />
+                
+                <div className="event-card-content">
+                    <div className="event-card-image-wrapper">
+                        <img 
+                            src={event.event_img} 
+                            alt={event.event_name}
+                            className="event-card-image"
+                        />
+                        {event.min_price && (
+                            <div className="event-card-price">
+                                <span className="event-card-price-value">€{event.min_price}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="event-card-info">
+                        <div className="event-card-main">
+                            <div className="event-card-badges">
+                                <div className="event-card-badge event-card-date-badge">
+                                    <CalendarIcon strokeColor="rgb(167, 139, 250)" />
+                                    <span>{event.event_date}</span>
+                                </div>
+                                <div className="event-card-badge event-card-time-badge">
+                                    <ClockIcon strokeColor="rgb(34, 211, 238)" />
+                                    <span>{open} - {close}</span>
+                                </div>
+                            </div>
+                            
+                            <h3 className="event-card-title">{event.event_name}</h3>
+
+                            <div className="event-card-details">
+                                <div className="event-card-detail-item">
+                                    <LocationIcon strokeColor="rgb(52, 211, 153)" />
+                                    <span>{event.venue_name}</span>
+                                </div>
+
+                                <div className="event-card-detail-item">
+                                    <HangerIcon strokeColor="rgb(232, 121, 249)" />
+                                    <span>{dressCode}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="event-card-button">
+                            View Details
+                            <ArrowRight />
+                        </div>
+                    </div>
                 </div>
             </div>
         </NavLink>

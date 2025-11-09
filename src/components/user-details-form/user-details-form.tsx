@@ -20,11 +20,11 @@ export const UserDetailsForm = forwardRef(
       const baseUser = {
         owner_name: "",
         owner_last_name: "",
-        owner_dpi: "",
+        owner_phone_prefix: "+1",
         owner_phone: "",
         owner_email: "",
-        confirmationMail: "",
         owner_birthdate: "",
+        owner_gender: "",
       };
 
       return isAbooking
@@ -100,28 +100,28 @@ export const UserDetailsForm = forwardRef(
     return (
       <form className="user-details-form-container">
         {fields.map((field, index) => {
-          const email = watch(`usuarios.${index}.owner_email`);
           const totalAssistantValue = watch(
             `usuarios.${index}.total_assistant`
           );
           return (
             <div key={field.id} className="user-details-form">
               <h4>
-                {isAbooking ? (
-                  "Booker data"
-                ) : (
-                  <>Assistant data &#8226; {index + 1}</>
-                )}
+                <span className="user-details-form-number">{index + 1}</span>
+                {isAbooking ? "Booker Information" : "Assistant Information"}
               </h4>
               <div className="sep" />
               <div className="form-content-container">
-                <div>
-                  <label>Name:</label>
+                {/* Name */}
+                <div className="form-field">
+                  <label>
+                    Name <span className="form-field-required">*</span>
+                  </label>
                   <input
                     {...register(`usuarios.${index}.owner_name`, {
-                      required: "The name is required",
+                      required: "Name is required",
                     })}
-                    autoComplete="off"
+                    placeholder="Enter your name"
+                    autoComplete="given-name"
                   />
                   {errors.usuarios?.[index]?.owner_name && (
                     <p className="user-form-error">
@@ -129,13 +129,18 @@ export const UserDetailsForm = forwardRef(
                     </p>
                   )}
                 </div>
-                <div>
-                  <label>Surname:</label>
+
+                {/* Surname */}
+                <div className="form-field">
+                  <label>
+                    Surname <span className="form-field-required">*</span>
+                  </label>
                   <input
                     {...register(`usuarios.${index}.owner_last_name`, {
-                      required: "The surname is required",
+                      required: "Surname is required",
                     })}
-                    autoComplete="off"
+                    placeholder="Enter your surname"
+                    autoComplete="family-name"
                   />
                   {errors.usuarios?.[index]?.owner_last_name && (
                     <p className="user-form-error">
@@ -143,54 +148,23 @@ export const UserDetailsForm = forwardRef(
                     </p>
                   )}
                 </div>
-                <div>
-                  <label>DPI number:</label>
-                  <input
-                    {...register(`usuarios.${index}.owner_dpi`, {
-                      required: "The DPI number is required",
-                      pattern: {
-                        value: /^[0-9]{13}$/,
-                        message: "The DPI must have 13 numeric digits",
-                      },
-                    })}
-                    autoComplete="off"
-                  />
-                  {errors.usuarios?.[index]?.owner_dpi && (
-                    <p className="user-form-error">
-                      {errors.usuarios[index].owner_dpi.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label>Telephone number:</label>
-                  <input
-                    {...register(`usuarios.${index}.owner_phone`, {
-                      required: "The telephone is required",
-                      pattern: {
-                        value: /^[0-9]{8,15}$/,
-                        message: "Check the telephone",
-                      },
-                    })}
-                    autoComplete="off"
-                  />
-                  {errors.usuarios?.[index]?.owner_phone && (
-                    <p className="user-form-error">
-                      {errors.usuarios[index].owner_phone.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label>Email:</label>
+
+                {/* Email */}
+                <div className="form-field">
+                  <label>
+                    Email <span className="form-field-required">*</span>
+                  </label>
                   <input
                     type="email"
                     {...register(`usuarios.${index}.owner_email`, {
-                      required: "The email is required",
+                      required: "Email is required",
                       pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "Invalid email",
+                        message: "Invalid email address",
                       },
                     })}
-                    autoComplete="off"
+                    placeholder="email@example.com"
+                    autoComplete="email"
                   />
                   {errors.usuarios?.[index]?.owner_email && (
                     <p className="user-form-error">
@@ -198,31 +172,175 @@ export const UserDetailsForm = forwardRef(
                     </p>
                   )}
                 </div>
-                <div>
-                  <label>Email confirmation:</label>
-                  <input
-                    type="email"
-                    {...register(`usuarios.${index}.confirmationMail`, {
-                      required: "The email confirmation is required",
-                      validate: (value) =>
-                        value === email || "The emails do not match",
-                    })}
-                    autoComplete="off"
-                  />
-                  {errors.usuarios?.[index]?.confirmationMail && (
+
+                {/* Phone */}
+                <div className="form-field">
+                  <label>
+                    Phone Number <span className="form-field-required">*</span>
+                  </label>
+                  <div className="phone-input-container">
+                    <div className="phone-prefix-select">
+                      <select
+                        {...register(`usuarios.${index}.owner_phone_prefix`)}
+                      >
+                        <option value="+1">+1</option>
+                        <option value="+7">+7</option>
+                        <option value="+20">+20</option>
+                        <option value="+27">+27</option>
+                        <option value="+30">+30</option>
+                        <option value="+31">+31</option>
+                        <option value="+32">+32</option>
+                        <option value="+33">+33</option>
+                        <option value="+34">+34</option>
+                        <option value="+39">+39</option>
+                        <option value="+40">+40</option>
+                        <option value="+41">+41</option>
+                        <option value="+43">+43</option>
+                        <option value="+44">+44</option>
+                        <option value="+45">+45</option>
+                        <option value="+46">+46</option>
+                        <option value="+47">+47</option>
+                        <option value="+48">+48</option>
+                        <option value="+49">+49</option>
+                        <option value="+51">+51</option>
+                        <option value="+52">+52</option>
+                        <option value="+53">+53</option>
+                        <option value="+54">+54</option>
+                        <option value="+55">+55</option>
+                        <option value="+56">+56</option>
+                        <option value="+57">+57</option>
+                        <option value="+58">+58</option>
+                        <option value="+60">+60</option>
+                        <option value="+61">+61</option>
+                        <option value="+62">+62</option>
+                        <option value="+63">+63</option>
+                        <option value="+64">+64</option>
+                        <option value="+65">+65</option>
+                        <option value="+66">+66</option>
+                        <option value="+81">+81</option>
+                        <option value="+82">+82</option>
+                        <option value="+84">+84</option>
+                        <option value="+86">+86</option>
+                        <option value="+90">+90</option>
+                        <option value="+91">+91</option>
+                        <option value="+92">+92</option>
+                        <option value="+93">+93</option>
+                        <option value="+94">+94</option>
+                        <option value="+95">+95</option>
+                        <option value="+98">+98</option>
+                        <option value="+212">+212</option>
+                        <option value="+213">+213</option>
+                        <option value="+216">+216</option>
+                        <option value="+218">+218</option>
+                        <option value="+220">+220</option>
+                        <option value="+234">+234</option>
+                        <option value="+351">+351</option>
+                        <option value="+352">+352</option>
+                        <option value="+353">+353</option>
+                        <option value="+354">+354</option>
+                        <option value="+355">+355</option>
+                        <option value="+356">+356</option>
+                        <option value="+357">+357</option>
+                        <option value="+358">+358</option>
+                        <option value="+359">+359</option>
+                        <option value="+370">+370</option>
+                        <option value="+371">+371</option>
+                        <option value="+372">+372</option>
+                        <option value="+373">+373</option>
+                        <option value="+374">+374</option>
+                        <option value="+375">+375</option>
+                        <option value="+376">+376</option>
+                        <option value="+377">+377</option>
+                        <option value="+378">+378</option>
+                        <option value="+380">+380</option>
+                        <option value="+381">+381</option>
+                        <option value="+382">+382</option>
+                        <option value="+385">+385</option>
+                        <option value="+386">+386</option>
+                        <option value="+387">+387</option>
+                        <option value="+389">+389</option>
+                        <option value="+420">+420</option>
+                        <option value="+421">+421</option>
+                        <option value="+423">+423</option>
+                        <option value="+500">+500</option>
+                        <option value="+501">+501</option>
+                        <option value="+502">+502</option>
+                        <option value="+503">+503</option>
+                        <option value="+504">+504</option>
+                        <option value="+505">+505</option>
+                        <option value="+506">+506</option>
+                        <option value="+507">+507</option>
+                        <option value="+508">+508</option>
+                        <option value="+509">+509</option>
+                        <option value="+590">+590</option>
+                        <option value="+591">+591</option>
+                        <option value="+592">+592</option>
+                        <option value="+593">+593</option>
+                        <option value="+594">+594</option>
+                        <option value="+595">+595</option>
+                        <option value="+596">+596</option>
+                        <option value="+597">+597</option>
+                        <option value="+598">+598</option>
+                        <option value="+599">+599</option>
+                        <option value="+850">+850</option>
+                        <option value="+852">+852</option>
+                        <option value="+853">+853</option>
+                        <option value="+855">+855</option>
+                        <option value="+856">+856</option>
+                        <option value="+880">+880</option>
+                        <option value="+886">+886</option>
+                        <option value="+960">+960</option>
+                        <option value="+961">+961</option>
+                        <option value="+962">+962</option>
+                        <option value="+963">+963</option>
+                        <option value="+964">+964</option>
+                        <option value="+965">+965</option>
+                        <option value="+966">+966</option>
+                        <option value="+967">+967</option>
+                        <option value="+968">+968</option>
+                        <option value="+970">+970</option>
+                        <option value="+971">+971</option>
+                        <option value="+972">+972</option>
+                        <option value="+973">+973</option>
+                        <option value="+974">+974</option>
+                        <option value="+975">+975</option>
+                        <option value="+976">+976</option>
+                        <option value="+977">+977</option>
+                      </select>
+                    </div>
+                    <div className="phone-number-input">
+                      <input
+                        {...register(`usuarios.${index}.owner_phone`, {
+                          required: "Phone number is required",
+                          pattern: {
+                            value: /^[0-9]{6,15}$/,
+                            message: "Enter a valid phone number",
+                          },
+                        })}
+                        placeholder="123456789"
+                        autoComplete="tel"
+                      />
+                    </div>
+                  </div>
+                  {errors.usuarios?.[index]?.owner_phone && (
                     <p className="user-form-error">
-                      {errors.usuarios[index].confirmationMail.message}
+                      {errors.usuarios[index].owner_phone.message}
                     </p>
                   )}
                 </div>
-                <div>
-                  <label>Birthday date:</label>
+
+                {/* Birthday */}
+                <div className="form-field">
+                  <label>
+                    Date of Birth <span className="form-field-required">*</span>
+                  </label>
                   <input
                     type="date"
+                    max={new Date().toISOString().split('T')[0]}
                     {...register(`usuarios.${index}.owner_birthdate`, {
-                      required: "The birthday date is required",
+                      required: "Date of birth is required",
                     })}
-                    autoComplete="off"
+                    autoComplete="bday"
                   />
                   {errors.usuarios?.[index]?.owner_birthdate && (
                     <p className="user-form-error">
@@ -230,14 +348,79 @@ export const UserDetailsForm = forwardRef(
                     </p>
                   )}
                 </div>
+
+                {/* Gender */}
+                <div className="form-field">
+                  <label>
+                    Gender <span className="form-field-required">*</span>
+                  </label>
+                  <div className="gender-selection">
+                    <div className="gender-option">
+                      <input
+                        type="radio"
+                        id={`gender-male-${index}`}
+                        value="male"
+                        {...register(`usuarios.${index}.owner_gender`, {
+                          required: "Please select a gender",
+                        })}
+                      />
+                      <label
+                        htmlFor={`gender-male-${index}`}
+                        className="gender-label"
+                      >
+                        Male
+                      </label>
+                    </div>
+                    <div className="gender-option">
+                      <input
+                        type="radio"
+                        id={`gender-female-${index}`}
+                        value="female"
+                        {...register(`usuarios.${index}.owner_gender`, {
+                          required: "Please select a gender",
+                        })}
+                      />
+                      <label
+                        htmlFor={`gender-female-${index}`}
+                        className="gender-label"
+                      >
+                        Female
+                      </label>
+                    </div>
+                    <div className="gender-option">
+                      <input
+                        type="radio"
+                        id={`gender-other-${index}`}
+                        value="other"
+                        {...register(`usuarios.${index}.owner_gender`, {
+                          required: "Please select a gender",
+                        })}
+                      />
+                      <label
+                        htmlFor={`gender-other-${index}`}
+                        className="gender-label"
+                      >
+                        Other
+                      </label>
+                    </div>
+                  </div>
+                  {errors.usuarios?.[index]?.owner_gender && (
+                    <p className="user-form-error">
+                      {errors.usuarios[index].owner_gender.message}
+                    </p>
+                  )}
+                </div>
+
                 {isAbooking && (
                   <>
-                    <div>
-                      <label>Start time:</label>
+                    <div className="form-field">
+                      <label>
+                        Start time <span className="form-field-required">*</span>
+                      </label>
                       <input
                         type="time"
                         {...register(`usuarios.${index}.start_time`, {
-                          required: "The start time is required",
+                          required: "Start time is required",
                         })}
                         autoComplete="off"
                       />
@@ -247,13 +430,15 @@ export const UserDetailsForm = forwardRef(
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label>End time:</label>
+                    <div className="form-field">
+                      <label>
+                        End time <span className="form-field-required">*</span>
+                      </label>
                       <input
                         type="time"
                         defaultValue={"06:00"}
                         {...register(`usuarios.${index}.end_time`, {
-                          required: "The end time is required",
+                          required: "End time is required",
                         })}
                         autoComplete="off"
                       />
@@ -263,8 +448,10 @@ export const UserDetailsForm = forwardRef(
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label>Total assistants:</label>
+                    <div className="form-field">
+                      <label>
+                        Total assistants <span className="form-field-required">*</span>
+                      </label>
                       <input
                         type="number"
                         min={2}
@@ -284,8 +471,10 @@ export const UserDetailsForm = forwardRef(
                       )}
                     </div>
 
-                    <div>
-                      <label>Payment options</label>
+                    <div className="form-field">
+                      <label>
+                        Payment options <span className="form-field-required">*</span>
+                      </label>
                       <select
                         {...register(`usuarios.${index}.payment_type`, {
                           required: "Payment type is required",
@@ -296,7 +485,7 @@ export const UserDetailsForm = forwardRef(
                         })}
                       >
                         <option value="" disabled>
-                          Selecciona tipo de pago
+                          Select payment type
                         </option>
                         <option value="2">Per person</option>
                         <option value="1">One time payment</option>
@@ -313,10 +502,12 @@ export const UserDetailsForm = forwardRef(
                       totalAssistantValue > 0 &&
                       [...Array(Number(totalAssistantValue) - 1)].map(
                         (_, i) => (
-                          <div key={i}>
-                            <label>Assistant names:</label>
+                          <div key={i} className="form-field">
+                            <label>
+                              Assistant {i + 1} name <span className="form-field-required">*</span>
+                            </label>
                             <input
-                              placeholder={`Assistant #${i + 1} name`}
+                              placeholder={`Enter assistant ${i + 1} name`}
                               {...register(
                                 `usuarios.${index}.assistants.${i}`,
                                 {

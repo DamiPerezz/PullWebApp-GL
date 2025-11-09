@@ -1,60 +1,71 @@
-import { NavLink } from 'react-router-dom';
-import { ClockIcon, LocationIcon } from '../../icons/icons';
-import './venues-card.css';
-import type { VenueInfo } from '../../types/types';
-
-const ArrowRightIcon = () => (
-    <svg 
-        className="venue-card-action-icon" 
-        fill="none" 
-        stroke="currentColor" 
-        viewBox="0 0 24 24" 
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M13 7l5 5m0 0l-5 5m5-5H6" 
-        />
-    </svg>
-);
+import { NavLink } from "react-router-dom";
+import { ClockIcon, LocationIcon } from "../../icons/icons";
+import "./venues-card.css";
+import type { VenueInfo } from "../../types/types";
+import { ArrowRight, Calendar } from "lucide-react";
 
 export const VenuesCard = ({ venue }: { venue: VenueInfo }) => {
+  const open = venue.open_time.slice(0, 5);
+  const close = venue.close_time.slice(0, 5);
 
-    const open = venue.open_time.slice(0, 5);
-    const close = venue.close_time.slice(0, 5);
+  return (
+    <NavLink
+      to={`/venues/${venue.slug}/events`}
+      className="venues-card-container"
+    >
+      <div className="venues-card-inner">
+        <div className="venues-card-bg-gradient" />
 
-    return (
-        <NavLink to={`/venues/${venue.slug}/events`} className="venues-card-container">
-            <img 
-                src={venue.image} 
-                alt={venue.venue_name} 
-                width={150} 
-                height={150}
-                loading="lazy"
+        <div className="venues-card-content">
+          <div className="venues-card-image-wrapper">
+            <img
+              src={venue.image}
+              alt={venue.venue_name}
+              className="venues-card-image"
+              loading="lazy"
             />
-            
-            <div className="venue-info">
-                <p className='title'>{venue.venue_name}</p>
-                <div>
-                    <p className='extra-info'>
-                        <ClockIcon strokeColor={'var(--light-color-gray)'} /> 
-                        {open} - {close}
-                    </p>
-                    <p className='extra-info'>
-                        <LocationIcon strokeColor={'var(--light-color-gray)'} /> 
-                        {venue.location}
-                    </p>
-                </div>
+          </div>
+
+          <div className="venues-card-info">
+            <div>
+              <h3 className="venues-card-title">{venue.venue_name}</h3>
+
+              <div className="venues-card-details">
+                <p className="venues-card-detail-item">
+                  <ClockIcon
+                    strokeColor="rgb(34, 211, 238)"
+                    className="icon-clock"
+                  />
+                  <span>
+                    {open} - {close}
+                  </span>
+                </p>
+
+                <p className="venues-card-detail-item">
+                  <LocationIcon
+                    strokeColor="rgb(52, 211, 153)"
+                    className="icon-location"
+                  />
+                  <span>{venue.location}</span>
+                </p>
+              </div>
             </div>
 
-            <div className="venue-card-action">
-                <div className="venue-card-action-button">
-                    <span>View Events</span>
-                    <ArrowRightIcon />
-                </div>
+            <div className="venues-card-footer">
+              <div className="venues-card-footer-info">
+                <Calendar />
+                <span className="venues-card-footer-text">
+                  View upcoming events
+                </span>
+              </div>
+              <div className="venues-card-button">
+                <span>View events</span>
+                <ArrowRight />
+              </div>
             </div>
-        </NavLink>
-    );
+          </div>
+        </div>
+      </div>
+    </NavLink>
+  );
 };
