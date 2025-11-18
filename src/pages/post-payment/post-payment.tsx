@@ -80,7 +80,8 @@ const normalizeTicket = (ticket: any, eventInfo: EventInfo | null): PurchasedTic
 };
 
 export function PostPaymentPage() {
-  const { orderId, eventId } = useParams<{ orderId: string; eventId: string }>();
+  // ✅ CAMBIO: Cambiado eventId a eventSlug
+  const { orderId, eventSlug } = useParams<{ orderId: string; eventSlug: string }>();
   const navigate = useNavigate();
 
   const [tickets, setTickets] = useState<PurchasedTicketInfo[]>([]);
@@ -90,18 +91,19 @@ export function PostPaymentPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!eventId || !orderId) {
+    // ✅ CAMBIO: Usar eventSlug en lugar de eventId
+    if (!eventSlug || !orderId) {
       setError("Incomplete order information");
       setLoading(false);
       return;
     }
 
-    console.log('🔍 Loading post-payment data:', { eventId, orderId });
+    console.log('🔍 Loading post-payment data:', { eventSlug, orderId });
 
-    // Cargar información del evento Y los tickets
+    // ✅ CAMBIO: Usar eventSlug en ambas llamadas
     Promise.all([
-      getEventDetailedInfo(eventId),
-      getTicketsByOrderId(orderId, eventId)
+      getEventDetailedInfo(eventSlug),
+      getTicketsByOrderId(orderId, eventSlug)
     ])
       .then(([eventData, ticketsData]) => {
         console.log('✅ Event data loaded:', eventData);
@@ -134,7 +136,7 @@ export function PostPaymentPage() {
         setError("Error loading tickets");
         setLoading(false);
       });
-  }, [orderId, eventId]);
+  }, [orderId, eventSlug]); // ✅ CAMBIO: Actualizada la dependencia
 
   /**
    * Genera un PDF individual para un ticket

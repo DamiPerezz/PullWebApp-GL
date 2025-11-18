@@ -3,6 +3,7 @@ import { CalendarIcon, ClockIcon, LocationIcon, HangerIcon } from '../../icons/i
 import { NavLink } from 'react-router-dom';
 import type { EventInfo } from '../../types/types';
 import { ArrowRight } from 'lucide-react';
+import { formatEventDateShort } from '../../utils/dateFormatter';
 
 export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVenueEventPage?: boolean }) => {
 
@@ -41,7 +42,7 @@ export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVen
                             <div className="event-card-badges">
                                 <div className="event-card-badge event-card-date-badge">
                                     <CalendarIcon strokeColor="rgb(167, 139, 250)" />
-                                    <span>{event.event_date}</span>
+                                    <span>{formatEventDateShort(event.event_date)}</span>
                                 </div>
                                 <div className="event-card-badge event-card-time-badge">
                                     <ClockIcon strokeColor="rgb(34, 211, 238)" />

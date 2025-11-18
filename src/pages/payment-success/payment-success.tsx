@@ -1,8 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "../../components/layout/layout";
 import { useEffect, useState } from "react";
-import { confirmStripePayment } from "../../controller/purchase-pages-controller";
-import { getEventDetailedInfo } from "../../controller/purchase-pages-controller";
+import { confirmStripePayment, getEventDetailedInfo } from "../../controller/purchase-pages-controller";
 import "./payment-success.css";
 import { CheckCircle, Loader } from "lucide-react";
 
@@ -16,8 +15,6 @@ export const PaymentSuccessPage = () => {
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
-    const orderId = localStorage.getItem('pending_order_id');
-    const eventId = localStorage.getItem('pending_event_id');
 
     if (!sessionId) {
       setError("Missing session information");
@@ -25,49 +22,42 @@ export const PaymentSuccessPage = () => {
       return;
     }
 
-    if (!orderId || !eventId) {
-      setError("Missing order information");
-      setLoading(false);
-      return;
+    const eventId = localStorage.getItem('pending_event_id');
+
+    if (eventId) {
+      getEventDetailedInfo(eventId)
+        .then((eventData) => {
+          if (eventData?.event_img) {
+            setEventImage(eventData.event_img);
+          }
+        })
+        .catch((err) => {
+          console.log("Could not load event image:", err);
+        });
     }
 
-    // Cargar imagen del evento para el fondo
-    getEventDetailedInfo(eventId)
-      .then((eventData) => {
-        if (eventData?.event_img) {
-          setEventImage(eventData.event_img);
-        }
-      })
-      .catch((err) => {
-        console.log("Could not load event image:", err);
-      });
+    console.log('Processing payment success:', { sessionId });
 
-    console.log('Processing payment success:', { sessionId, orderId, eventId });
-
-    // Confirmar el pago con el backend
-    confirmStripePayment(sessionId, orderId)
-      .then(() => {
-        console.log('Payment confirmed successfully');
+    confirmStripePayment(sessionId)
+      .then((response) => {
+        console.log('Payment confirmed successfully:', response);
         
-        // Mostrar mensaje de éxito
         setSuccess(true);
         setLoading(false);
         
-        // Esperar 2 segundos para que el usuario vea el mensaje
         setTimeout(() => {
-          // Limpiar localStorage
           localStorage.removeItem('pending_order_id');
           localStorage.removeItem('pending_event_id');
           localStorage.removeItem('pending_ticket_type_id');
           localStorage.removeItem('pending_quantity');
           
-          // Redirigir a la página de post-payment
-          navigate(`/wallet/${orderId}/${eventId}`);
+          // NAVEGACIÓN CORREGIDA: usar post-purchase en lugar de wallet
+          navigate(`/post-purchase/${response.order_id}/${response.event_slug}`);
         }, 2000);
       })
       .catch((err) => {
         console.error("Error confirming payment:", err);
-        setError(err.response?.data?.error || "Error confirming payment");
+        setError(err.message || "Error confirming payment");
         setLoading(false);
       });
   }, [searchParams, navigate]);
@@ -76,7 +66,6 @@ export const PaymentSuccessPage = () => {
     return (
       <Layout>
         <div className="payment-success-wrapper">
-          {/* Background */}
           {eventImage ? (
             <>
               <div 
@@ -118,7 +107,6 @@ export const PaymentSuccessPage = () => {
   return (
     <Layout>
       <div className="payment-success-wrapper">
-        {/* Background with blur effect */}
         {eventImage ? (
           <>
             <div 

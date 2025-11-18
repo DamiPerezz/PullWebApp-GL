@@ -1,18 +1,18 @@
+// event-venue-page.tsx
 import { Layout } from "../../components/layout/layout";
 import "./event-venue-page.css";
 import { EventCard } from "../../components/events-card/events-card";
 import { ClockIcon, EmailIcon, LocationIcon } from "../../icons/icons";
 import { useEffect, useState } from "react";
-import { getEventsByVenue, getVenueDescription, getVenueInfo } from "../../controller/events-page-controller";
+import { getEventsByVenue, getVenueInfo } from "../../controller/events-page-controller";
 import { useParams } from "react-router-dom";
-import type { EventInfo, VenueDescription, VenueEventInfo } from "../../types/types";
-import { Users, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import type { EventInfo, VenueEventInfo } from "../../types/types";
+import { MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const VenueEventsPage = () => {
   const { venueId } = useParams<{ venueId: string }>();
   const [events, setAllEvents] = useState<EventInfo[]>([]);
   const [venueInfo, setVenueInfo] = useState<VenueEventInfo | null>(null);
-  const [venueDescription, setVenueDescription] = useState<VenueDescription | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const eventsPerPage = 5;
@@ -25,28 +25,22 @@ export const VenueEventsPage = () => {
 
     getEventsByVenue(venueId)
       .then((events) => {
+        console.log("✅ Events received:", events); // DEBUG
         setAllEvents(events);
       })
       .catch((error) => {
-        console.error("Error fetching events:", error);
+        console.error("❌ Error fetching events:", error);
       });
 
     getVenueInfo(venueId)
       .then((venue) => {
+        console.log("✅ Venue info received:", venue); // DEBUG
         setVenueInfo(venue);
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching venue info:", error);
+        console.error("❌ Error fetching venue info:", error);
         setIsLoading(false);
-      });
-
-    getVenueDescription(venueId)
-      .then((description) => {
-        setVenueDescription(description);
-      })
-      .catch((error) => {
-        console.error("Error fetching venue description:", error);
       });
   }, [venueId]);
 
@@ -57,6 +51,9 @@ export const VenueEventsPage = () => {
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
+
+  console.log("📊 Events state:", events); // DEBUG
+  console.log("📊 Current events:", currentEvents); // DEBUG
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -138,15 +135,13 @@ export const VenueEventsPage = () => {
                 <div className="venue-info-section">
                   <div className="venue-info-card">
                     <h3 className="venue-card-title">Information</h3>
-                    <div className="venue-info-stat">
-                      <Users className="venue-info-stat-icon" />
-                      <div className="venue-info-stat-content">
-                        <span className="venue-info-stat-label">Capacity</span>
-                        <span className="venue-info-stat-value">{venueInfo?.capacity}</span>
-                      </div>
-                    </div>
-
-                    <div className="venue-info-divider" />
+                    
+                    {venueInfo?.description && (
+                      <>
+                        <p className="venue-description-text">{venueInfo.description}</p>
+                        <div className="venue-info-divider" />
+                      </>
+                    )}
 
                     <div className="venue-info-details">
                       <div className="venue-info-detail-item">
@@ -170,12 +165,7 @@ export const VenueEventsPage = () => {
                       rel="noopener noreferrer"
                     >
                       Get Directions
-                    </a>
-                  </div>
-
-                  <div className="venue-description-card">
-                    <h3 className="venue-card-title">Description</h3>
-                    <p className="venue-description-text">{venueDescription?.description}</p>
+                   </a>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import type { EventInfo, VenueDescription, VenueEventInfo } from "../types/types";
+import type { EventInfo, VenueEventInfo } from "../types/types";
 import { apiClient } from "../utils/axios";
 
 export const getAllEvents = async (): Promise<EventInfo[]> => {
@@ -13,10 +13,5 @@ export const getEventsByVenue = async (slugId: string): Promise<EventInfo[]> => 
 
 export const getVenueInfo = async (slugId: string): Promise<VenueEventInfo> => {
     const response = await apiClient.get<VenueEventInfo>(`/venues/events/get-venue-info/${slugId}`);
-    return response.data;
-}
-
-export const getVenueDescription = async (slugId: string): Promise<VenueDescription> => {
-    const response = await apiClient.get<VenueDescription>(`/venues/events/get-venue-description/${slugId}`);
     return response.data;
 }

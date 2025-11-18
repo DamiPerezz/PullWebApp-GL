@@ -1,0 +1,505 @@
+.wallet-page {
+  min-height: 100vh;
+  padding: 6rem 1.5rem 3rem;
+  background: #0a0a0f;
+  position: relative;
+}
+
+.wallet-page-bg-blur {
+  position: fixed;
+  inset: 0;
+  background-image: url('../../assets/fondo.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(24px) brightness(0.25);
+  z-index: 0;
+}
+
+.wallet-page__container {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.wallet-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.wallet-page__spinner {
+  animation: spin 1s linear infinite;
+  color: rgb(167, 139, 250);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Profile Section */
+.wallet-page__profile {
+  background: rgba(15, 15, 21, 0.4);
+  backdrop-filter: blur(48px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.wallet-page__profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-page__profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgb(139, 92, 246), rgb(79, 70, 229));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.wallet-page__profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wallet-page__profile-info {
+  flex: 1;
+}
+
+.wallet-page__profile-name {
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.wallet-page__profile-email {
+  font-size: 0.9375rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 0.75rem 0;
+}
+
+.wallet-page__profile-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.wallet-page__profile-tier--regular {
+  background: linear-gradient(to right, rgba(52, 211, 153, 0.15), rgba(16, 185, 129, 0.15));
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: rgb(52, 211, 153);
+}
+
+.wallet-page__profile-tier--vip {
+  background: linear-gradient(to right, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: rgb(251, 191, 36);
+}
+
+/* Stats Grid */
+.wallet-page__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.wallet-page__stat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.wallet-page__stat:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.wallet-page__stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wallet-page__stat-icon--purple {
+  background: rgba(139, 92, 246, 0.2);
+  color: rgb(167, 139, 250);
+}
+
+.wallet-page__stat-icon--green {
+  background: rgba(16, 185, 129, 0.2);
+  color: rgb(52, 211, 153);
+}
+
+.wallet-page__stat-icon--blue {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgb(96, 165, 250);
+}
+
+.wallet-page__stat-icon--orange {
+  background: rgba(245, 158, 11, 0.2);
+  color: rgb(251, 191, 36);
+}
+
+.wallet-page__stat-content {
+  flex: 1;
+}
+
+.wallet-page__stat-label {
+  font-size: 0.8125rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 0.25rem 0;
+}
+
+.wallet-page__stat-value {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: white;
+  margin: 0;
+}
+
+/* Tags */
+.wallet-page__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wallet-page__tag {
+  padding: 0.375rem 0.75rem;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 0.5rem;
+  color: rgb(196, 181, 253);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+/* Tickets Section */
+.wallet-page__tickets {
+  background: rgba(15, 15, 21, 0.4);
+  backdrop-filter: blur(48px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.wallet-page__tickets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.wallet-page__tickets-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wallet-page__tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.25rem;
+  border-radius: 0.625rem;
+}
+
+.wallet-page__tab {
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wallet-page__tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wallet-page__tab--active {
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+.wallet-page__error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.75rem;
+  color: rgb(248, 113, 113);
+  font-size: 0.875rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+.wallet-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.wallet-page__empty svg {
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+.wallet-page__empty h3 {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.wallet-page__empty p {
+  font-size: 0.9375rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* Tickets Grid */
+.wallet-page__tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.wallet-page__ticket-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.wallet-page__ticket-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.wallet-page__ticket-image {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.wallet-page__ticket-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wallet-page__ticket-validated {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(16, 185, 129, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.wallet-page__ticket-content {
+  padding: 1.25rem;
+}
+
+.wallet-page__ticket-event {
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: white;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.01em;
+}
+
+.wallet-page__ticket-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+.wallet-page__ticket-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 300;
+}
+
+.wallet-page__ticket-detail svg {
+  color: rgb(139, 92, 246);
+  flex-shrink: 0;
+}
+
+.wallet-page__ticket-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-page__ticket-type {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.wallet-page__ticket-view {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wallet-page__ticket-view:hover {
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(217, 70, 239, 0.3));
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1280px) {
+  .wallet-page__container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .wallet-page {
+    padding: 5rem 1rem 2rem;
+  }
+
+  .wallet-page__profile,
+  .wallet-page__tickets {
+    padding: 1.5rem;
+  }
+
+  .wallet-page__profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .wallet-page__profile-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .wallet-page__profile-name {
+    font-size: 1.5rem;
+  }
+
+  .wallet-page__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wallet-page__tickets-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wallet-page__tickets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .wallet-page {
+    padding: 5rem 1.1rem 2rem;
+  }
+
+  .wallet-page__container {
+    padding: 0;
+  }
+
+  .wallet-page__profile,
+  .wallet-page__tickets {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .wallet-page__container {
+    padding: 0 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-page__ticket-card,
+  .wallet-page__ticket-view,
+  .wallet-page__stat,
+  .wallet-page__tab {
+    transition: none !important;
+  }
+}

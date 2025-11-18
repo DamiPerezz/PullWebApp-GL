@@ -1,4 +1,8 @@
-// types.tsx - Tipos completos con sistema VIP
+// types.tsx - Tipos completos con sistema VIP y Autenticación
+
+// ============================================================
+// VENUE & EVENT TYPES
+// ============================================================
 
 export type VenueInfo = {
   id: string;
@@ -32,7 +36,6 @@ export type EventInfo = {
 
 export type VenueEventInfo = {
   name: string;
-  capacity: number;
   email: string;
   image: string;
   open_time: string;
@@ -40,6 +43,7 @@ export type VenueEventInfo = {
   long_location: string;
   latitude: number;
   longitude: number;
+  description: string;
 };
 
 export type VenueDescription = {
@@ -57,6 +61,10 @@ export type EventDetailedInfo = {
   vip_enabled: boolean;
   custome_location?: VenueInfo;
 };
+
+// ============================================================
+// TICKET TYPES
+// ============================================================
 
 export type TicketType = {
   ticket_type_id: string;
@@ -84,6 +92,7 @@ export type TicketResponse = {
 };
 
 export type PurchasedTicketInfo = {
+  id: string;
   owner_full_name: string;
   owner_email: string;
   event_name: string;
@@ -93,6 +102,7 @@ export type PurchasedTicketInfo = {
   qr_token: string;
   ticket_type?: string;
   benefits?: string;
+  validated_at?: string;
   public_users?: {
     name: string;
     surname: string;
@@ -103,8 +113,18 @@ export type PurchasedTicketInfo = {
     benefits?: string;
   };
   orders?: {
-    id: number;
+    id: string;
     created_at: string;
+  };
+  events?: {
+    name: string;
+    event_date: string;
+    start_time: string;
+    image: string;
+    venues?: {
+      name: string;
+      location: string;
+    };
   };
 };
 
@@ -124,6 +144,53 @@ export type UsuarioFormData = {
   payment_type?: string;
   assistants?: string[];
 };
+
+// ============================================================
+// USER & AUTHENTICATION TYPES
+// ============================================================
+
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  name: string;
+  surname: string;
+  phone?: string;
+  phone_prefix?: string;
+  tier: 'regular' | 'vip';
+  profile_image?: string;
+  tags: string[];
+  total_spent: number;
+  average_spend: number;
+  last_visit?: string;
+  member_since?: string;
+  stats?: {
+    total_tickets: number;
+    validated_tickets: number;
+    total_orders: number;
+  };
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  name: string;
+  surname: string;
+  phone?: string;
+  phone_prefix?: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  user: User;
+  token: string;
+}
+
+export interface UserProfileResponse {
+  success: boolean;
+  user: User;
+}
 
 // ============================================================
 // VIP TABLE TYPES
@@ -360,5 +427,22 @@ export const ZONE_COLORS: Record<ZoneType, ZoneColorConfig> = {
     background: 'rgba(59, 130, 246, 0.2)',
     text: 'rgb(147, 197, 253)',
     label: 'Standard',
+  },
+};
+
+// ============================================================
+// TIER COLORS
+// ============================================================
+
+export const TIER_COLORS = {
+  regular: {
+    background: 'rgba(16, 185, 129, 0.2)',
+    border: 'rgba(16, 185, 129, 0.3)',
+    text: 'rgb(52, 211, 153)',
+  },
+  vip: {
+    background: 'rgba(245, 158, 11, 0.2)',
+    border: 'rgba(245, 158, 11, 0.3)',
+    text: 'rgb(251, 191, 36)',
   },
 };

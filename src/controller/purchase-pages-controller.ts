@@ -1,3 +1,4 @@
+// purchase-pages-controller.ts - COMPLETO Y CORREGIDO
 import type { TicketResponse, TicketType, UserInfoTicket } from "../types/types";
 import { apiClient } from "../utils/axios";
 import { loadStripe } from "@stripe/stripe-js";
@@ -164,19 +165,20 @@ export const verifyPayment = async (
 
 /**
  * Confirma el pago de Stripe después de la redirección
+ * CORREGIDO: Solo necesita session_id, el backend lo procesa todo
  */
 export const confirmStripePayment = async (
-  session_id: string,
-  order_id: string
+  session_id: string
 ): Promise<{
   success: boolean;
-  message: string;
+  order_id: string;
+  event_slug: string;
+  order_status: string;
 }> => {
   try {
     const response = await apiClient.get(`/orders/confirm-payment`, {
       params: {
         session_id,
-        order_id,
       },
     });
 

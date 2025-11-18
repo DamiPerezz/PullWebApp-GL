@@ -1,5 +1,5 @@
-// App.tsx
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { VenuesPage } from "./pages/venues-page/venues-page";
 import { EventsPage } from "./pages/events-page/events-page";
 import { WalletPage } from "./pages/wallet-page/wallet-page";
@@ -16,36 +16,178 @@ import { VIPConfirmPage } from "./pages/vip-confirm-page/vip-confirm-page";
 import { VIPManagementPage } from "./pages/vip-management-page/vip-management-page";
 import { VIPPaymentPage } from "./pages/vip-payment-page/vip-payment-page";
 import { VIPPaymentSuccessPage } from "./pages/vip-payment-success-page/vip-payment-success-page";
+import { LoginPage } from "./pages/login-page/login-page";
+import { RegisterPage } from "./pages/register-page/register-page";
 import { NotFoundPage } from "./pages/not-found-page/not-found-page";
+import { NavBar } from "./components/nav-bar/nav-bar";
+import { VenueNavBar } from "./components/venue-nav-bar/venue-nav-bar";
+
+// Componente para rutas protegidas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at top left, rgba(139, 92, 246, 0.15), rgba(17, 24, 39, 1))',
+        color: 'white',
+        fontSize: '1.125rem'
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+// Layout con NavBar general
+const GeneralLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <NavBar />
+    {children}
+  </>
+);
+
+// Layout con VenueNavBar
+const VenueLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <VenueNavBar />
+    {children}
+  </>
+);
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/venues" />} />
-      <Route path="/venues" element={<VenuesPage />} />
-      <Route path="/events" element={<EventsPage />} />
-      <Route path="/event/:eventId" element={<EventDetailedPage />} />
-      <Route path="/venues/:venueId/events/" element={<VenueEventsPage />} />
-      
-      {/* Regular Ticket Purchase Flow */}
-      <Route path="/event/:eventId/tickets/:ticketTypeId" element={<PrePurchasePage />} />
-      <Route path="/event/:eventId/tickets/:ticketTypeId/:quantity" element={<PaymentPage />} />
-      <Route path="/payment-success" element={<PaymentSuccessPage />} />
-      <Route path="/payment-cancel" element={<PaymentCancelPage />} />
-      
-      {/* VIP Table Reservation Flow */}
-      <Route path="/event/:eventId/vip/setup" element={<VIPTableSetupPage />} />
-      <Route path="/event/:eventId/vip/confirm" element={<VIPConfirmPage />} />
-      <Route path="/vip/manage/:managementCode" element={<VIPManagementPage />} />
-      <Route path="/vip-payment/:paymentLinkCode" element={<VIPPaymentPage />} />
-      <Route path="/vip-payment/success" element={<VIPPaymentSuccessPage />} />
-      
-      {/* Post Payment / Wallet Routes */}
-      <Route path="/wallet" element={<WalletPage />} />
-      <Route path="/wallet/:orderId/:eventId" element={<PostPaymentPage />} />
-      
-      <Route path="/aboutUs" element={<AboutUsPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* Redirect */}
+        <Route path="/" element={<Navigate to="/venues" />} />
+
+        {/* Rutas públicas con NavBar general */}
+        <Route path="/venues" element={
+          <GeneralLayout>
+            <VenuesPage />
+          </GeneralLayout>
+        } />
+        
+        <Route path="/events" element={
+          <GeneralLayout>
+            <EventsPage />
+          </GeneralLayout>
+        } />
+
+        <Route path="/aboutUs" element={
+          <GeneralLayout>
+            <AboutUsPage />
+          </GeneralLayout>
+        } />
+
+        {/* Rutas de autenticación (sin navbar) */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Rutas de venue con VenueNavBar */}
+        <Route path="/venues/:venueId/events/" element={
+          <VenueLayout>
+            <VenueEventsPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/event/:eventId" element={
+          <VenueLayout>
+            <EventDetailedPage />
+          </VenueLayout>
+        } />
+        
+        {/* Regular Ticket Purchase Flow */}
+        <Route path="/event/:eventId/tickets/:ticketTypeId" element={
+          <VenueLayout>
+            <PrePurchasePage />
+          </VenueLayout>
+        } />
+
+        <Route path="/event/:eventId/tickets/:ticketTypeId/:quantity" element={
+          <VenueLayout>
+            <PaymentPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/payment/success" element={
+          <VenueLayout>
+            <PaymentSuccessPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/payment/cancel" element={
+          <VenueLayout>
+            <PaymentCancelPage />
+          </VenueLayout>
+        } />
+
+        {/* Post-Purchase Page - PÚBLICA (sin autenticación requerida) */}
+        <Route path="/post-purchase/:orderId/:eventSlug" element={
+          <VenueLayout>
+            <PostPaymentPage />
+          </VenueLayout>
+        } />
+        
+        {/* VIP Table Reservation Flow */}
+        <Route path="/event/:eventId/vip/setup" element={
+          <VenueLayout>
+            <VIPTableSetupPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/event/:eventId/vip/confirm" element={
+          <VenueLayout>
+            <VIPConfirmPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/vip/manage/:managementCode" element={
+          <VenueLayout>
+            <VIPManagementPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/vip-payment/:paymentLinkCode" element={
+          <VenueLayout>
+            <VIPPaymentPage />
+          </VenueLayout>
+        } />
+
+        <Route path="/vip-payment/success" element={
+          <VenueLayout>
+            <VIPPaymentSuccessPage />
+          </VenueLayout>
+        } />
+        
+        {/* Rutas protegidas - requieren autenticación */}
+        <Route path="/wallet" element={
+          <ProtectedRoute>
+            <VenueLayout>
+              <WalletPage />
+            </VenueLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* Wallet con tickets específicos - PROTEGIDA */}
+        <Route path="/wallet/:orderId/:eventSlug" element={
+          <ProtectedRoute>
+            <VenueLayout>
+              <PostPaymentPage />
+            </VenueLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </AuthProvider>
   );
 }
