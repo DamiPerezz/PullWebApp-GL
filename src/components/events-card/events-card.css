@@ -44,7 +44,8 @@
 
 .event-card-image-wrapper {
     position: relative;
-    width: 160px;
+    width: 140px;
+    height: 140px;
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -53,6 +54,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -212,7 +214,8 @@
 
 @media (max-width: 768px) {
     .event-card-image-wrapper {
-        width: 140px;
+        width: 120px;
+        height: 120px;
     }
 
     .event-card-info {
@@ -230,7 +233,8 @@
 
 @media (max-width: 640px) {
     .event-card-image-wrapper {
-        width: 120px;
+        width: 110px;
+        height: 110px;
     }
 
     .event-card-info {
@@ -258,7 +262,8 @@
 
 @media (max-width: 400px) {
     .event-card-image-wrapper {
-        width: 100px;
+        width: 90px;
+        height: 90px;
     }
 
     .event-card-info {

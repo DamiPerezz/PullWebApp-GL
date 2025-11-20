@@ -1,3 +1,4 @@
+// pre-purchase-page.tsx
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "../../components/layout/layout";
 import "./pre-purchase-page.css";
@@ -38,7 +39,7 @@ export const PrePurchasePage = () => {
 
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
-    const maxQuantity = Math.min(10, ticketDetails.ticket_quantity || 10);
+    const maxQuantity = Math.min(3, ticketDetails.ticket_quantity || 3);
     if (newQuantity >= 1 && newQuantity <= maxQuantity) {
       setQuantity(newQuantity);
     }
@@ -64,12 +65,15 @@ export const PrePurchasePage = () => {
     );
   }
 
-  const maxQuantity = Math.min(10, ticketDetails.ticket_quantity || 10);
+  const maxQuantity = Math.min(3, ticketDetails.ticket_quantity || 3);
+  const currencySymbol = ticketDetails.currency === 'GTQ' ? 'Q' : 
+                        ticketDetails.currency === 'USD' ? '$' : 
+                        ticketDetails.currency === 'EUR' ? '€' : 
+                        ticketDetails.currency || 'Q';
 
   return (
     <Layout>
       <div className="pre-purchase-wrapper">
-        {/* Background Blur */}
         {eventInfo?.event_img && (
           <>
             <div 
@@ -80,16 +84,13 @@ export const PrePurchasePage = () => {
           </>
         )}
 
-        {/* Content */}
         <div className="pre-purchase-content">
           <div className="pre-purchase-container">
-            {/* Back Button */}
             <button onClick={handleBack} className="pre-purchase-back-button">
               <ChevronLeft />
               Back to Event
             </button>
 
-            {/* Progress Steps */}
             <div className="pre-purchase-steps">
               <div className="pre-purchase-step pre-purchase-step-active">
                 <div className="pre-purchase-step-number">1</div>
@@ -107,7 +108,6 @@ export const PrePurchasePage = () => {
               </div>
             </div>
 
-            {/* Event Info Section */}
             <div className="pre-purchase-event-info">
               <div className="pre-purchase-event-image">
                 <img src={eventInfo?.event_img} alt={eventInfo?.event_name} />
@@ -131,11 +131,8 @@ export const PrePurchasePage = () => {
               </div>
             </div>
 
-            {/* Content Grid */}
             <div className="pre-purchase-grid">
-              {/* Left Column */}
               <div className="pre-purchase-left">
-                {/* Ticket Card */}
                 <div className="pre-purchase-ticket-card">
                   <div className="pre-purchase-ticket-content">
                     <h3 className="pre-purchase-ticket-title">
@@ -146,14 +143,12 @@ export const PrePurchasePage = () => {
                     </p>
                   </div>
 
-                  {/* Price */}
                   <div className="pre-purchase-ticket-price">
-                    <span className="pre-purchase-price-amount">€{ticketDetails.ticket_price?.toFixed(2)}</span>
+                    <span className="pre-purchase-price-amount">{currencySymbol}{ticketDetails.ticket_price?.toFixed(2)}</span>
                     <span className="pre-purchase-price-label">per person</span>
                   </div>
                 </div>
 
-                {/* Quantity Selector */}
                 <div className="pre-purchase-quantity-card">
                   <h3 className="pre-purchase-quantity-title">Select Quantity</h3>
 
@@ -183,12 +178,16 @@ export const PrePurchasePage = () => {
                   </div>
 
                   <div className="pre-purchase-quantity-info">
-                    <p>Maximum {maxQuantity} tickets • {ticketDetails.ticket_quantity} tickets remaining</p>
+                    <p>Maximum 3 tickets • {ticketDetails.ticket_quantity} tickets remaining</p>
+                    {maxQuantity === 3 && ticketDetails.ticket_quantity > 3 && (
+                      <p style={{ marginTop: '0.5rem', color: 'rgba(167, 139, 250, 0.8)', fontSize: '0.8125rem' }}>
+                        💡 For 4+ tickets, use group reservations
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Right Column - Order Summary */}
               <div className="pre-purchase-right">
                 <TicketReceipt
                   quantity={quantity}

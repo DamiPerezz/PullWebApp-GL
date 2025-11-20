@@ -1,102 +1,60 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Layout } from "../../components/layout/layout";
-import { useEffect, useState } from "react";
-import { confirmStripePayment, getEventDetailedInfo } from "../../controller/purchase-pages-controller";
-import "./payment-success.css";
-import { CheckCircle, Loader } from "lucide-react";
+// pages/payment-success-page.tsx
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Layout } from '../../components/layout/layout';
+import { CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import './payment-success.css';
 
 export const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
+  const orderId = searchParams.get('order_id');
   const navigate = useNavigate();
+  
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [eventImage, setEventImage] = useState<string | null>(null);
+  const [orderData, setOrderData] = useState<any>(null);
 
   useEffect(() => {
-    const sessionId = searchParams.get("session_id");
-
-    if (!sessionId) {
-      setError("Missing session information");
+    if (!orderId) {
       setLoading(false);
       return;
     }
 
-    const eventId = localStorage.getItem('pending_event_id');
-
-    if (eventId) {
-      getEventDetailedInfo(eventId)
-        .then((eventData) => {
-          if (eventData?.event_img) {
-            setEventImage(eventData.event_img);
-          }
-        })
-        .catch((err) => {
-          console.log("Could not load event image:", err);
-        });
-    }
-
-    console.log('Processing payment success:', { sessionId });
-
-    confirmStripePayment(sessionId)
-      .then((response) => {
-        console.log('Payment confirmed successfully:', response);
-        
-        setSuccess(true);
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/orders/${orderId}/details`)
+      .then(res => res.json())
+      .then(data => {
+        setOrderData(data);
         setLoading(false);
-        
-        setTimeout(() => {
-          localStorage.removeItem('pending_order_id');
-          localStorage.removeItem('pending_event_id');
-          localStorage.removeItem('pending_ticket_type_id');
-          localStorage.removeItem('pending_quantity');
-          
-          // NAVEGACIÓN CORREGIDA: usar post-purchase en lugar de wallet
-          navigate(`/post-purchase/${response.order_id}/${response.event_slug}`);
-        }, 2000);
       })
-      .catch((err) => {
-        console.error("Error confirming payment:", err);
-        setError(err.message || "Error confirming payment");
+      .catch(() => {
         setLoading(false);
       });
-  }, [searchParams, navigate]);
+  }, [orderId]);
 
-  if (error) {
+  if (loading) {
     return (
       <Layout>
         <div className="payment-success-wrapper">
-          {eventImage ? (
-            <>
-              <div 
-                className="payment-success-bg-blur"
-                style={{ backgroundImage: `url(${eventImage})` }}
-              />
-              <div className="payment-success-bg-overlay" />
-            </>
-          ) : (
-            <div className="payment-success-bg-gradient" />
-          )}
+          <div className="payment-success-loading">
+            <div className="payment-success-spinner"></div>
+            <p>Loading your order...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
-          <div className="payment-success-content">
-            <div className="payment-success-container">
-              <div className="payment-success-card payment-success-error">
-                <div className="payment-success-icon-error">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" strokeWidth="2"/>
-                    <line x1="15" y1="9" x2="9" y2="15" strokeWidth="2"/>
-                    <line x1="9" y1="9" x2="15" y2="15" strokeWidth="2"/>
-                  </svg>
-                </div>
-                <h1 className="payment-success-title">Error</h1>
-                <p className="payment-success-message">{error}</p>
-                <button 
-                  onClick={() => navigate('/')}
-                  className="payment-success-button"
-                >
-                  Back to home
-                </button>
-              </div>
+  if (!orderId) {
+    return (
+      <Layout>
+        <div className="payment-success-wrapper">
+          <div className="payment-success-container">
+            <div className="payment-success-card payment-error-card">
+              <div className="payment-error-icon">⚠️</div>
+              <h1>Order Not Found</h1>
+              <p>Unable to find your order information</p>
+              <button onClick={() => navigate('/')} className="payment-success-button payment-success-button-primary">
+                Return to Home
+              </button>
             </div>
           </div>
         </div>
@@ -107,47 +65,110 @@ export const PaymentSuccessPage = () => {
   return (
     <Layout>
       <div className="payment-success-wrapper">
-        {eventImage ? (
+        {orderData?.event_img && (
           <>
             <div 
               className="payment-success-bg-blur"
-              style={{ backgroundImage: `url(${eventImage})` }}
+              style={{ backgroundImage: `url(${orderData.event_img})` }}
             />
-            <div className="payment-success-bg-overlay" />
+            <div className="payment-success-bg-overlay-dark" />
           </>
-        ) : (
-          <div className="payment-success-bg-gradient" />
         )}
-
+        {!orderData?.event_img && <div className="payment-success-bg-overlay" />}
+        
         <div className="payment-success-content">
           <div className="payment-success-container">
             <div className="payment-success-card">
-              {loading ? (
-                <>
-                  <div className="payment-success-spinner">
-                    <Loader className="spinner-icon" />
-                  </div>
-                  <h1 className="payment-success-title">Processing payment</h1>
-                  <p className="payment-success-message">
-                    We're confirming your payment and generating your tickets...
+              <div className="payment-success-icon-wrapper">
+                <CheckCircle className="payment-success-icon" />
+              </div>
+
+              <h1 className="payment-success-title">Payment Authorized!</h1>
+              
+              <div className="payment-success-description">
+                <p>Your payment has been successfully authorized and is being held securely.</p>
+              </div>
+
+              <div className="payment-status-card">
+                <div className="payment-status-header">
+                  <Clock />
+                  <span>Pending Staff Approval</span>
+                </div>
+                <div className="payment-status-body">
+                  <p>
+                    Your order is now waiting for staff confirmation. Once approved, your payment will be processed and you'll receive your tickets via email.
                   </p>
-                  <div className="payment-success-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                  <div className="payment-status-timeline">
+                    <div className="timeline-step timeline-step-completed">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-content">
+                        <h4>Payment Authorized</h4>
+                        <p>Your payment is securely held</p>
+                      </div>
+                    </div>
+                    <div className="timeline-step timeline-step-current">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-content">
+                        <h4>Staff Review</h4>
+                        <p>Staff is reviewing your order</p>
+                      </div>
+                    </div>
+                    <div className="timeline-step">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-content">
+                        <h4>Tickets Sent</h4>
+                        <p>You'll receive tickets via email</p>
+                      </div>
+                    </div>
                   </div>
-                </>
-              ) : success ? (
-                <>
-                  <div className="payment-success-icon">
-                    <CheckCircle />
-                  </div>
-                  <h1 className="payment-success-title">Payment successful!</h1>
-                  <p className="payment-success-message">
-                    Your payment has been processed successfully. Redirecting to your tickets...
-                  </p>
-                </>
-              ) : null}
+                </div>
+              </div>
+
+              <div className="payment-info-box">
+                <h3>Important Information</h3>
+                <ul>
+                  <li>Your payment is <strong>authorized but not yet charged</strong></li>
+                  <li>Staff will review your order shortly (usually within 24 hours)</li>
+                  <li>If approved, payment will be processed and tickets sent to your email</li>
+                  <li>If rejected, the authorization will be cancelled and funds returned</li>
+                  <li>You'll receive email updates about your order status</li>
+                </ul>
+              </div>
+
+              <div style={{
+                padding: "1rem",
+                borderRadius: "0.5rem",
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                marginBottom: "2rem",
+              }}>
+                <p style={{ 
+                  fontSize: "0.8125rem", 
+                  color: "rgba(255, 255, 255, 0.6)", 
+                  margin: "0 0 0.25rem 0" 
+                }}>
+                  Order Reference
+                </p>
+                <p style={{ 
+                  fontSize: "0.9375rem", 
+                  color: "white", 
+                  fontWeight: "500",
+                  fontFamily: "monospace",
+                  margin: 0 
+                }}>
+                  {orderId.slice(0, 8).toUpperCase()}
+                </p>
+              </div>
+
+              <div className="payment-success-actions">
+                <button 
+                  onClick={() => navigate('/')} 
+                  className="payment-success-button payment-success-button-primary"
+                >
+                  Return to Home
+                  <ArrowRight />
+                </button>
+              </div>
             </div>
           </div>
         </div>

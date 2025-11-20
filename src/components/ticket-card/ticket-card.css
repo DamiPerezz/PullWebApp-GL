@@ -1,0 +1,157 @@
+/* components/ticket-card/ticket-card.css */
+.ticket-card {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 15, 21, 0.8) 50%, rgba(217, 70, 239, 0.1) 100%);
+    backdrop-filter: blur(24px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ticket-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.2);
+}
+
+.ticket-card-validated {
+    border-color: rgba(52, 211, 153, 0.3);
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(15, 15, 21, 0.8) 50%, rgba(16, 185, 129, 0.1) 100%);
+}
+
+.ticket-card-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-card-type {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(196, 181, 253);
+}
+
+.ticket-card-validated-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    background: rgba(52, 211, 153, 0.2);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgb(52, 211, 153);
+}
+
+.ticket-card-body {
+    padding: 1.25rem;
+}
+
+.ticket-card-event-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 1.25rem 0;
+    letter-spacing: -0.01em;
+}
+
+.ticket-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ticket-card-detail {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.ticket-card-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgb(167, 139, 250);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.ticket-card-detail-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 0.25rem 0;
+}
+
+.ticket-card-detail-value {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: white;
+    margin: 0;
+}
+
+.ticket-card-detail-sub {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0.125rem 0 0 0;
+}
+
+.ticket-card-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-card-qr svg {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ticket-card-qr-text {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    text-align: center;
+}
+
+.ticket-card-footer {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+}
+
+.ticket-card-download-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 0.625rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ticket-card-download-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .ticket-card-event-name {
+        font-size: 1.125rem;
+    }
+
+    .ticket-card-detail-value {
+        font-size: 0.8125rem;
+    }
+}

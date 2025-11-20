@@ -1,107 +1,111 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Layout } from "../../components/layout/layout";
-import { useEffect, useState } from "react";
-import { cancelOrder, getEventDetailedInfo } from "../../controller/purchase-pages-controller";
-import "../payment-success/payment-success.css";
-import { XCircle } from "lucide-react";
+// pages/payment-cancel-page/payment-cancel-page.tsx - CORREGIDO
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Layout } from '../../components/layout/layout';
+import { AlertTriangle, ArrowRight, RefreshCw } from 'lucide-react';
+import { getOrderDataAfterCancel } from '../../controller/purchase-pages-controller';
+import './payment-cancel.css';
 
 export const PaymentCancelPage = () => {
   const [searchParams] = useSearchParams();
+  const orderId = searchParams.get('order_id');
+  const eventId = searchParams.get('event_id');
+  const ticketTypeId = searchParams.get('ticket_type_id');
+  const quantity = searchParams.get('quantity');
+  
   const navigate = useNavigate();
-  const [eventImage, setEventImage] = useState<string | null>(null);
+  
+  const [loading, setLoading] = useState(true);
+  const [orderData, setOrderData] = useState<any>(null);
 
   useEffect(() => {
-    const orderId = localStorage.getItem('pending_order_id');
-    const eventId = localStorage.getItem('pending_event_id');
-
-    // Cargar imagen del evento para el fondo
-    if (eventId) {
-      getEventDetailedInfo(eventId)
-        .then((eventData) => {
-          if (eventData?.event_img) {
-            setEventImage(eventData.event_img);
-          }
-        })
-        .catch((err) => {
-          console.log("Could not load event image:", err);
-        });
-    }
-
     if (orderId) {
-      // Cancelar la orden en el backend
-      cancelOrder(orderId).catch((err) => {
-        console.error("Error canceling order:", err);
-      });
+      getOrderDataAfterCancel(orderId)
+        .then((data) => {
+          setOrderData(data);
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
-  }, [searchParams]);
+  }, [orderId]);
 
   const handleRetry = () => {
-    const orderId = localStorage.getItem('pending_order_id');
-    const eventId = localStorage.getItem('pending_event_id');
-    const ticketTypeId = localStorage.getItem('pending_ticket_type_id');
-    const quantity = localStorage.getItem('pending_quantity');
-    
-    if (orderId && eventId && ticketTypeId && quantity) {
-      // Redirigir de vuelta a la página de pago con el parámetro cancelled
+    // Navegar de vuelta a la página de pago con los datos preservados
+    if (eventId && ticketTypeId && quantity && orderId) {
       navigate(`/event/${eventId}/tickets/${ticketTypeId}/${quantity}?order_id=${orderId}&cancelled=true`);
-    } else {
-      // Si no hay datos guardados, volver al inicio
-      navigate('/');
     }
   };
 
   const handleGoHome = () => {
-    // Limpiar localStorage
-    localStorage.removeItem('pending_order_id');
-    localStorage.removeItem('pending_event_id');
-    localStorage.removeItem('pending_ticket_type_id');
-    localStorage.removeItem('pending_quantity');
-    
     navigate('/');
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="payment-cancel-wrapper">
+          <div className="payment-cancel-loading">
+            <div className="payment-cancel-spinner"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="payment-success-wrapper">
-        {/* Background with blur effect */}
-        {eventImage ? (
-          <>
-            <div 
-              className="payment-success-bg-blur"
-              style={{ backgroundImage: `url(${eventImage})` }}
-            />
-            <div className="payment-success-bg-overlay" />
-          </>
-        ) : (
-          <div className="payment-success-bg-gradient" />
-        )}
-
-        <div className="payment-success-content">
-          <div className="payment-success-container">
-            <div className="payment-success-card payment-success-error">
-              <div className="payment-success-icon-error">
-                <XCircle />
+      <div className="payment-cancel-wrapper">
+        <div className="payment-cancel-bg-overlay" />
+        
+        <div className="payment-cancel-content">
+          <div className="payment-cancel-container">
+            <div className="payment-cancel-card">
+              {/* Warning Icon */}
+              <div className="payment-cancel-icon-wrapper">
+                <AlertTriangle className="payment-cancel-icon" />
               </div>
-              <h1 className="payment-success-title">Payment cancelled</h1>
-              <p className="payment-success-message">
-                The payment process has been cancelled. Your data has been saved and you can try again.
-              </p>
-              <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%' }}>
+
+              {/* Title */}
+              <h1 className="payment-cancel-title">Payment Cancelled</h1>
+              
+              {/* Description */}
+              <div className="payment-cancel-description">
+                <p>Your payment was cancelled. No charges were made to your account.</p>
+              </div>
+
+              {/* Info Box */}
+              <div className="payment-cancel-info-box">
+                <h3>What happens now?</h3>
+                <ul>
+                  <li>Your order has been cancelled</li>
+                  <li>No payment was processed</li>
+                  <li>Your form data has been saved</li>
+                  <li>You can try again when you&apos;re ready</li>
+                </ul>
+              </div>
+
+              {/* Actions */}
+              <div className="payment-cancel-actions">
+                {orderId && eventId && ticketTypeId && quantity && (
+                  <button 
+                    onClick={handleRetry} 
+                    className="payment-cancel-button payment-cancel-button-primary"
+                  >
+                    <RefreshCw />
+                    Try Again
+                  </button>
+                )}
                 <button 
-                  onClick={handleRetry}
-                  className="payment-success-button"
+                  onClick={handleGoHome} 
+                  className="payment-cancel-button payment-cancel-button-secondary"
                 >
-                  Try again
-                </button>
-                <button 
-                  onClick={handleGoHome}
-                  className="payment-success-button"
-                  style={{ 
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
-                  }}
-                >
-                  Back to home
+                  Return to Home
+                  <ArrowRight />
                 </button>
               </div>
             </div>

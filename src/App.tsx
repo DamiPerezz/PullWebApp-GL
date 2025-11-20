@@ -1,3 +1,4 @@
+// App.tsx - COMPLETO Y CORREGIDO
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { VenuesPage } from "./pages/venues-page/venues-page";
@@ -104,39 +105,45 @@ export default function App() {
           </VenueLayout>
         } />
         
-        {/* Regular Ticket Purchase Flow */}
+        {/* 🎫 FLUJO DE COMPRA DE TICKETS REGULAR (1-3 tickets) */}
+        
+        {/* Paso 1: Seleccionar cantidad (máximo 3) */}
         <Route path="/event/:eventId/tickets/:ticketTypeId" element={
           <VenueLayout>
             <PrePurchasePage />
           </VenueLayout>
         } />
 
+        {/* Paso 2: Ingresar datos y procesar pago */}
         <Route path="/event/:eventId/tickets/:ticketTypeId/:quantity" element={
           <VenueLayout>
             <PaymentPage />
           </VenueLayout>
         } />
 
-        <Route path="/payment/success" element={
+        {/* Paso 3: Confirmación de pago autorizado */}
+        <Route path="/order/payment-success" element={
           <VenueLayout>
             <PaymentSuccessPage />
           </VenueLayout>
         } />
 
-        <Route path="/payment/cancel" element={
+        {/* Cancelación del pago */}
+        <Route path="/order/payment-cancel" element={
           <VenueLayout>
             <PaymentCancelPage />
           </VenueLayout>
         } />
 
-        {/* Post-Purchase Page - PÚBLICA (sin autenticación requerida) */}
+        {/* Ver tickets después de la aprobación - PÚBLICA */}
         <Route path="/post-purchase/:orderId/:eventSlug" element={
           <VenueLayout>
             <PostPaymentPage />
           </VenueLayout>
         } />
         
-        {/* VIP Table Reservation Flow */}
+        {/* 🍾 FLUJO DE RESERVA VIP (4+ personas) */}
+        
         <Route path="/event/:eventId/vip/setup" element={
           <VenueLayout>
             <VIPTableSetupPage />
@@ -167,7 +174,7 @@ export default function App() {
           </VenueLayout>
         } />
         
-        {/* Rutas protegidas - requieren autenticación */}
+        {/* 👛 WALLET - PROTEGIDA */}
         <Route path="/wallet" element={
           <ProtectedRoute>
             <VenueLayout>

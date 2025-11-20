@@ -1,9 +1,4 @@
-// types.tsx - Tipos completos con sistema VIP y Autenticación
-
-// ============================================================
-// VENUE & EVENT TYPES
-// ============================================================
-
+// types/types.tsx - ACTUALIZACIÓN COMPLETA
 export type VenueInfo = {
   id: string;
   slug: string;
@@ -32,6 +27,8 @@ export type EventInfo = {
   event_img: string;
   requirements: Requirements[];
   vip_enabled: boolean;
+  min_price?: number;
+  currency: string;
 };
 
 export type VenueEventInfo = {
@@ -60,11 +57,8 @@ export type EventDetailedInfo = {
   requirements: Requirements[];
   vip_enabled: boolean;
   custome_location?: VenueInfo;
+  currency: string;
 };
-
-// ============================================================
-// TICKET TYPES
-// ============================================================
 
 export type TicketType = {
   ticket_type_id: string;
@@ -73,6 +67,7 @@ export type TicketType = {
   ticket_price: number;
   ticket_description: string;
   ticket_quantity: number;
+  currency: string;
 };
 
 export type UserInfoTicket = {
@@ -145,10 +140,6 @@ export type UsuarioFormData = {
   assistants?: string[];
 };
 
-// ============================================================
-// USER & AUTHENTICATION TYPES
-// ============================================================
-
 export interface User {
   id: string;
   email: string;
@@ -191,10 +182,6 @@ export interface UserProfileResponse {
   success: boolean;
   user: User;
 }
-
-// ============================================================
-// VIP TABLE TYPES
-// ============================================================
 
 export interface VIPTable {
   id: string;
@@ -252,7 +239,7 @@ export type VIPPerk = {
   created_at: string;
 };
 
-export type VIPReservationStatus = 'pending' | 'active' | 'completed' | 'cancelled' | 'expired';
+export type VIPReservationStatus = 'pending_staff_approval' | 'approved' | 'confirmed' | 'completed' | 'cancelled' | 'rejected';
 export type VIPGuestStatus = 'pending' | 'paid' | 'cancelled';
 
 export type VIPGuest = {
@@ -281,12 +268,13 @@ export type VIPReservation = {
   status: VIPReservationStatus;
   guest_count: number;
   total_amount: number;
+  host_amount: number;
   paid_amount: number;
   management_code: string;
   payment_link_code: string;
-  deadline_at: string;
   created_at: string;
   updated_at: string;
+  approved_at?: string;
   cancelled_at?: string;
   completed_at?: string;
   metadata?: Record<string, any>;
@@ -298,10 +286,11 @@ export type VIPReservationDetails = {
   payment_link_code: string;
   guest_count: number;
   total_amount: number;
+  host_amount: number;
   paid_amount: number;
-  deadline_at: string;
   created_at: string;
-  status_name: VIPReservationStatus;
+  approved_at?: string;
+  status: VIPReservationStatus;
   event_name: string;
   event_image: string;
   event_date: string;
@@ -328,36 +317,40 @@ export type VIPReservationDetails = {
 };
 
 export type CreateVIPReservationRequest = {
-  event_id: string;
+  event_slug: string;
   table_id: string;
   bottle_id: string;
-  organizer: {
+  organizer_data: {
     name: string;
     last_name: string;
     email: string;
     phone: string;
     phone_prefix?: string;
     gender?: string;
+    birth_date?: string;
   };
+  guest_count: number;
   guests: Array<{
     name: string;
     last_name: string;
     email: string;
     gender?: string;
+    host_pays: boolean;
   }>;
+  special_requests?: string;
 };
 
 export type CreateVIPReservationResponse = {
   success: boolean;
   reservation_id: string;
   management_code: string;
-  payment_link: string;
-  deadline_minutes: number;
+  payment_link_code: string;
+  message: string;
 };
 
 export type VIPGuestPaymentRequest = {
   payment_link_code: string;
-  guest_id: string;
+  guest_email: string;
 };
 
 export type VIPManagementAction = {
@@ -372,9 +365,23 @@ export type VIPManagementAction = {
   guest_id?: string;
 };
 
-// ============================================================
-// CONSTANTS
-// ============================================================
+export type ReservationData = {
+  venue_id: string;
+  event_id?: string;
+  guest_count: number;
+  booking_date: string;
+  table_preferences?: Record<string, any>;
+  special_requests?: string;
+  user_data: {
+    name: string;
+    surname: string;
+    email: string;
+    phone?: string;
+    phone_prefix?: string;
+    birth_date?: string;
+    gender?: string;
+  };
+};
 
 export const GENDER_OPTIONS = [
   { value: "male", label: "Masculino" },
@@ -384,21 +391,17 @@ export const GENDER_OPTIONS = [
 ] as const;
 
 export const PHONE_PREFIX_OPTIONS = [
-  { value: "+502", label: "+502 (Guatemala)", flag: "🇬🇹" },
+  { value: "+34", label: "+34 (España)", flag: "🇪🇸" },
   { value: "+1", label: "+1 (USA/Canadá)", flag: "🇺🇸" },
   { value: "+52", label: "+52 (México)", flag: "🇲🇽" },
-  { value: "+503", label: "+503 (El Salvador)", flag: "🇸🇻" },
-  { value: "+504", label: "+504 (Honduras)", flag: "🇭🇳" },
-  { value: "+505", label: "+505 (Nicaragua)", flag: "🇳🇮" },
-  { value: "+506", label: "+506 (Costa Rica)", flag: "🇨🇷" },
-  { value: "+507", label: "+507 (Panamá)", flag: "🇵🇦" },
+  { value: "+33", label: "+33 (France)", flag: "🇫🇷" },
+  { value: "+44", label: "+44 (UK)", flag: "🇬🇧" },
+  { value: "+49", label: "+49 (Germany)", flag: "🇩🇪" },
+  { value: "+39", label: "+39 (Italy)", flag: "🇮🇹" },
+  { value: "+351", label: "+351 (Portugal)", flag: "🇵🇹" },
 ] as const;
 
 export const VIP_DEADLINE_MINUTES = 30;
-
-// ============================================================
-// HELPER TYPES
-// ============================================================
 
 export type ZoneType = 'vip-premium' | 'vip' | 'standard';
 
@@ -429,10 +432,6 @@ export const ZONE_COLORS: Record<ZoneType, ZoneColorConfig> = {
     label: 'Standard',
   },
 };
-
-// ============================================================
-// TIER COLORS
-// ============================================================
 
 export const TIER_COLORS = {
   regular: {

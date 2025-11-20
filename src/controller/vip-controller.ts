@@ -1,4 +1,4 @@
-// vip-controller.ts
+// controllers/vip-controller.ts
 import type { 
   VIPTable, 
   VIPBottle, 
@@ -12,43 +12,43 @@ import type {
 import { apiClient } from "../utils/axios";
 
 export const getAvailableVIPTables = async (eventSlug: string): Promise<{ tables: VIPTable[] }> => {
-  const response = await apiClient.get(`/vip/tables/${eventSlug}`);
+  const response = await apiClient.get(`/vip-reservations/tables/${eventSlug}`);
   return response.data;
 };
 
 export const getVenueBottles = async (venueId: string): Promise<{ bottles: VIPBottle[] }> => {
-  const response = await apiClient.get(`/vip/bottles/${venueId}`);
+  const response = await apiClient.get(`/vip-reservations/bottles/${venueId}`);
   return response.data;
 };
 
 export const getVenueMixers = async (venueId: string): Promise<{ mixers: VIPMixer[] }> => {
-  const response = await apiClient.get(`/vip/mixers/${venueId}`);
+  const response = await apiClient.get(`/vip-reservations/mixers/${venueId}`);
   return response.data;
 };
 
 export const getVenuePerks = async (venueId: string): Promise<{ perks: VIPPerk[] }> => {
-  const response = await apiClient.get(`/vip/perks/${venueId}`);
+  const response = await apiClient.get(`/vip-reservations/perks/${venueId}`);
   return response.data;
 };
 
 export const createVIPReservation = async (
   data: CreateVIPReservationRequest
 ): Promise<CreateVIPReservationResponse> => {
-  const response = await apiClient.post('/vip/create', data);
+  const response = await apiClient.post('/vip-reservations/create', data);
   return response.data;
 };
 
 export const getVIPReservationByCode = async (
   managementCode: string
 ): Promise<{ reservation: VIPReservationDetails }> => {
-  const response = await apiClient.get(`/vip/manage/${managementCode}`);
+  const response = await apiClient.get(`/vip-reservations/manage/${managementCode}`);
   return response.data;
 };
 
 export const getVIPReservationByPaymentLink = async (
   paymentLinkCode: string
-): Promise<{ reservation: VIPReservationDetails }> => {
-  const response = await apiClient.get(`/vip/payment/${paymentLinkCode}`);
+): Promise<VIPReservationDetails> => {
+  const response = await apiClient.get(`/vip-reservations/payment/${paymentLinkCode}`);
   return response.data;
 };
 
@@ -61,7 +61,7 @@ export const addGuestToReservation = async (
     gender?: string;
   }
 ): Promise<{ success: boolean; guest_id: string }> => {
-  const response = await apiClient.post('/vip/add-guest', {
+  const response = await apiClient.post('/vip-reservations/add-guest', {
     management_code: managementCode,
     guest_data: guestData,
   });
@@ -72,7 +72,7 @@ export const removeGuestFromReservation = async (
   managementCode: string,
   guestId: string
 ): Promise<{ success: boolean }> => {
-  const response = await apiClient.post('/vip/remove-guest', {
+  const response = await apiClient.post('/vip-reservations/remove-guest', {
     management_code: managementCode,
     guest_id: guestId,
   });
@@ -82,7 +82,7 @@ export const removeGuestFromReservation = async (
 export const cancelVIPReservation = async (
   managementCode: string
 ): Promise<{ success: boolean }> => {
-  const response = await apiClient.post('/vip/cancel', {
+  const response = await apiClient.post('/vip-reservations/cancel', {
     management_code: managementCode,
   });
   return response.data;
@@ -90,11 +90,11 @@ export const cancelVIPReservation = async (
 
 export const createVIPGuestCheckout = async (
   paymentLinkCode: string,
-  guestId: string
+  guestEmail: string
 ): Promise<{ success: boolean; sessionId: string; url: string }> => {
-  const response = await apiClient.post('/vip/checkout', {
+  const response = await apiClient.post('/vip-reservations/checkout', {
     payment_link_code: paymentLinkCode,
-    guest_id: guestId,
+    guest_email: guestEmail,
   });
   return response.data;
 };
@@ -102,7 +102,7 @@ export const createVIPGuestCheckout = async (
 export const confirmVIPGuestPayment = async (
   sessionId: string
 ): Promise<{ success: boolean }> => {
-  const response = await apiClient.get('/vip/confirm-payment', {
+  const response = await apiClient.get('/vip-reservations/confirm-payment', {
     params: { session_id: sessionId },
   });
   return response.data;
