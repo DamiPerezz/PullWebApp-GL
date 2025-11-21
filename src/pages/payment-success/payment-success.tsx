@@ -2,16 +2,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '../../components/layout/layout';
-import { CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, ArrowRight, Copy, Check } from 'lucide-react';
 import './payment-success.css';
 
 export const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order_id');
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!orderId) {
@@ -19,16 +20,26 @@ export const PaymentSuccessPage = () => {
       return;
     }
 
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/orders/${orderId}/details`)
+    // ✅ Obtener detalles completos de la orden
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/orders/details/${orderId}`)
       .then(res => res.json())
       .then(data => {
+        console.log('📦 Order data:', data);
         setOrderData(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch(err => {
+        console.error('❌ Error fetching order:', err);
         setLoading(false);
       });
   }, [orderId]);
+
+  const handleCopyReference = () => {
+    const reference = orderData?.order?.order_number || orderId;
+    navigator.clipboard.writeText(reference);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (loading) {
     return (
@@ -62,20 +73,24 @@ export const PaymentSuccessPage = () => {
     );
   }
 
+  // ✅ Obtener order_number del response
+  const orderNumber = orderData?.order?.order_number;
+  const eventImage = orderData?.event?.image;
+
   return (
     <Layout>
       <div className="payment-success-wrapper">
-        {orderData?.event_img && (
+        {eventImage && (
           <>
-            <div 
+            <div
               className="payment-success-bg-blur"
-              style={{ backgroundImage: `url(${orderData.event_img})` }}
+              style={{ backgroundImage: `url(${eventImage})` }}
             />
             <div className="payment-success-bg-overlay-dark" />
           </>
         )}
-        {!orderData?.event_img && <div className="payment-success-bg-overlay" />}
-        
+        {!eventImage && <div className="payment-success-bg-overlay" />}
+
         <div className="payment-success-content">
           <div className="payment-success-container">
             <div className="payment-success-card">
@@ -84,7 +99,7 @@ export const PaymentSuccessPage = () => {
               </div>
 
               <h1 className="payment-success-title">Payment Authorized!</h1>
-              
+
               <div className="payment-success-description">
                 <p>Your payment has been successfully authorized and is being held securely.</p>
               </div>
@@ -135,34 +150,98 @@ export const PaymentSuccessPage = () => {
                 </ul>
               </div>
 
+              {/* ✅ Order Reference Card Centrada */}
               <div style={{
-                padding: "1rem",
-                borderRadius: "0.5rem",
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
+                padding: "1.5rem",
+                borderRadius: "0.75rem",
+                background: "rgba(139, 92, 246, 0.05)",
+                border: "1px solid rgba(139, 92, 246, 0.2)",
                 marginBottom: "2rem",
+                textAlign: "center", // ← CENTRADO
               }}>
-                <p style={{ 
-                  fontSize: "0.8125rem", 
-                  color: "rgba(255, 255, 255, 0.6)", 
-                  margin: "0 0 0.25rem 0" 
+                <p style={{
+                  fontSize: "0.8125rem",
+                  color: "rgba(255, 255, 255, 0.6)",
+                  margin: "0 0 0.75rem 0",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  fontWeight: "500"
                 }}>
                   Order Reference
                 </p>
-                <p style={{ 
-                  fontSize: "0.9375rem", 
-                  color: "white", 
-                  fontWeight: "500",
-                  fontFamily: "monospace",
-                  margin: 0 
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column", // ← Stack vertical
+                  alignItems: "center",
+                  gap: "1rem"
                 }}>
-                  {orderId.slice(0, 8).toUpperCase()}
+                  <p style={{
+                    fontSize: "1.5rem", // ← Más grande
+                    color: "white",
+                    fontWeight: "600",
+                    fontFamily: "monospace",
+                    margin: 0,
+                    letterSpacing: "0.15em",
+                    background: "linear-gradient(135deg, rgb(167, 139, 250), rgb(217, 70, 239))",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text"
+                  }}>
+                    {orderNumber || orderId.slice(0, 8).toUpperCase()}
+                  </p>
+                  <button
+                    onClick={handleCopyReference}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      padding: "0.625rem 1.25rem",
+                      background: copied ? "rgba(52, 211, 153, 0.1)" : "rgba(139, 92, 246, 0.1)",
+                      border: copied ? "1px solid rgba(52, 211, 153, 0.3)" : "1px solid rgba(139, 92, 246, 0.3)",
+                      borderRadius: "0.5rem",
+                      color: copied ? "rgb(52, 211, 153)" : "rgb(167, 139, 250)",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!copied) {
+                        e.currentTarget.style.background = "rgba(139, 92, 246, 0.2)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!copied) {
+                        e.currentTarget.style.background = "rgba(139, 92, 246, 0.1)";
+                      }
+                    }}
+                  >
+                    {copied ? (
+                      <>
+                        <Check style={{ width: "1rem", height: "1rem" }} />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy style={{ width: "1rem", height: "1rem" }} />
+                        Copy Reference
+                      </>
+                    )}
+                  </button>
+                </div>
+                <p style={{
+                  fontSize: "0.75rem",
+                  color: "rgba(255, 255, 255, 0.5)",
+                  margin: "1rem 0 0 0",
+                  lineHeight: "1.5"
+                }}>
+                  Save this reference number. You can use it to track your order status or contact support.
                 </p>
               </div>
 
               <div className="payment-success-actions">
-                <button 
-                  onClick={() => navigate('/')} 
+                <button
+                  onClick={() => navigate('/')}
                   className="payment-success-button payment-success-button-primary"
                 >
                   Return to Home

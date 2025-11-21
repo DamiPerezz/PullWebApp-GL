@@ -1,4 +1,4 @@
-// controller/purchase-pages-controller.ts - CORREGIDO
+// controller/purchase-pages-controller.ts - COMPLETO CORREGIDO
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
@@ -17,19 +17,49 @@ export const getEventDetailedInfo = async (eventSlug: string) => {
   return response.data;
 };
 
+// ✅ CORREGIDO - Enviar datos en el formato correcto
 export const createPendingOrder = async (
+  eventId: string,
   ticketTypeId: string,
-  slugId: string,
+  ticketTypeName: string,
+  ticketPrice: number,
+  currency: string,
   formData: any
 ) => {
-  const response = await axios.post(`${API_BASE_URL}/orders/create-pending-order`, {
+  // Estructurar tickets_data como array de objetos
+  const ticketsData = formData.usuarios.map((usuario: any) => ({
     ticket_type_id: ticketTypeId,
-    slug_id: slugId,
-    usuarios: formData.usuarios,
-  });
+    ticket_type_name: ticketTypeName,
+    quantity: 1,
+    price: ticketPrice,
+    owner_name: usuario.owner_name,
+    owner_last_name: usuario.owner_last_name,
+    owner_email: usuario.owner_email,
+    owner_phone: usuario.owner_phone,
+    owner_phone_prefix: usuario.owner_phone_prefix || '+34',
+    owner_gender: usuario.owner_gender,
+    owner_birthdate: usuario.owner_birthdate,
+  }));
+
+  const totalAmount = ticketPrice * formData.usuarios.length;
+
+  const requestData = {
+    event_id: eventId,
+    ticket_type_id: ticketTypeId,
+    tickets_data: ticketsData,
+    total: totalAmount,
+    currency: currency,
+    user_name: formData.usuarios[0].owner_name + ' ' + formData.usuarios[0].owner_last_name,
+    user_email: formData.usuarios[0].owner_email,
+  };
+
+  console.log('📤 Sending order request:', requestData);
+
+  const response = await axios.post(`${API_BASE_URL}/orders/create-pending-order`, requestData);
   return response.data;
 };
 
+// ✅ CORREGIDO - Simular pago que deja en pending_staff_approval
 export const simulateStripePayment = async (orderId: string) => {
   const response = await axios.post(`${API_BASE_URL}/orders/simulate-payment`, {
     order_id: orderId,

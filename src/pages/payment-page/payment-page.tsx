@@ -1,4 +1,4 @@
-// payment-page.tsx - CORREGIDO
+// payment-page.tsx - COMPLETO CORREGIDO
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Layout } from "../../components/layout/layout";
 import "./payment-page.css";
@@ -58,7 +58,7 @@ export const PaymentPage = () => {
         .then((data) => {
           if (data.order_data && data.order_data.tickets_data) {
             try {
-              const ticketsData = typeof data.order_data.tickets_data === 'string' 
+              const ticketsData = typeof data.order_data.tickets_data === 'string'
                 ? JSON.parse(data.order_data.tickets_data)
                 : data.order_data.tickets_data;
               setCancelledOrderData(ticketsData);
@@ -88,6 +88,7 @@ export const PaymentPage = () => {
       });
   }, [eventId, ticketTypeId, orderIdParam, cancelledParam]);
 
+  // payment-page.tsx - SECCIÓN onSubmit CORREGIDA
   const onSubmit = async (formData: any) => {
     if (processing) return;
 
@@ -105,7 +106,7 @@ export const PaymentPage = () => {
         throw new Error("No ticket information provided");
       }
 
-      const missingFields = formData.usuarios.some((ticket: any) => 
+      const missingFields = formData.usuarios.some((ticket: any) =>
         !ticket.owner_name || !ticket.owner_last_name || !ticket.owner_email ||
         !ticket.owner_phone || !ticket.owner_birthdate
       );
@@ -116,10 +117,52 @@ export const PaymentPage = () => {
 
       console.log('✅ Data structure validated');
 
-      // 1. Create pending order
+      // ✅ CRÍTICO: Verificar que tenemos eventInfo con el ID real
+      if (!eventInfo) {
+        throw new Error("Event information not loaded");
+      }
+
+      // ✅ Necesitamos obtener el event_id real del backend
+      // Primero verificamos si eventInfo tiene un campo 'id' o 'event_id'
+      let realEventID = (eventInfo as any).event_id || (eventInfo as any).id;
+
+      if (!realEventID) {
+        // Si no tenemos el ID, necesitamos hacer una petición adicional
+        console.log('⚠️ Event ID not in eventInfo, fetching from API...');
+        const eventDetailsResponse = await fetch(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/event/get-event-info/${eventId}`
+        );
+
+        if (!eventDetailsResponse.ok) {
+          throw new Error("Failed to get event ID");
+        }
+
+        const eventDetails = await eventDetailsResponse.json();
+        realEventID = eventDetails.event_id || eventDetails.id;
+      }
+
+      if (!realEventID) {
+        throw new Error("Could not determine event ID");
+      }
+
+      console.log('🎯 Using Event ID:', realEventID);
+
+      // ✅ 1. Crear orden pendiente con el ID REAL del evento
+      console.log('📝 Creating pending order with data:', {
+        eventId: realEventID, // ← ID REAL, no slug
+        ticketTypeId,
+        ticketName: ticketDetails.ticket_name,
+        price: ticketDetails.ticket_price,
+        currency: ticketDetails.currency,
+        quantity: formData.usuarios.length
+      });
+
       const orderResponse = await createPendingOrder(
+        realEventID!, // ← ID REAL del evento
         ticketTypeId!,
-        eventId!,
+        ticketDetails.ticket_name,
+        ticketDetails.ticket_price,
+        ticketDetails.currency || 'EUR',
         formData
       );
 
@@ -131,8 +174,8 @@ export const PaymentPage = () => {
 
       const orderId = orderResponse.order_id;
 
-      // 2. Simulate Stripe payment
-      console.log('💳 Simulating payment...');
+      // ✅ 2. Simular pago de Stripe
+      console.log('💳 Simulating payment for order:', orderId);
       const paymentResponse = await simulateStripePayment(orderId);
 
       console.log('✅ Payment simulated:', paymentResponse);
@@ -141,30 +184,30 @@ export const PaymentPage = () => {
         throw new Error(paymentResponse.error || "Payment simulation failed");
       }
 
-      // 3. Show success
+      // ✅ 3. Mostrar éxito
       setPaymentSuccess(true);
       setProcessing(false);
 
-      // 4. Redirect after 3 seconds - ✅ RUTA CORREGIDA
+      // ✅ 4. Redirigir después de 3 segundos
       setTimeout(() => {
         navigate(`/order/payment-success?order_id=${orderId}`);
       }, 3000);
-      
+
     } catch (error: any) {
       console.error("❌ Error during checkout:", error);
-      
+
       let errorMessage = "An unexpected error occurred. Please try again.";
-      
+
       if (error.message) {
         errorMessage = error.message;
       } else if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
       }
-      
+
       if (error.response?.data?.details) {
         console.error('Error details:', error.response.data.details);
       }
-      
+
       setError(errorMessage);
       setProcessing(false);
     }
@@ -194,7 +237,7 @@ export const PaymentPage = () => {
   return (
     <Layout>
       <div className="payment-page-wrapper">
-        <div 
+        <div
           className="payment-page-bg-blur"
           style={{ backgroundImage: `url(${eventInfo?.event_img})` }}
         />
@@ -221,7 +264,7 @@ export const PaymentPage = () => {
                     <h4 className="payment-page-error-title">Error</h4>
                     <p className="payment-page-error-message">{error}</p>
                   </div>
-                  <button 
+                  <button
                     onClick={handleDismissError}
                     className="payment-page-error-close"
                     aria-label="Dismiss error"
@@ -293,8 +336,8 @@ export const PaymentPage = () => {
 
                 <div className="payment-page-grid">
                   <div className="payment-page-left">
-                    <UserDetailsForm 
-                      quantity={Number(quantity!)} 
+                    <UserDetailsForm
+                      quantity={Number(quantity!)}
                       ref={formRef}
                       initialData={cancelledOrderData}
                       ticketGender={ticketGender}
