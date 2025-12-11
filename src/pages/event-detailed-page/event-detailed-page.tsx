@@ -166,24 +166,12 @@ export const EventDetailedPage = () => {
 
                             <div className="event-detailed-right">
                                 <div className="event-detailed-right-header">
-                                    {/* Tags fecha/hora - Line 1 in mobile */}
-                                    <div className="event-detailed-tags event-detailed-tags-datetime">
-                                        <div className="event-detailed-tag date">
-                                            <Calendar size={14} />
-                                            <span>{formattedDate}</span>
-                                        </div>
-                                        <div className="event-detailed-tag time">
-                                            <Clock size={14} />
-                                            <span>{open} - {close}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Title - Line 2 in mobile */}
+                                    {/* Title */}
                                     <h1 className="event-detailed-title">
                                         {eventDetailedInfo?.event_name}
                                     </h1>
 
-                                    {/* Tags edad/dress code - Line 3 in mobile */}
+                                    {/* Tags - age and dress code only */}
                                     {(eventDetailedInfo?.min_age || eventDetailedInfo?.dress_code) && (
                                         <div className="event-detailed-tags event-detailed-tags-info">
                                             {eventDetailedInfo?.min_age && (
@@ -201,23 +189,46 @@ export const EventDetailedPage = () => {
                                         </div>
                                     )}
 
-                                    {/* Mobile only - location and description */}
-                                    <div className="event-detailed-mobile-location">
-                                        <MapPin size={16} />
-                                        <span>{eventDetailedInfo?.location}</span>
+                                    {/* Date - plain text with icon */}
+                                    <div className="event-detailed-date-time date">
+                                        <Calendar size={14} />
+                                        <span>{formattedDate}</span>
                                     </div>
-                                    {eventDetailedInfo?.description && (
-                                        <div className="event-detailed-mobile-description">
-                                            <p>{eventDetailedInfo.description}</p>
-                                            <button
-                                                className="event-detailed-mobile-read-more"
-                                                onClick={() => setShowDescriptionModal(true)}
-                                            >
-                                                Read more
-                                            </button>
-                                        </div>
-                                    )}
+
+                                    {/* Time - plain text with icon */}
+                                    <div className="event-detailed-date-time time">
+                                        <Clock size={14} />
+                                        <span>{open} - {close}</span>
+                                    </div>
+
+                                    {/* Location button - mobile only */}
+                                    <a
+                                        href={getMapUrl()}
+                                        className="event-detailed-location-button-mobile"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <MapPin size={14} />
+                                        <span>Get Directions</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
+
                                 </div>
+
+                                {/* Mobile only - description below tags */}
+                                {eventDetailedInfo?.description && (
+                                    <div className="event-detailed-mobile-description">
+                                        <p>{eventDetailedInfo.description}</p>
+                                        <button
+                                            className="event-detailed-mobile-read-more"
+                                            onClick={() => setShowDescriptionModal(true)}
+                                        >
+                                            Read more
+                                        </button>
+                                    </div>
+                                )}
 
                                 <div className="event-detailed-tickets-section">
                                     <h2 className="event-detailed-tickets-title">Available Tickets</h2>

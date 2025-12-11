@@ -169,7 +169,9 @@
 
 .payment-page-step-active .payment-page-step-number {
     background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: rgba(139, 92, 246, 0.4);
     color: rgb(196, 181, 253);
 }
 

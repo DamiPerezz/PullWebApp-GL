@@ -69,8 +69,10 @@
 
 /* Date tag - Purple */
 .event-info-tag.date {
-    background: rgba(167, 139, 250, 0.15);
-    border: 1px solid rgba(167, 139, 250, 0.4);
+    background: rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(139, 92, 246, 0.4);
     color: rgb(196, 181, 253);
 }
 
@@ -102,7 +104,9 @@
 
 /* Dress code tag - Pink */
 .event-info-tag.dress-code {
-    background: rgba(232, 121, 249, 0.15);
+    background: rgba(232, 121, 249, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(232, 121, 249, 0.4);
     color: rgb(245, 158, 253);
 }
