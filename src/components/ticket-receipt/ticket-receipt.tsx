@@ -20,7 +20,7 @@ export const TicketReceipt = (
                           ticketDetails.currency || 'Q';
     
     const subtotal = ticketDetails.ticket_price * quantity;
-    const serviceFee = subtotal * 0.07;
+    const serviceFee = subtotal * 0.112;
     const total = subtotal + serviceFee;
 
     return (
@@ -60,7 +60,7 @@ export const TicketReceipt = (
                         <span>{currencySymbol}{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="ticket-receipt-fee">
-                        <span>Service Fee (7%)</span>
+                        <span>Service Fee</span>
                         <span>{currencySymbol}{serviceFee.toFixed(2)}</span>
                     </div>
 
@@ -80,11 +80,6 @@ export const TicketReceipt = (
                     {buttonText}
                     <ChevronLeft className="ticket-receipt-button-icon" />
                 </button>
-
-                <div className="ticket-receipt-badge">
-                    <div className="ticket-receipt-badge-dot" />
-                    Secure payment with Stripe
-                </div>
             </div>
         </div>
     );

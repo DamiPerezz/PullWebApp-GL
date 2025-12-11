@@ -1,11 +1,11 @@
 import { Footer } from '../footer/footer.tsx'
-import { NavBar } from '../nav-bar/nav-bar.tsx'
+import { VenueNavBar } from '../venue-nav-bar/venue-nav-bar.tsx'
 import './layout.css'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className='layout-container'>
-            <NavBar />
+            <VenueNavBar />
             <main className='layout-content'>
                 {children}
             </main>

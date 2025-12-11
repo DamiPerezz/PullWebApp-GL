@@ -70,6 +70,33 @@ export const XBrandIcon = ({
   );
 };
 
+export const LinkedInIcon = ({
+  strokeColor,
+}: {
+  strokeColor?: string | "currentColor";
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={strokeColor}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+      <path d="M8 11l0 5" />
+      <path d="M8 8l0 .01" />
+      <path d="M12 16l0 -5" />
+      <path d="M16 16v-3a2 2 0 0 0 -4 0" />
+    </svg>
+  );
+};
+
 export const CalendarIcon = ({
   strokeColor,
 }: {
@@ -105,8 +132,10 @@ export const CalendarIcon = ({
 
 export const ClockIcon = ({
   strokeColor,
+  className,
 }: {
   strokeColor?: string | "currentColor";
+  className?: string;
 }) => {
   return (
     <svg
@@ -119,6 +148,7 @@ export const ClockIcon = ({
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={className}
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
@@ -129,8 +159,10 @@ export const ClockIcon = ({
 
 export const LocationIcon = ({
   strokeColor,
+  className,
 }: {
   strokeColor?: string | "currentColor";
+  className?: string;
 }) => {
   return (
     <svg
@@ -143,6 +175,7 @@ export const LocationIcon = ({
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={className}
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />

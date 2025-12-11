@@ -40,3 +40,72 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Protected route loading styles */
+.protected-route-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 15, 1) 0%,
+    rgba(20, 15, 35, 1) 100%
+  );
+  z-index: 9999;
+}
+
+.protected-route-loading__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.protected-route-loading__spinner {
+  color: rgb(167, 139, 250);
+  animation: spin 1s linear infinite;
+}
+
+.protected-route-loading__text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .protected-route-loading__content {
+    padding: 1.5rem;
+  }
+
+  .protected-route-loading__spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .protected-route-loading__text {
+    font-size: 0.875rem;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .protected-route-loading__spinner {
+    animation: none;
+  }
+}

@@ -16,7 +16,7 @@ export const PaymentCancelPage = () => {
   const navigate = useNavigate();
   
   const [loading, setLoading] = useState(true);
-  const [orderData, setOrderData] = useState<any>(null);
+  const [_orderData, setOrderData] = useState<any>(null);
 
   useEffect(() => {
     if (orderId) {

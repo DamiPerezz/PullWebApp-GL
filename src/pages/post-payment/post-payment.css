@@ -1,6 +1,6 @@
 /* Post Payment Page - Modern Design */
 .post-payment-wrapper {
-    min-height: 100vh;
+    flex: 1;
     position: relative;
     overflow: hidden;
     background: #0a0a0f;

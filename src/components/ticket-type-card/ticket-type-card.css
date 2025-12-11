@@ -38,11 +38,8 @@
 
 .ticket-type-card:hover {
     border-color: rgba(139, 92, 246, 0.5);
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
-    transform: translateY(-2px);
 }
 
-.ticket-type-card:hover::before,
 .ticket-type-card:hover::after {
     opacity: 1;
 }
@@ -58,7 +55,6 @@
 
 .ticket-women:hover {
     border-color: rgba(236, 72, 153, 0.5);
-    box-shadow: 0 8px 32px rgba(236, 72, 153, 0.2);
 }
 
 /* Men Ticket Variant */
@@ -72,7 +68,6 @@
 
 .ticket-men:hover {
     border-color: rgba(59, 130, 246, 0.5);
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
 }
 
 /* Group Ticket Variant - Subtle Purple Touches */
@@ -86,7 +81,6 @@
 
 .ticket-group:hover {
     border-color: rgba(139, 92, 246, 0.5);
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
 }
 
 .ticket-type-card-header {
@@ -242,6 +236,10 @@
     gap: 1rem;
 }
 
+.ticket-type-card-footer--centered {
+    justify-content: center;
+}
+
 .ticket-type-card-price {
     font-size: 1.0625rem;
     font-weight: 600;
@@ -291,6 +289,31 @@
     border-color: rgba(139, 92, 246, 0.5);
 }
 
+.ticket-group-capacity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.15));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: rgb(196, 181, 253);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.ticket-group-capacity svg {
+    width: 1rem;
+    height: 1rem;
+    color: rgb(167, 139, 250);
+}
+
+.ticket-group:hover .ticket-group-capacity {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(167, 139, 250, 0.25));
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
 .ticket-type-card-button {
     display: flex;
     align-items: center;
@@ -326,7 +349,6 @@
 .ticket-type-card:hover .ticket-type-card-button {
     background: linear-gradient(to right, rgba(139, 92, 246, 0.5), rgba(217, 70, 239, 0.5));
     border-color: rgba(139, 92, 246, 0.6);
-    transform: translateX(4px);
 }
 
 .ticket-women:hover .ticket-type-card-button {
@@ -347,11 +369,6 @@
 .ticket-type-card-button svg {
     width: 1.125rem;
     height: 1.125rem;
-    transition: transform 0.3s ease;
-}
-
-.ticket-type-card:hover .ticket-type-card-button svg {
-    transform: scale(1.1);
 }
 
 /* Unavailable Ticket Styles */

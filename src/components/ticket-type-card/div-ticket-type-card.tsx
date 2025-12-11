@@ -1,6 +1,6 @@
 // div-ticket-type-card.tsx - ACTUALIZADO PROFESIONAL
 import type { TicketType } from "../../types/types";
-import { User, Users, CheckCircle, Wine } from 'lucide-react';
+import { User, Users, CheckCircle } from 'lucide-react';
 import './ticket-type-card.css';
 
 const getCurrencySymbol = (currency: string): string => {

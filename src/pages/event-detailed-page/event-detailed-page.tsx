@@ -3,20 +3,21 @@ import { useEffect, useState } from 'react';
 import { Layout } from '../../components/layout/layout';
 import { TicketTypeCard } from '../../components/ticket-type-card/ticket-type-card';
 import { DivTicketTypeCard } from '../../components/ticket-type-card/div-ticket-type-card';
-import { Calendar, Clock, MapPin, ChevronLeft, Plus, Shirt, Wine, CheckCircle, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, Plus, Shirt, X } from 'lucide-react';
 import type { EventDetailedInfo, TicketType } from '../../types/types';
 import './event-detailed-page.css';
-import { getEventDetailedInfo } from '../../controller/event-controller'; // CORREGIDO
-import { getTicketTypes } from '../../controller/event-controller'; // CORREGIDO
-import { useParams, useNavigate } from 'react-router-dom';
+import { getEventDetailedInfo } from '../../controller/event-controller';
+import { getTicketTypes } from '../../controller/event-controller';
+import { useParams } from 'react-router-dom';
+import { SEO, generateEventStructuredData } from '../../components/seo/seo';
 
 export const EventDetailedPage = () => {
     const { eventId } = useParams<{ eventId: string }>();
-    const navigate = useNavigate();
 
     const [eventDetailedInfo, setEventDetailedInfo] = useState<EventDetailedInfo | null>(null);
     const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
     const [loading, setIsLoading] = useState<boolean>(true);
+    const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
     useEffect(() => {
         if (!eventId) {
@@ -28,35 +29,27 @@ export const EventDetailedPage = () => {
             .then(data => {
                 setEventDetailedInfo(data);
             })
-            .catch(error => {
-                console.error("Error fetching event details:", error);
+            .catch(() => {
+                // Silently handle error
             });
 
-        getTicketTypes(eventId) // CORREGIDO
+        getTicketTypes(eventId)
             .then(data => {
                 setTicketTypes(data);
                 setIsLoading(false);
             })
-            .catch(error => {
-                console.error("Error fetching ticket types:", error);
+            .catch(() => {
                 setIsLoading(false);
             });
     }, [eventId]);
 
-    const handleBack = () => {
-        navigate(-1);
-    };
-
-    const handleViewMap = () => {
-        // Use event coordinates if available, otherwise use a default location
-        const lat = eventDetailedInfo?.custome_location?.latitude || 40.4531; // CORREGIDO
-        const lng = eventDetailedInfo?.custome_location?.longitude || -3.6883; // CORREGIDO
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-        window.open(mapsUrl, '_blank', 'noopener,noreferrer');
-    };
-
-    const handleVIPClick = () => {
-        navigate(`/event/${eventId}/vip/setup`); // AGREGADO
+    const getMapUrl = () => {
+        const lat = eventDetailedInfo?.custom_location?.latitude;
+        const lng = eventDetailedInfo?.custom_location?.longitude;
+        if (lat && lng) {
+            return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        }
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventDetailedInfo?.location || '')}`;
     };
 
     if (loading) {
@@ -86,34 +79,68 @@ export const EventDetailedPage = () => {
         day: 'numeric'
     });
 
+    // Generate structured data for SEO
+    const eventStructuredData = eventDetailedInfo ? generateEventStructuredData({
+        name: eventDetailedInfo.event_name,
+        description: eventDetailedInfo.description || `Evento en ${eventDetailedInfo.location}`,
+        startDate: `${eventDetailedInfo.date}T${eventDetailedInfo.open_time}`,
+        endDate: `${eventDetailedInfo.date}T${eventDetailedInfo.close_time}`,
+        location: eventDetailedInfo.location,
+        image: eventDetailedInfo.event_img,
+        url: `https://web.pullevents.com/event/${eventId}`,
+        price: ticketTypes[0]?.ticket_price,
+        currency: "GTQ",
+        availability: ticketTypes.some(t => t.ticket_quantity > 0) ? "InStock" : "SoldOut"
+    }) : undefined;
+
     return (
         <Layout>
+            {eventDetailedInfo && (
+                <SEO
+                    title={eventDetailedInfo.event_name}
+                    description={eventDetailedInfo.description || `Compra entradas para ${eventDetailedInfo.event_name} en ${eventDetailedInfo.location}. ${formattedDate}.`}
+                    keywords={`${eventDetailedInfo.event_name}, entradas ${eventDetailedInfo.location}, eventos guatemala, fiestas ${eventDetailedInfo.location}`}
+                    canonicalUrl={`https://web.pullevents.com/event/${eventId}`}
+                    ogTitle={`${eventDetailedInfo.event_name} | Pull Events`}
+                    ogDescription={`Compra entradas para ${eventDetailedInfo.event_name}. ${formattedDate} en ${eventDetailedInfo.location}.`}
+                    ogImage={eventDetailedInfo.event_img}
+                    ogType="event"
+                    structuredData={eventStructuredData}
+                />
+            )}
             <div className="event-detailed-wrapper">
-                <div 
-                    className="event-detailed-bg-blur" 
+                <div
+                    className="event-detailed-bg-blur"
                     style={{ backgroundImage: `url(${eventDetailedInfo?.event_img})` }}
                 />
                 <div className="event-detailed-bg-overlay" />
                 
                 <div className="event-detailed-content">
                     <div className="event-detailed-container">
-                        <button 
-                            onClick={handleBack}
-                            className="event-detailed-back-button"
-                        >
-                            <ChevronLeft />
-                            Back to Events
-                        </button>
-
                         <div className="event-detailed-layout">
                             <div className="event-detailed-left">
                                 <div className="event-detailed-image-wrapper">
-                                    <img 
-                                        src={eventDetailedInfo?.event_img} 
+                                    <img
+                                        src={eventDetailedInfo?.event_img}
                                         alt={eventDetailedInfo?.event_name}
                                         className="event-detailed-image"
                                     />
                                 </div>
+
+                                {eventDetailedInfo?.description && (
+                                    <div className="event-detailed-description-card">
+                                        <h3 className="event-detailed-description-title">Event Description</h3>
+                                        <p className="event-detailed-description">
+                                            {eventDetailedInfo.description}
+                                        </p>
+                                        <button
+                                            className="event-detailed-read-more"
+                                            onClick={() => setShowDescriptionModal(true)}
+                                        >
+                                            Read more
+                                        </button>
+                                    </div>
+                                )}
 
                                 <div className="event-detailed-info-card">
                                     <div className="event-detailed-location-info">
@@ -122,61 +149,72 @@ export const EventDetailedPage = () => {
                                             <span>{eventDetailedInfo?.location}</span>
                                         </div>
                                     </div>
-                                    <button 
-                                        onClick={handleViewMap}
+                                    <a
+                                        href={getMapUrl()}
                                         className="event-detailed-location-button"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                     >
                                         <MapPin size={16} />
                                         <span>Get Directions</span>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="9 18 15 12 9 6"></polyline>
                                         </svg>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
 
                             <div className="event-detailed-right">
                                 <div className="event-detailed-right-header">
-                                    <h1 className="event-detailed-title">
-                                        {eventDetailedInfo?.event_name}
-                                    </h1>
-
-                                    <div className="event-detailed-date-time">
-                                        <div className="event-detailed-meta-item date">
-                                            <Calendar />
+                                    {/* Tags fecha/hora - Line 1 in mobile */}
+                                    <div className="event-detailed-tags event-detailed-tags-datetime">
+                                        <div className="event-detailed-tag date">
+                                            <Calendar size={14} />
                                             <span>{formattedDate}</span>
                                         </div>
-                                        <div className="event-detailed-meta-item time">
-                                            <Clock />
+                                        <div className="event-detailed-tag time">
+                                            <Clock size={14} />
                                             <span>{open} - {close}</span>
                                         </div>
                                     </div>
 
-                                    {eventDetailedInfo?.requirements && eventDetailedInfo.requirements.length > 0 && (
-                                        <div className="event-detailed-requirements">
-                                            {eventDetailedInfo.requirements.map(req => {
-                                                if (req.name === 'age') {
-                                                    return (
-                                                        <div key={req.name} className="event-detailed-requirement age">
-                                                            <Plus size={16} />
-                                                            <span>{req.description}</span>
-                                                        </div>
-                                                    );
-                                                }
-                                                if (req.name === 'dress_code') {
-                                                    return (
-                                                        <div key={req.name} className="event-detailed-requirement dress-code">
-                                                            <Shirt size={16} />
-                                                            <span>{req.description}</span>
-                                                        </div>
-                                                    );
-                                                }
-                                                return (
-                                                    <div key={req.name} className="event-detailed-requirement">
-                                                        <span>{req.description}</span>
-                                                    </div>
-                                                );
-                                            })}
+                                    {/* Title - Line 2 in mobile */}
+                                    <h1 className="event-detailed-title">
+                                        {eventDetailedInfo?.event_name}
+                                    </h1>
+
+                                    {/* Tags edad/dress code - Line 3 in mobile */}
+                                    {(eventDetailedInfo?.min_age || eventDetailedInfo?.dress_code) && (
+                                        <div className="event-detailed-tags event-detailed-tags-info">
+                                            {eventDetailedInfo?.min_age && (
+                                                <div className="event-detailed-tag age">
+                                                    <Plus size={14} />
+                                                    <span>{eventDetailedInfo.min_age}+</span>
+                                                </div>
+                                            )}
+                                            {eventDetailedInfo?.dress_code && (
+                                                <div className="event-detailed-tag dress-code">
+                                                    <Shirt size={14} />
+                                                    <span>{eventDetailedInfo.dress_code}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Mobile only - location and description */}
+                                    <div className="event-detailed-mobile-location">
+                                        <MapPin size={16} />
+                                        <span>{eventDetailedInfo?.location}</span>
+                                    </div>
+                                    {eventDetailedInfo?.description && (
+                                        <div className="event-detailed-mobile-description">
+                                            <p>{eventDetailedInfo.description}</p>
+                                            <button
+                                                className="event-detailed-mobile-read-more"
+                                                onClick={() => setShowDescriptionModal(true)}
+                                            >
+                                                Read more
+                                            </button>
                                         </div>
                                     )}
                                 </div>
@@ -184,41 +222,6 @@ export const EventDetailedPage = () => {
                                 <div className="event-detailed-tickets-section">
                                     <h2 className="event-detailed-tickets-title">Available Tickets</h2>
                                     <div className="event-detailed-tickets-grid">
-                                        {eventDetailedInfo?.vip_enabled && ( // CORREGIDO - Solo mostrar si VIP está habilitado
-                                            <div className="event-detailed-vip-section" onClick={handleVIPClick}>
-                                                <div className="event-detailed-vip-content">
-                                                    <div className="event-detailed-vip-header">
-                                                        <Wine />
-                                                        <h3 className="event-detailed-vip-title">VIP Table Service</h3>
-                                                    </div>
-
-                                                    <p className="event-detailed-vip-description">
-                                                        Reserve an exclusive table with premium bottle service. Perfect for groups looking for a VIP experience.
-                                                    </p>
-
-                                                    <ul className="event-detailed-vip-features">
-                                                        <li className="event-detailed-vip-feature">
-                                                            <CheckCircle />
-                                                            <span>Premium bottle service</span>
-                                                        </li>
-                                                        <li className="event-detailed-vip-feature">
-                                                            <CheckCircle />
-                                                            <span>Dedicated VIP area</span>
-                                                        </li>
-                                                        <li className="event-detailed-vip-feature">
-                                                            <CheckCircle />
-                                                            <span>Easy group payment split</span>
-                                                        </li>
-                                                    </ul>
-
-                                                    <button className="event-detailed-vip-button">
-                                                        <Users />
-                                                        View Table Options
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-
                                         {ticketTypes.map(ticket => {
                                             if (ticket.ticket_quantity === 0) {
                                                 return <DivTicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
@@ -231,6 +234,25 @@ export const EventDetailedPage = () => {
                         </div>
                     </div>
                 </div>
+
+                {showDescriptionModal && eventDetailedInfo?.description && (
+                    <div className="event-detailed-modal-overlay" onClick={() => setShowDescriptionModal(false)}>
+                        <div className="event-detailed-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="event-detailed-modal-header">
+                                <h3 className="event-detailed-modal-title">About this event</h3>
+                                <button
+                                    className="event-detailed-modal-close"
+                                    onClick={() => setShowDescriptionModal(false)}
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <div className="event-detailed-modal-content">
+                                <p>{eventDetailedInfo.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </Layout>
     );

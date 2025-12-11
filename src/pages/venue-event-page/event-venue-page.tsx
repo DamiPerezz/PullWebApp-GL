@@ -1,21 +1,21 @@
 // event-venue-page.tsx
-import { Layout } from "../../components/layout/layout";
 import "./event-venue-page.css";
 import { EventCard } from "../../components/events-card/events-card";
-import { ClockIcon, EmailIcon, LocationIcon } from "../../icons/icons";
+import { ClockIcon, EmailIcon } from "../../icons/icons";
 import { useEffect, useState } from "react";
 import { getEventsByVenue, getVenueInfo } from "../../controller/events-page-controller";
 import { useParams } from "react-router-dom";
 import type { EventInfo, VenueEventInfo } from "../../types/types";
-import { MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight, Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Layout } from "../../components/layout/layout";
 
 export const VenueEventsPage = () => {
   const { venueId } = useParams<{ venueId: string }>();
   const [events, setAllEvents] = useState<EventInfo[]>([]);
   const [venueInfo, setVenueInfo] = useState<VenueEventInfo | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const eventsPerPage = 5;
+  const maxEventsToShow = 4;
 
   useEffect(() => {
     if (!venueId) {
@@ -25,21 +25,23 @@ export const VenueEventsPage = () => {
 
     getEventsByVenue(venueId)
       .then((events) => {
-        console.log("✅ Events received:", events); // DEBUG
-        setAllEvents(events);
+        const sortedEvents = [...events].sort((a, b) => {
+          const dateA = new Date(a.event_date).getTime();
+          const dateB = new Date(b.event_date).getTime();
+          return dateA - dateB;
+        });
+        setAllEvents(sortedEvents);
       })
-      .catch((error) => {
-        console.error("❌ Error fetching events:", error);
+      .catch(() => {
+        // Silently handle error
       });
 
     getVenueInfo(venueId)
       .then((venue) => {
-        console.log("✅ Venue info received:", venue); // DEBUG
         setVenueInfo(venue);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("❌ Error fetching venue info:", error);
+      .catch(() => {
         setIsLoading(false);
       });
   }, [venueId]);
@@ -47,25 +49,8 @@ export const VenueEventsPage = () => {
   const open = venueInfo?.open_time?.slice(0, 5) || "";
   const close = venueInfo?.close_time?.slice(0, 5) || "";
 
-  const totalPages = Math.ceil(events.length / eventsPerPage);
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
-
-  console.log("📊 Events state:", events); // DEBUG
-  console.log("📊 Current events:", currentEvents); // DEBUG
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const displayedEvents = events.slice(0, maxEventsToShow);
+  const hasMoreEvents = events.length > maxEventsToShow;
 
   return (
     <Layout>
@@ -96,33 +81,31 @@ export const VenueEventsPage = () => {
             <div className="venue-page-content">
               <div className="venue-page-grid">
                 <div className="venue-events-section">
+                  <h2 className="venue-events-title">
+                    Upcoming Events
+                  </h2>
                   <div className="venue-events-list">
                     {events.length !== 0 ? (
                       <>
-                        {currentEvents.map((event) => (
+                        {displayedEvents.map((event) => (
                           <EventCard key={event.event_id} event={event} isVenueEventPage />
                         ))}
-                        {totalPages > 1 && (
-                          <div className="venue-pagination">
-                            <button
-                              onClick={handlePrevPage}
-                              disabled={currentPage === 1}
-                              className="venue-pagination-btn"
-                            >
-                              <ChevronLeft />
-                            </button>
-                            <span className="venue-pagination-text">
-                              Page {currentPage} of {totalPages}
-                            </span>
-                            <button
-                              onClick={handleNextPage}
-                              disabled={currentPage === totalPages}
-                              className="venue-pagination-btn"
-                            >
-                              <ChevronRight />
-                            </button>
-                          </div>
-                        )}
+                        <div className="venue-events-buttons">
+                          <Link
+                            to={`/venues/${venueId}/all-events`}
+                            className="venue-btn venue-btn--purple"
+                          >
+                            <span>All Events</span>
+                            <ChevronRight size={18} />
+                          </Link>
+                          <Link
+                            to={`/venues/${venueId}/calendar`}
+                            className="venue-btn venue-btn--cyan"
+                          >
+                            <Calendar size={18} />
+                            <span>Calendar</span>
+                          </Link>
+                        </div>
                       </>
                     ) : (
                       <div className="venue-events-empty">
@@ -152,20 +135,27 @@ export const VenueEventsPage = () => {
                         <EmailIcon strokeColor="rgb(232, 121, 249)" />
                         <span>{venueInfo?.email}</span>
                       </div>
-                      <div className="venue-info-detail-item">
-                        <LocationIcon strokeColor="rgb(52, 211, 153)" />
-                        <span>{venueInfo?.long_location}</span>
-                      </div>
+                      <a
+                        href={venueInfo?.latitude && venueInfo?.longitude
+                          ? `https://www.google.com/maps/search/?api=1&query=${venueInfo.latitude},${venueInfo.longitude}`
+                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueInfo?.long_location || '')}`}
+                        className="venue-info-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MapPin size={16} />
+                        <span>Get Directions</span>
+                        <ChevronRight size={14} className="venue-info-link-arrow" />
+                      </a>
+                      <Link
+                        to={`/venues/${venueId}/calendar`}
+                        className="venue-info-link"
+                      >
+                        <Calendar size={16} />
+                        <span>View Event Calendar</span>
+                        <ChevronRight size={14} className="venue-info-link-arrow" />
+                      </Link>
                     </div>
-
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${40.4531},${-3.6883}`}
-                      className="venue-info-directions"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Get Directions
-                   </a>
                   </div>
                 </div>
               </div>

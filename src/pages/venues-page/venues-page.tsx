@@ -4,6 +4,7 @@ import { VenuesCard } from "../../components/venues-card/venues-card";
 import { useEffect, useState } from "react";
 import type { VenueInfo } from "../../types/types";
 import { getAllVenues } from "../../controller/venues-page-controller";
+import { SEO } from "../../components/seo/seo";
 
 export const VenuesPage = () => {
   const [venues, setVenues] = useState<VenueInfo[]>([]);
@@ -15,14 +16,21 @@ export const VenuesPage = () => {
         setVenues(data);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching venues:", error);
+      .catch(() => {
         setIsLoading(false);
       });
   }, []);
 
   return (
     <Layout>
+      <SEO
+        title="Discotecas y Venues"
+        description="Descubre las mejores discotecas, bares y venues de Guatemala. Reserva mesas VIP, compra entradas y vive la mejor vida nocturna guatemalteca."
+        keywords="discotecas guatemala, venues guatemala, bares guatemala, antros guatemala, vida nocturna guatemala, clubs nocturnos, reservar mesa vip"
+        canonicalUrl="https://web.pullevents.com/venues"
+        ogTitle="Mejores Discotecas y Venues en Guatemala"
+        ogDescription="Explora las discotecas más exclusivas de Guatemala. Reserva tu mesa VIP y vive noches inolvidables."
+      />
       <div className="venues-page-wrapper">
         <div className="venues-page-background" />
 

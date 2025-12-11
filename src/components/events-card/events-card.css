@@ -12,21 +12,22 @@
     padding: 0;
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(15, 15, 21, 0.4);
-    backdrop-filter: blur(48px);
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(64px);
+    -webkit-backdrop-filter: blur(64px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
 
 .event-card:hover .event-card-inner {
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+    border-color: rgba(168, 85, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(168, 85, 255, 0.2), 0 0 20px rgba(168, 85, 255, 0.1);
 }
 
 .event-card-bg-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, transparent 50%, rgba(217, 70, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(168, 85, 255, 0.08) 0%, transparent 50%, rgba(139, 92, 246, 0.08) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -44,8 +45,8 @@
 
 .event-card-image-wrapper {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -55,11 +56,6 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.event-card:hover .event-card-image {
-    transform: scale(1.08);
 }
 
 .event-card-price {
@@ -74,8 +70,8 @@
 }
 
 .event-card-price-value {
-    font-size: 0.9375rem;
-    font-weight: 500;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     color: white;
     display: block;
 }
@@ -83,8 +79,8 @@
 .event-card-info {
     flex: 1;
     display: flex;
-    padding: 1rem;
-    gap: 0.75rem;
+    padding: 0.75rem;
+    gap: 0.625rem;
     align-items: center;
 }
 
@@ -92,7 +88,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 0.5rem;
 }
 
 .event-card-badges {
@@ -107,14 +103,14 @@
     gap: 0.375rem;
     padding: 0.375rem 0.75rem;
     border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
 }
 
 .event-card-date-badge {
-    background: linear-gradient(to right, rgba(139, 92, 246, 0.25), rgba(217, 70, 239, 0.25));
-    border: 1px solid rgba(139, 92, 246, 0.5);
-    color: rgb(200, 180, 255);
+    background: linear-gradient(to right, rgba(168, 85, 255, 0.2), rgba(139, 92, 246, 0.2));
+    border: 1px solid rgba(168, 85, 255, 0.4);
+    color: rgb(200, 160, 255);
 }
 
 .event-card-time-badge {
@@ -129,8 +125,8 @@
 }
 
 .event-card-title {
-    font-size: 1.25rem;
-    font-weight: 500;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-medium);
     color: white;
     margin: 0;
     line-height: 1.3;
@@ -139,7 +135,7 @@
 
 .event-card:hover .event-card-title {
     color: transparent;
-    background: linear-gradient(to right, rgb(167, 139, 250), rgb(232, 121, 249));
+    background: linear-gradient(to right, rgb(168, 85, 255), rgb(200, 160, 255));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -155,8 +151,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.8125rem;
-    font-weight: 300;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-light);
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -174,10 +170,10 @@
     padding: 0.625rem 1rem;
     border-radius: 0.5rem;
     background: transparent;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    color: rgba(167, 139, 250, 0.9);
-    font-size: 0.8125rem;
-    font-weight: 400;
+    border: 1px solid rgba(168, 85, 255, 0.3);
+    color: rgba(168, 85, 255, 0.9);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -185,8 +181,8 @@
 }
 
 .event-card:hover .event-card-button {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(168, 85, 255, 0.15);
+    border-color: rgba(168, 85, 255, 0.5);
     color: white;
     gap: 0.5rem;
 }
@@ -201,8 +197,159 @@
     transform: translateX(2px);
 }
 
+/* ========================================
+   VENUE EVENT CARD - Clean Professional UI
+   ======================================== */
+
 .venue-event-card {
     width: 100%;
+}
+
+.venue-event-card .event-card-content {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.venue-event-card .event-card-image-wrapper {
+    position: relative;
+    width: 120px;
+    height: auto;
+    min-height: 130px;
+    flex-shrink: 0;
+    align-self: stretch;
+    border-radius: 0.75rem 0 0 0.75rem;
+    overflow: hidden;
+}
+
+.venue-event-card .event-card-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.venue-event-card .event-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0.875rem;
+    gap: 0.5rem;
+}
+
+.venue-event-card .event-card-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.venue-event-card .event-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.venue-event-card .event-card-title {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: white;
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    transition: all 0.3s ease;
+}
+
+.venue-event-card:hover .event-card-title {
+    color: transparent;
+    background: linear-gradient(to right, rgb(168, 85, 255), rgb(200, 160, 255));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.venue-event-card .event-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.venue-event-card .event-card-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-normal);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.venue-event-card .event-card-detail-item svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.venue-event-card .event-card-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: rgb(168, 85, 255);
+    transition: all 0.2s ease;
+    margin-top: 0.25rem;
+}
+
+.venue-event-card:hover .event-card-button {
+    background: transparent;
+    border: none;
+    color: rgb(200, 160, 255);
+}
+
+.venue-event-card .event-card-button svg {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.venue-event-card:hover .event-card-button svg {
+    transform: translateX(4px);
+}
+
+/* Responsive adjustments for venue-event-card */
+@media (max-width: 640px) {
+    .venue-event-card .event-card-image-wrapper {
+        width: 100px;
+        height: auto;
+        min-height: 110px;
+    }
+
+    .venue-event-card .event-card-info {
+        padding: 0.75rem;
+        gap: 0.375rem;
+    }
+
+    .venue-event-card .event-card-main {
+        gap: 0.5rem;
+    }
+
+    .venue-event-card .event-card-title {
+        font-size: 1rem;
+    }
+
+    .venue-event-card .event-card-detail-item {
+        font-size: 0.75rem;
+    }
+
+    .venue-event-card .event-card-button {
+        font-size: 0.75rem;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -214,72 +361,44 @@
 
 @media (max-width: 768px) {
     .event-card-image-wrapper {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
     }
 
     .event-card-info {
-        padding: 0.875rem;
+        padding: 0.625rem;
     }
 
-    .event-card-title {
-        font-size: 1.125rem;
-    }
-
-    .event-card-button {
-        display: none;
-    }
-}
-
-@media (max-width: 640px) {
-    .event-card-image-wrapper {
-        width: 110px;
-        height: 110px;
-    }
-
-    .event-card-info {
-        padding: 0.75rem;
-        gap: 0.625rem;
-    }
-    
     .event-card-title {
         font-size: 1rem;
     }
-    
-    .event-card-badge {
-        font-size: 0.6875rem;
-        padding: 0.3125rem 0.625rem;
-    }
-    
-    .event-card-detail-item {
-        font-size: 0.75rem;
-    }
-    
+
     .event-card-button {
         display: none;
     }
+
 }
 
-@media (max-width: 400px) {
+@media (max-width: 640px) {
     .event-card-image-wrapper {
         width: 90px;
         height: 90px;
     }
 
     .event-card-info {
-        padding: 0.625rem;
-        gap: 0.5rem;
+        padding: 0.5rem;
+        gap: 0.375rem;
     }
-    
+
     .event-card-title {
         font-size: 0.9375rem;
     }
-    
+
     .event-card-badge {
         font-size: 0.625rem;
         padding: 0.25rem 0.5rem;
     }
-    
+
     .event-card-detail-item {
         font-size: 0.6875rem;
     }
@@ -287,6 +406,52 @@
     .event-card-button {
         display: none;
     }
+
+}
+
+@media (max-width: 400px) {
+    .event-card-image-wrapper {
+        width: 80px;
+        height: 80px;
+    }
+
+    .event-card-info {
+        padding: 0.5rem;
+        gap: 0.375rem;
+    }
+
+    .event-card-title {
+        font-size: 0.875rem;
+    }
+
+    .event-card-badge {
+        font-size: 0.5625rem;
+        padding: 0.1875rem 0.375rem;
+    }
+
+    .event-card-detail-item {
+        font-size: 0.625rem;
+    }
+
+    .event-card-button {
+        display: none;
+    }
+
+    .venue-event-card .event-card-image-wrapper {
+        width: 85px;
+        height: auto;
+        min-height: 95px;
+    }
+
+    .venue-event-card .event-card-info {
+        padding: 0.5rem;
+        gap: 0.25rem;
+    }
+
+    .venue-event-card .event-card-title {
+        font-size: 0.875rem;
+    }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

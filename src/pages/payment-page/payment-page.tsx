@@ -1,4 +1,5 @@
-// payment-page.tsx - COMPLETO CORREGIDO
+// payment-page.tsx
+// SECURITY: Using apiClient for consistent cookie-based authentication
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Layout } from "../../components/layout/layout";
 import "./payment-page.css";
@@ -13,7 +14,9 @@ import {
   getOrderDataAfterCancel,
 } from "../../controller/purchase-pages-controller";
 import type { TicketType, EventDetailedInfo } from "../../types/types";
-import { ChevronLeft, Calendar, Clock, MapPin, AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Check } from "lucide-react";
+import { EventInfoCard } from "../../components/event-info-card/event-info-card";
+import { apiClient } from "../../utils/axios";
 
 export const PaymentPage = () => {
   const { eventId, ticketTypeId, quantity } = useParams<{
@@ -62,13 +65,13 @@ export const PaymentPage = () => {
                 ? JSON.parse(data.order_data.tickets_data)
                 : data.order_data.tickets_data;
               setCancelledOrderData(ticketsData);
-            } catch (e) {
-              console.error("Error parsing tickets_data:", e);
+            } catch {
+              // Silently handle parsing error
             }
           }
         })
-        .catch((error) => {
-          console.error("Error loading cancelled order data:", error);
+        .catch(() => {
+          // Silently handle error
         });
     }
 
@@ -81,18 +84,14 @@ export const PaymentPage = () => {
         setEventInfo(eventData);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+      .catch(() => {
         setError("Failed to load event information. Please try again.");
         setIsLoading(false);
       });
   }, [eventId, ticketTypeId, orderIdParam, cancelledParam]);
 
-  // payment-page.tsx - SECCIÓN onSubmit CORREGIDA
   const onSubmit = async (formData: any) => {
     if (processing) return;
-
-    console.log('📤 Form data received:', formData);
 
     setProcessing(true);
     setError(null);
@@ -115,9 +114,7 @@ export const PaymentPage = () => {
         throw new Error("Please fill in all required fields for each ticket");
       }
 
-      console.log('✅ Data structure validated');
-
-      // ✅ CRÍTICO: Verificar que tenemos eventInfo con el ID real
+      // Verificar que tenemos eventInfo con el ID real
       if (!eventInfo) {
         throw new Error("Event information not loaded");
       }
@@ -128,16 +125,8 @@ export const PaymentPage = () => {
 
       if (!realEventID) {
         // Si no tenemos el ID, necesitamos hacer una petición adicional
-        console.log('⚠️ Event ID not in eventInfo, fetching from API...');
-        const eventDetailsResponse = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/event/get-event-info/${eventId}`
-        );
-
-        if (!eventDetailsResponse.ok) {
-          throw new Error("Failed to get event ID");
-        }
-
-        const eventDetails = await eventDetailsResponse.json();
+        const eventDetailsResponse = await apiClient.get(`/event/get-event-info/${eventId}`);
+        const eventDetails = eventDetailsResponse.data;
         realEventID = eventDetails.event_id || eventDetails.id;
       }
 
@@ -145,18 +134,7 @@ export const PaymentPage = () => {
         throw new Error("Could not determine event ID");
       }
 
-      console.log('🎯 Using Event ID:', realEventID);
-
-      // ✅ 1. Crear orden pendiente con el ID REAL del evento
-      console.log('📝 Creating pending order with data:', {
-        eventId: realEventID, // ← ID REAL, no slug
-        ticketTypeId,
-        ticketName: ticketDetails.ticket_name,
-        price: ticketDetails.ticket_price,
-        currency: ticketDetails.currency,
-        quantity: formData.usuarios.length
-      });
-
+      // Crear orden pendiente
       const orderResponse = await createPendingOrder(
         realEventID!, // ← ID REAL del evento
         ticketTypeId!,
@@ -166,36 +144,28 @@ export const PaymentPage = () => {
         formData
       );
 
-      console.log('✅ Order created:', orderResponse);
-
       if (!orderResponse.success) {
         throw new Error(orderResponse.error || "Failed to create pending order");
       }
 
       const orderId = orderResponse.order_id;
 
-      // ✅ 2. Simular pago de Stripe
-      console.log('💳 Simulating payment for order:', orderId);
+      // Simular pago de Stripe
       const paymentResponse = await simulateStripePayment(orderId);
-
-      console.log('✅ Payment simulated:', paymentResponse);
 
       if (!paymentResponse.success) {
         throw new Error(paymentResponse.error || "Payment simulation failed");
       }
 
-      // ✅ 3. Mostrar éxito
       setPaymentSuccess(true);
       setProcessing(false);
 
-      // ✅ 4. Redirigir después de 3 segundos
+      // Redirigir después de 3 segundos
       setTimeout(() => {
         navigate(`/order/payment-success?order_id=${orderId}`);
       }, 3000);
 
     } catch (error: any) {
-      console.error("❌ Error during checkout:", error);
-
       let errorMessage = "An unexpected error occurred. Please try again.";
 
       if (error.message) {
@@ -204,18 +174,9 @@ export const PaymentPage = () => {
         errorMessage = error.response.data.error;
       }
 
-      if (error.response?.data?.details) {
-        console.error('Error details:', error.response.data.details);
-      }
-
       setError(errorMessage);
       setProcessing(false);
     }
-  };
-
-  const handleBack = () => {
-    if (processing) return;
-    navigate(`/event/${eventId}/tickets/${ticketTypeId}`);
   };
 
   const handleDismissError = () => {
@@ -245,17 +206,6 @@ export const PaymentPage = () => {
 
         <div className="payment-page-content">
           <div className="payment-page-container">
-            {!paymentSuccess && (
-              <button
-                onClick={handleBack}
-                className="payment-page-back-button"
-                disabled={processing}
-              >
-                <ChevronLeft />
-                Back to Tickets
-              </button>
-            )}
-
             {error && (
               <div className="payment-page-error">
                 <div className="payment-page-error-content">
@@ -296,13 +246,13 @@ export const PaymentPage = () => {
               <>
                 <div className="payment-page-steps">
                   <div className="payment-page-step payment-page-step-completed">
-                    <div className="payment-page-step-number">1</div>
+                    <div className="payment-page-step-number"><Check size={14} strokeWidth={3} /></div>
                     <div className="payment-page-step-label">Select Tickets</div>
                   </div>
                   <div className="payment-page-step-line payment-page-step-line-completed"></div>
                   <div className="payment-page-step payment-page-step-active">
                     <div className="payment-page-step-number">2</div>
-                    <div className="payment-page-step-label">Enter Data</div>
+                    <div className="payment-page-step-label">Enter Details</div>
                   </div>
                   <div className="payment-page-step-line"></div>
                   <div className="payment-page-step">
@@ -311,28 +261,7 @@ export const PaymentPage = () => {
                   </div>
                 </div>
 
-                <div className="payment-page-event-info">
-                  <div className="payment-page-event-image">
-                    <img src={eventInfo?.event_img} alt={eventInfo?.event_name} />
-                  </div>
-                  <div className="payment-page-event-details">
-                    <h2 className="payment-page-event-name">{eventInfo?.event_name}</h2>
-                    <div className="payment-page-event-meta">
-                      <p>
-                        <Calendar className="payment-page-event-icon" />
-                        <span>{new Date(eventInfo?.date || '').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                      </p>
-                      <p>
-                        <Clock className="payment-page-event-icon" />
-                        <span>{eventInfo?.open_time?.slice(0, 5)} - {eventInfo?.close_time?.slice(0, 5)}</span>
-                      </p>
-                      <p>
-                        <MapPin className="payment-page-event-icon" />
-                        <span>{eventInfo?.location}</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <EventInfoCard eventInfo={eventInfo} />
 
                 <div className="payment-page-grid">
                   <div className="payment-page-left">

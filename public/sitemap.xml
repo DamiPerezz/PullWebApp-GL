@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- =====================================================
+       PULL EVENTS - INTERNATIONAL SITEMAP
+       web.pullevents.com
+       Markets: Guatemala, Spain, Dubai/UAE
+  ===================================================== -->
+
+  <!-- HOME PAGE -->
+  <url>
+    <loc>https://web.pullevents.com/</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="es-GT" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="en-AE" href="https://web.pullevents.com/"/>
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://web.pullevents.com/"/>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://web.pullevents.com/og-image.jpg</image:loc>
+      <image:title>Pull Events - VIP Parties &amp; Nightlife Worldwide</image:title>
+      <image:caption>Buy tickets for the best parties, nightclubs and VIP events. Guatemala, Spain, Dubai and worldwide.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- VENUES PAGE -->
+  <url>
+    <loc>https://web.pullevents.com/venues</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://web.pullevents.com/venues"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://web.pullevents.com/venues"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://web.pullevents.com/venues"/>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://web.pullevents.com/og-image.jpg</image:loc>
+      <image:title>Nightclubs &amp; Venues Worldwide</image:title>
+      <image:caption>Discover the best nightclubs and venues. VIP tables and bottle service available.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- EVENTS PAGE -->
+  <url>
+    <loc>https://web.pullevents.com/events</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://web.pullevents.com/events"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://web.pullevents.com/events"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://web.pullevents.com/events"/>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://web.pullevents.com/og-image.jpg</image:loc>
+      <image:title>Events &amp; Parties Worldwide</image:title>
+      <image:caption>Buy tickets for concerts, festivals, parties and exclusive events.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- ABOUT US -->
+  <url>
+    <loc>https://web.pullevents.com/aboutUs</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- LOGIN -->
+  <url>
+    <loc>https://web.pullevents.com/login</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- LEGAL PAGES -->
+  <url>
+    <loc>https://web.pullevents.com/cookie-policy</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://web.pullevents.com/privacy</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://web.pullevents.com/terms</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+</urlset>

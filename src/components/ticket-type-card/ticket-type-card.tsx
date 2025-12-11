@@ -32,13 +32,13 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
         return 'ticket-type-card';
     };
 
-    const isGroupTicket = ticket.ticket_name.toLowerCase().includes('group');
+    const isGroupTicket = ticket.is_group || ticket.ticket_name.toLowerCase().includes('group');
     const currencySymbol = getCurrencySymbol(ticket.currency);
 
     if (isGroupTicket) {
         return (
-            <NavLink 
-                to={`/event/${ticket.slug}/tickets/${ticket.ticket_type_id}`} 
+            <NavLink
+                to={`/event/${ticket.slug}/group/setup`}
                 className={getTicketClass()}
             >
                 <div className="ticket-type-card-header">
@@ -71,7 +71,10 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
                 </div>
                 
                 <div className="ticket-type-card-footer">
-                    <p className="ticket-type-card-price">{currencySymbol}{ticket.ticket_price.toFixed(2)}</p>
+                    <div className="ticket-group-capacity">
+                        <Users size={16} />
+                        <span>{ticket.min_quantity || 4}-{ticket.max_quantity || 12} guests</span>
+                    </div>
                     <div className="ticket-type-card-button">
                         <Wine />
                         Reserve Now

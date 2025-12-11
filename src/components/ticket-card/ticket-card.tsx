@@ -10,7 +10,6 @@ interface TicketCardProps {
 export const TicketCard = ({ ticket }: TicketCardProps) => {
   const eventName = ticket.events?.name || "Event";
   const eventDate = ticket.events?.event_date || "";
-  const eventTime = ticket.events?.start_time || "";
   const venueName = ticket.events?.venues?.name || "";
   const venueLocation = ticket.events?.venues?.location || "";
   const ticketType = ticket.ticket_types?.name || "General Admission";
@@ -19,17 +18,12 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-  };
-
-  const formatTime = (timeStr: string) => {
-    if (!timeStr) return "";
-    return timeStr.slice(0, 5);
   };
 
   const handleDownload = () => {

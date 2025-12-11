@@ -1,3 +1,5 @@
+// login-pop-up.tsx
+// SECURITY: Authentication via HttpOnly cookies - no localStorage for tokens
 import { useForm } from "react-hook-form";
 import { CloseXIcon } from "../../icons/icons";
 import { useState } from "react";
@@ -34,22 +36,13 @@ export const LoginPopUp = ({
         return;
       }
 
-      setAuthError(null); // Reset any previous errors
+      setAuthError(null);
 
       const response = await authenticateBooking(reservationId, data);
 
       if (response.success) {
-        // TODO: Store token and user info in sessionStorage or context
-        localStorage.setItem("reservationToken", response.token);
-        localStorage.setItem(
-          "reservationAdmin",
-          JSON.stringify({
-            name: response.user.name,
-            email: response.user.email,
-            reservationId: reservationId,
-          })
-        );
-
+        // SECURITY: El servidor establece una cookie HttpOnly
+        // No guardamos tokens en localStorage para prevenir XSS
         handleAdminStatusChange(true);
 
         // Close popup and reset form
@@ -59,8 +52,6 @@ export const LoginPopUp = ({
         setAuthError("Authentication failed");
       }
     } catch (error: any) {
-      console.error("Error en login:", error);
-
       // Handle different types of errors
       if (error.response?.status === 401) {
         setAuthError("DPI o contraseña incorrectos");
@@ -94,6 +85,7 @@ export const LoginPopUp = ({
               })}
               placeholder="Ingresa tu DPI (13 dígitos)"
               maxLength={13}
+              autoComplete="off"
             />
             {errors.dpi && (
               <span className="error-message">{errors.dpi.message}</span>
@@ -112,6 +104,7 @@ export const LoginPopUp = ({
                 },
               })}
               placeholder="Ingresa tu contraseña"
+              autoComplete="current-password"
             />
             {errors.password && (
               <span className="error-message">{errors.password.message}</span>

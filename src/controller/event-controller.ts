@@ -1,29 +1,28 @@
 // controllers/event-controller.ts
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+// SECURITY: Using apiClient for consistent cookie-based authentication
+import { apiClient } from '../utils/axios';
 
 export const getEventDetailedInfo = async (eventSlugOrId: string) => {
-  const response = await axios.get(`${API_URL}/event/get-detailed-event-info/${eventSlugOrId}`);
+  const response = await apiClient.get(`/event/get-detailed-event-info/${eventSlugOrId}`);
   return response.data;
 };
 
 export const getTicketTypes = async (eventSlug: string) => {
-  const response = await axios.get(`${API_URL}/ticket-type/get-ticket-types/${eventSlug}`);
+  const response = await apiClient.get(`/ticket-type/get-ticket-types/${eventSlug}`);
   return response.data;
 };
 
 export const getEventInfo = async (eventSlugOrId: string) => {
-  const response = await axios.get(`${API_URL}/event/get-event-info/${eventSlugOrId}`);
+  const response = await apiClient.get(`/event/get-event-info/${eventSlugOrId}`);
   return response.data;
 };
 
 export const getAllEvents = async () => {
-  const response = await axios.get(`${API_URL}/event/get-all-events`);
+  const response = await apiClient.get(`/event/get-all-events`);
   return response.data;
 };
 
 export const getEventsByVenue = async (venueSlug: string) => {
-  const response = await axios.get(`${API_URL}/venues/events/get-all-events/${venueSlug}`);
+  const response = await apiClient.get(`/venues/events/get-all-events/${venueSlug}`);
   return response.data;
 };

@@ -28,7 +28,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
           owner_last_name: existingData.owner_last_name || "",
           owner_email: existingData.owner_email || "",
           owner_phone: existingData.owner_phone || "",
-          owner_phone_prefix: existingData.owner_phone_prefix || "+34",
+          owner_phone_prefix: existingData.owner_phone_prefix || "+502",
           owner_dpi: existingData.owner_dpi || "",
           owner_birthdate: existingData.owner_birthdate || "",
           owner_gender: existingData.owner_gender || ticketGender || "",
@@ -136,6 +136,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
                   placeholder="Enter name"
                   value={data.owner_name}
                   onChange={(e) => handleInputChange(index, "owner_name", e.target.value)}
+                  maxLength={50}
                 />
                 {errors[index]?.owner_name && <p className="user-form-error">{errors[index].owner_name}</p>}
               </div>
@@ -149,6 +150,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
                   placeholder="Enter last name"
                   value={data.owner_last_name}
                   onChange={(e) => handleInputChange(index, "owner_last_name", e.target.value)}
+                  maxLength={50}
                 />
                 {errors[index]?.owner_last_name && <p className="user-form-error">{errors[index].owner_last_name}</p>}
               </div>
@@ -162,6 +164,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
                   placeholder="email@example.com"
                   value={data.owner_email}
                   onChange={(e) => handleInputChange(index, "owner_email", e.target.value)}
+                  maxLength={100}
                 />
                 {errors[index]?.owner_email && <p className="user-form-error">{errors[index].owner_email}</p>}
               </div>
@@ -189,6 +192,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
                       placeholder="612345678"
                       value={data.owner_phone}
                       onChange={(e) => handleInputChange(index, "owner_phone", e.target.value)}
+                      maxLength={15}
                     />
                   </div>
                 </div>

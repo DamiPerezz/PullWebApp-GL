@@ -4,6 +4,7 @@ import { EventCard } from "../../components/events-card/events-card";
 import { useEffect, useState } from "react";
 import { getAllEvents } from "../../controller/events-page-controller";
 import type { EventInfo } from "../../types/types";
+import { SEO } from "../../components/seo/seo";
 
 export const EventsPage = () => {
 
@@ -15,8 +16,7 @@ export const EventsPage = () => {
         getAllEvents().then((events) => {
             setAllEvents(events)
             setIsLoading(false)
-        }).catch((error) => {
-            console.error("Error fetching events:", error)
+        }).catch(() => {
             setIsLoading(false)
         })
 
@@ -24,6 +24,14 @@ export const EventsPage = () => {
 
     return (
         <Layout>
+            <SEO
+                title="Eventos y Fiestas"
+                description="Compra entradas para los mejores eventos, fiestas y conciertos de Guatemala. Descubre eventos exclusivos, fiestas VIP y las noches más épicas."
+                keywords="eventos guatemala, fiestas guatemala, conciertos guatemala, eventos vip, fiestas exclusivas, entradas eventos, tickets fiestas, nightlife guatemala"
+                canonicalUrl="https://web.pullevents.com/events"
+                ogTitle="Eventos y Fiestas en Guatemala"
+                ogDescription="Encuentra y compra entradas para los eventos más exclusivos de Guatemala. Fiestas VIP, conciertos y más."
+            />
             <div className="events-container">
                 <h2>Choose an Event</h2>
                 {events.length !== 0 && !loading ? events.map((event) => (

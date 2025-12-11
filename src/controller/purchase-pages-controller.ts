@@ -1,23 +1,21 @@
-// controller/purchase-pages-controller.ts - COMPLETO CORREGIDO
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+// controller/purchase-pages-controller.ts
+// SECURITY: Using apiClient for consistent cookie-based authentication and error handling
+import { apiClient } from '../utils/axios';
 
 export const getTicketInfo = async (eventSlug: string, ticketTypeId: string) => {
-  const response = await axios.get(
-    `${API_BASE_URL}/ticket-type/get-ticket-info/${eventSlug}/${ticketTypeId}`
+  const response = await apiClient.get(
+    `/ticket-type/get-ticket-info/${eventSlug}/${ticketTypeId}`
   );
   return response.data;
 };
 
 export const getEventDetailedInfo = async (eventSlug: string) => {
-  const response = await axios.get(
-    `${API_BASE_URL}/event/get-detailed-event-info/${eventSlug}`
+  const response = await apiClient.get(
+    `/event/get-detailed-event-info/${eventSlug}`
   );
   return response.data;
 };
 
-// ✅ CORREGIDO - Enviar datos en el formato correcto
 export const createPendingOrder = async (
   eventId: string,
   ticketTypeId: string,
@@ -41,7 +39,9 @@ export const createPendingOrder = async (
     owner_birthdate: usuario.owner_birthdate,
   }));
 
-  const totalAmount = ticketPrice * formData.usuarios.length;
+  // Calculate total with 11.2% service fee
+  const subtotal = ticketPrice * formData.usuarios.length;
+  const totalAmount = subtotal * 1.112; // Include 11.2% service fee
 
   const requestData = {
     event_id: eventId,
@@ -53,29 +53,26 @@ export const createPendingOrder = async (
     user_email: formData.usuarios[0].owner_email,
   };
 
-  console.log('📤 Sending order request:', requestData);
-
-  const response = await axios.post(`${API_BASE_URL}/orders/create-pending-order`, requestData);
+  const response = await apiClient.post(`/orders/create-pending-order`, requestData);
   return response.data;
 };
 
-// ✅ CORREGIDO - Simular pago que deja en pending_staff_approval
 export const simulateStripePayment = async (orderId: string) => {
-  const response = await axios.post(`${API_BASE_URL}/orders/simulate-payment`, {
+  const response = await apiClient.post(`/orders/simulate-payment`, {
     order_id: orderId,
   });
   return response.data;
 };
 
 export const createCheckoutSession = async (orderId: string) => {
-  const response = await axios.post(`${API_BASE_URL}/orders/create-checkout-session`, {
+  const response = await apiClient.post(`/orders/create-checkout-session`, {
     order_id: orderId,
   });
   return response.data;
 };
 
 export const confirmPayment = async (sessionId: string) => {
-  const response = await axios.get(`${API_BASE_URL}/orders/confirm-payment`, {
+  const response = await apiClient.get(`/orders/confirm-payment`, {
     params: {
       session_id: sessionId,
     },
@@ -84,7 +81,7 @@ export const confirmPayment = async (sessionId: string) => {
 };
 
 export const cancelOrder = async (orderId: string) => {
-  const response = await axios.get(`${API_BASE_URL}/orders/cancel-order`, {
+  const response = await apiClient.get(`/orders/cancel-order`, {
     params: {
       order_id: orderId,
     },
@@ -93,22 +90,22 @@ export const cancelOrder = async (orderId: string) => {
 };
 
 export const getOrderDataAfterCancel = async (orderId: string) => {
-  const response = await axios.get(
-    `${API_BASE_URL}/orders/cancelled/${orderId}`
+  const response = await apiClient.get(
+    `/orders/cancelled/${orderId}`
   );
   return response.data;
 };
 
 export const getOrderByPaymentLink = async (paymentLinkCode: string) => {
-  const response = await axios.get(
-    `${API_BASE_URL}/orders/by-payment-link/${paymentLinkCode}`
+  const response = await apiClient.get(
+    `/orders/by-payment-link/${paymentLinkCode}`
   );
   return response.data;
 };
 
 export const getTicketsByOrderId = async (orderId: string, eventSlug: string) => {
-  const response = await axios.get(
-    `${API_BASE_URL}/orders/${orderId}/${eventSlug}`
+  const response = await apiClient.get(
+    `/orders/${orderId}/${eventSlug}`
   );
   return response.data;
 };
@@ -118,7 +115,7 @@ export const validateTicketPurchase = async (
   ticketTypeId: string,
   quantity: number
 ) => {
-  const response = await axios.post(`${API_BASE_URL}/stripe/validate-purchase`, {
+  const response = await apiClient.post(`/stripe/validate-purchase`, {
     event_slug: eventSlug,
     ticket_type_id: ticketTypeId,
     quantity: quantity,

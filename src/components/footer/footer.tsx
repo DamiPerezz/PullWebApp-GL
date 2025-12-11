@@ -1,4 +1,5 @@
-import { InstagramIcon, TikTokIcon, XBrandIcon } from '../../icons/icons'
+import { Link } from 'react-router-dom'
+import { InstagramIcon, TikTokIcon, LinkedInIcon } from '../../icons/icons'
 import './footer.css'
 
 export const Footer = () => {
@@ -13,23 +14,25 @@ export const Footer = () => {
                     </p>
                     <div className="important-documents">
                         <span>•</span>
-                        <a href="/privacy">Privacy</a>
+                        <Link to="/privacy">Privacy</Link>
                         <span>•</span>
-                        <a href="/terms">Terms</a>
+                        <Link to="/terms">Terms</Link>
                         <span>•</span>
-                        <a href="/cookies">Cookies</a>
+                        <Link to="/cookie-policy">Cookies</Link>
                     </div>
                 </div>
 
                 <div className="social-media">
                     <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <InstagramIcon strokeColor="rgba(255, 255, 255, 0.6)" />
+                        <InstagramIcon strokeColor="currentColor" />
                     </a>
+                    <span className="social-media-separator">•</span>
                     <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                        <TikTokIcon strokeColor="rgba(255, 255, 255, 0.6)" />
+                        <TikTokIcon strokeColor="currentColor" />
                     </a>
-                    <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X">
-                        <XBrandIcon strokeColor="rgba(255, 255, 255, 0.6)" />
+                    <span className="social-media-separator">•</span>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <LinkedInIcon strokeColor="currentColor" />
                     </a>
                 </div>
             </div>

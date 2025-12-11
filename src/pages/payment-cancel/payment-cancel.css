@@ -1,6 +1,6 @@
 /* pages/payment-cancel-page/payment-cancel-page.css */
 .payment-cancel-wrapper {
-    min-height: 100vh;
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;

@@ -1,0 +1,117 @@
+{
+  "name": "Pull Events - Party Tickets & VIP Events Worldwide",
+  "short_name": "Pull Events",
+  "description": "Buy tickets for the best parties, nightclubs & VIP events. Book VIP tables and bottle service. Guatemala, Spain, Dubai & worldwide.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0f",
+  "theme_color": "#7c3aed",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["entertainment", "lifestyle", "social"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Pull Events Homepage"
+    },
+    {
+      "src": "/screenshots/events.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Available Events"
+    },
+    {
+      "src": "/screenshots/mobile-home.jpg",
+      "sizes": "750x1334",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Pull Events Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Events",
+      "short_name": "Events",
+      "description": "Explore all available events",
+      "url": "/events",
+      "icons": [{ "src": "/icons/events-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Browse Venues",
+      "short_name": "Venues",
+      "description": "Discover the best nightclubs",
+      "url": "/venues",
+      "icons": [{ "src": "/icons/venues-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Wallet",
+      "short_name": "Wallet",
+      "description": "View your tickets",
+      "url": "/wallet",
+      "icons": [{ "src": "/icons/wallet-icon.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.pullevents.app",
+      "id": "com.pullevents.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/pull-events/id123456789"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

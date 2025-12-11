@@ -33,6 +33,36 @@ export const RegisterPage = () => {
     e.preventDefault();
     setError('');
 
+    // SECURITY: Input validation
+    const trimmedName = formData.name.trim();
+    const trimmedSurname = formData.surname.trim();
+    const trimmedEmail = formData.email.trim().toLowerCase();
+    const trimmedPhone = formData.phone.trim();
+
+    // Validate name (letters, spaces, hyphens only)
+    if (!trimmedName || !/^[a-zA-ZÀ-ÿ\s'-]{1,50}$/.test(trimmedName)) {
+      setError('Please enter a valid first name (max 50 characters)');
+      return;
+    }
+
+    // Validate surname
+    if (!trimmedSurname || !/^[a-zA-ZÀ-ÿ\s'-]{1,50}$/.test(trimmedSurname)) {
+      setError('Please enter a valid last name (max 50 characters)');
+      return;
+    }
+
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    // Validate phone if provided
+    if (trimmedPhone && !/^\d{6,15}$/.test(trimmedPhone)) {
+      setError('Phone number must be 6-15 digits');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -47,11 +77,11 @@ export const RegisterPage = () => {
 
     try {
       await register({
-        email: formData.email,
+        email: trimmedEmail,
         password: formData.password,
-        name: formData.name,
-        surname: formData.surname,
-        phone: formData.phone,
+        name: trimmedName,
+        surname: trimmedSurname,
+        phone: trimmedPhone,
         phone_prefix: formData.phone_prefix
       });
       navigate('/wallet', { replace: true });
@@ -106,6 +136,7 @@ export const RegisterPage = () => {
                     placeholder="John"
                     required
                     autoComplete="given-name"
+                    maxLength={50}
                   />
                 </div>
               </div>
@@ -126,6 +157,7 @@ export const RegisterPage = () => {
                     placeholder="Doe"
                     required
                     autoComplete="family-name"
+                    maxLength={50}
                   />
                 </div>
               </div>
@@ -147,6 +179,7 @@ export const RegisterPage = () => {
                   placeholder="your@email.com"
                   required
                   autoComplete="email"
+                  maxLength={100}
                 />
               </div>
             </div>
@@ -166,6 +199,7 @@ export const RegisterPage = () => {
                   className="register-page__input"
                   placeholder="12345678"
                   autoComplete="tel"
+                  maxLength={15}
                 />
               </div>
             </div>
@@ -186,6 +220,7 @@ export const RegisterPage = () => {
                   placeholder="Min. 6 characters"
                   required
                   autoComplete="new-password"
+                  maxLength={128}
                 />
                 <button
                   type="button"
@@ -214,6 +249,7 @@ export const RegisterPage = () => {
                   placeholder="Confirm your password"
                   required
                   autoComplete="new-password"
+                  maxLength={128}
                 />
                 <button
                   type="button"

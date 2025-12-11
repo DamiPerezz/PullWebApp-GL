@@ -43,8 +43,7 @@ export const PostPaymentPage = () => {
         }
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("Error loading tickets:", err);
+      .catch(() => {
         setError("Failed to load tickets");
         setLoading(false);
       });
@@ -55,7 +54,7 @@ export const PostPaymentPage = () => {
   };
 
   const handleDownloadAll = () => {
-    console.log("Download all tickets");
+    // TODO: Implement download all tickets functionality
   };
 
   if (loading) {

@@ -1,25 +1,23 @@
 .layout-container {
     display: flex;
     flex-direction: column;
-    
+
     min-height: 100vh;
-    width: 100vw;
-    max-width: 100%;
-    
+    width: 100%;
+
     background: #0a0a0f;
-    
+
     position: relative;
-    overflow-x: hidden;
+    overflow-x: clip;
     z-index: 0;
 }
 
 .layout-content {
     flex: 1;
-    
+
     display: flex;
     flex-direction: column;
-    
-    overflow-x: hidden;
+
     position: relative;
     padding-top: 64px;
     z-index: 0;

@@ -1,0 +1,345 @@
+.group-payment-success-page {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.group-payment-success-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 0;
+}
+
+.group-payment-success-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.group-payment-success-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.group-payment-success-card {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.group-payment-success-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  margin-bottom: 1.5rem;
+}
+
+.group-payment-success-icon {
+  width: 3rem;
+  height: 3rem;
+  color: white;
+}
+
+.group-payment-success-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.group-payment-success-description {
+  margin-bottom: 2rem;
+}
+
+.group-payment-success-description p {
+  font-size: 1.125rem;
+  color: #718096;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.group-payment-success-status-card {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.group-payment-success-status-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.group-payment-success-status-header svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #667eea;
+}
+
+.group-payment-success-status-header span {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.group-payment-success-status-body p {
+  font-size: 0.9375rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.group-payment-success-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: #e2e8f0;
+  border: 2px solid #cbd5e0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-step-completed .timeline-dot {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.timeline-step-current .timeline-dot {
+  background: #667eea;
+  border-color: #667eea;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
+  }
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-content h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.25rem 0;
+}
+
+.timeline-content p {
+  font-size: 0.8125rem;
+  color: #718096;
+  margin: 0;
+}
+
+.group-payment-success-info-box {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+  display: flex;
+  gap: 1rem;
+}
+
+.group-payment-success-info-icon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.group-payment-success-info-content {
+  flex: 1;
+}
+
+.group-payment-success-info-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.group-payment-success-info-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.group-payment-success-info-content li {
+  font-size: 0.875rem;
+  color: #4a5568;
+  line-height: 1.5;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.group-payment-success-info-content li::before {
+  content: '•';
+  position: absolute;
+  left: 0.5rem;
+  color: #667eea;
+}
+
+.group-payment-success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.group-payment-success-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.group-payment-success-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.group-payment-success-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.group-payment-success-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.group-payment-success-error {
+  text-align: center;
+  padding: 2rem;
+}
+
+.group-payment-error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.group-payment-success-loading {
+  text-align: center;
+  padding: 3rem;
+  color: white;
+}
+
+.group-payment-success-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.group-payment-success-loading p {
+  color: white;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .group-payment-success-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .group-payment-success-title {
+    font-size: 1.75rem;
+  }
+
+  .group-payment-success-description p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .group-payment-success-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .group-payment-success-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .group-payment-success-icon-wrapper {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .group-payment-success-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .group-payment-success-title {
+    font-size: 1.5rem;
+  }
+
+  .group-payment-success-info-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .group-payment-success-info-content li {
+    text-align: left;
+  }
+}

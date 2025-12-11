@@ -1,0 +1,613 @@
+.guests-page-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0f;
+}
+
+.guests-page-bg-blur {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(24px) brightness(0.25);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.guests-page-bg-blur::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+.guests-page-bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.guests-page-content-wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+.guests-page-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+}
+
+.guests-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Header */
+.guests-page-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.guests-page-event-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guests-page-event-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.guests-page-event-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Error Box */
+.guests-page-error-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: rgb(248, 113, 113);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Section Header with Icon */
+.guests-page-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.guests-page-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(217, 70, 239, 0.08));
+  border: 1.5px solid rgba(139, 92, 246, 0.25);
+  border-radius: 14px;
+}
+
+/* Men Section - Blue Theme */
+.guests-page-section-header-men {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1));
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.guests-page-section-header-men .guests-page-section-icon {
+  color: rgb(96, 165, 250);
+}
+
+/* Women Section - Pink Theme */
+.guests-page-section-header-women {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0.1));
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.guests-page-section-header-women .guests-page-section-icon {
+  color: rgb(244, 114, 182);
+}
+
+.guests-page-section-icon {
+  flex-shrink: 0;
+}
+
+.guests-page-section-title {
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.guests-page-section-subtitle {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 14px;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Forms */
+.guests-page-forms {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.guests-page-guest-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.guests-page-guest-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.guests-page-guest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guests-page-guest-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guests-page-ticket-icon {
+  flex-shrink: 0;
+}
+
+.guests-page-ticket-icon-men {
+  color: rgb(96, 165, 250);
+}
+
+.guests-page-ticket-icon-women {
+  color: rgb(244, 114, 182);
+}
+
+.guests-page-guest-title {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Host Pays Checkbox */
+.guests-page-host-pays-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.guests-page-host-pays-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: rgb(139, 92, 246);
+}
+
+.guests-page-host-pays-checkbox input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guests-page-host-pays-checkbox span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.guests-page-guest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.guests-page-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.guests-page-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guests-page-form-field label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.guests-page-required {
+  color: rgb(239, 68, 68);
+  font-weight: 600;
+}
+
+.guests-page-form-field input,
+.guests-page-form-field select {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.guests-page-form-field input:focus,
+.guests-page-form-field select:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.guests-page-form-field input:disabled,
+.guests-page-form-field select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guests-page-form-field input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Receipt Section - Order Summary Style */
+.guests-page-receipt-card {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 21, 0.5);
+  backdrop-filter: blur(48px);
+}
+
+.guests-page-receipt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.guests-page-receipt-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.guests-page-receipt-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: rgb(167, 139, 250);
+}
+
+.guests-page-receipt-items {
+  margin-bottom: 0.75rem;
+}
+
+.guests-page-receipt-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.75rem;
+}
+
+.guests-page-receipt-item:last-child {
+  margin-bottom: 0;
+}
+
+.guests-page-receipt-item-info {
+  flex: 1;
+}
+
+.guests-page-receipt-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.guests-page-receipt-item-quantity {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.guests-page-receipt-item-price {
+  text-align: right;
+}
+
+.guests-page-receipt-item-amount {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: white;
+}
+
+.guests-page-receipt-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  margin-bottom: 1.5rem;
+}
+
+.guests-page-receipt-totals {
+  margin-bottom: 1rem;
+}
+
+.guests-page-receipt-subtotal,
+.guests-page-receipt-fee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.guests-page-receipt-subtotal span:first-child,
+.guests-page-receipt-fee span:first-child {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.guests-page-receipt-subtotal span:last-child,
+.guests-page-receipt-fee span:last-child {
+  font-weight: 500;
+  color: white;
+}
+
+.guests-page-receipt-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.guests-page-receipt-total span:first-child {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: white;
+}
+
+.guests-page-receipt-total-amount {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: transparent;
+  background: linear-gradient(to right, rgb(167, 139, 250), rgb(232, 121, 249));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.guests-page-receipt-button {
+  width: 100%;
+  padding: 1rem 1.75rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(217, 70, 239, 0.3));
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.guests-page-receipt-button:hover:not(:disabled) {
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.4), rgba(217, 70, 239, 0.4));
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.guests-page-receipt-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guests-page-receipt-button-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.guests-page-receipt-button:hover:not(:disabled) .guests-page-receipt-button-icon {
+  transform: translateX(0.25rem);
+}
+
+/* Notice Messages */
+.guests-page-notices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.guests-page-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.guests-page-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guests-page-notice-warning {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.guests-page-notice-warning svg {
+  color: rgb(251, 191, 36);
+}
+
+.guests-page-notice-success {
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.guests-page-notice-success svg {
+  color: rgb(52, 211, 153);
+}
+
+/* Counter Box */
+.guests-page-counter-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(217, 70, 239, 0.08));
+  border: 1.5px solid rgba(139, 92, 246, 0.25);
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+}
+
+.guests-page-counter-box svg {
+  color: rgb(167, 139, 250);
+  flex-shrink: 0;
+}
+
+.guests-page-counter-box strong {
+  color: rgb(167, 139, 250);
+  font-weight: 700;
+}
+
+.guests-page-counter-warning {
+  color: rgb(251, 191, 36);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.guests-page-counter-check {
+  color: rgb(52, 211, 153);
+  margin-left: auto;
+}
+
+/* Payment Note */
+.guests-page-payment-note {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Organizer Note */
+.guests-page-organizer-note {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Spinner Animation */
+.guests-page-btn-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .guests-page-container {
+    padding: 3rem 1.1rem 2.5rem;
+  }
+
+  .guests-page-event-title {
+    font-size: 24px;
+  }
+
+  .guests-page-forms {
+    grid-template-columns: 1fr;
+  }
+
+  .guests-page-form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .guests-page-section-header {
+    padding: 14px 16px;
+  }
+
+  .guests-page-section-title {
+    font-size: 18px;
+  }
+
+  .guests-page-guest-card {
+    padding: 16px;
+  }
+
+  .guests-page-receipt-card {
+    padding: 1.25rem;
+  }
+
+  .guests-page-receipt-button {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+}
