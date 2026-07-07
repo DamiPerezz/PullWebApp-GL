@@ -1,0 +1,94 @@
+{
+  "page": {
+    "error": "Error",
+    "dismissError": "Descartar error",
+    "processing": "Procesando...",
+    "proceedToPayment": "Proceder al Pago",
+    "cancelledWarning": "El pago fue cancelado. Tus datos del formulario se han conservado. Puedes intentar de nuevo cuando estés listo.",
+    "paymentSuccessTitle": "¡Pago Exitoso!",
+    "paymentSuccessDesc": "Tu pedido ha sido enviado y está pendiente de aprobación del staff. Recibirás un correo de confirmación en breve.",
+    "redirecting": "Redirigiendo...",
+    "processingOrder": "Procesando tu pedido...",
+    "processingWait": "Por favor espera mientras confirmamos tu pago",
+    "failedToLoad": "Error al cargar la información del evento. Por favor intenta de nuevo.",
+    "invalidFormData": "Estructura de datos del formulario inválida. Se esperaba { usuarios: [...] }",
+    "noTicketInfo": "No se proporcionó información de entradas",
+    "fillAllFields": "Por favor completa todos los campos requeridos para cada entrada",
+    "eventNotLoaded": "Información del evento no cargada",
+    "couldNotDetermineEventId": "No se pudo determinar el ID del evento",
+    "failedToCreateOrder": "Error al crear el pedido pendiente",
+    "paymentSimulationFailed": "La simulación del pago falló",
+    "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo."
+  },
+  "success": {
+    "title": "¡Pago Autorizado!",
+    "description": "Tu pago ha sido autorizado exitosamente y está siendo retenido de forma segura.",
+    "pendingApproval": "Pendiente de Aprobación",
+    "pendingDescription": "Tu pedido está esperando la confirmación del staff. Una vez aprobado, se procesará tu pago y recibirás tus entradas por correo electrónico.",
+    "orderReference": "Referencia del Pedido",
+    "copyReference": "Copiar Referencia",
+    "copied": "¡Copiado!",
+    "referenceHint": "Guarda este número de referencia. Puedes usarlo para consultar el estado de tu pedido o contactar con soporte.",
+    "importantInfo": "Información Importante",
+    "returnToVenue": "Volver al Venue",
+    "infoList": {
+      "authorized": "Tu pago está <strong>autorizado pero aún no cobrado</strong>",
+      "staffReview": "El staff revisará tu pedido pronto (normalmente en 24 horas)",
+      "approved": "Si es aprobado, se procesará el pago y recibirás las entradas por correo",
+      "rejected": "Si es rechazado, la autorización será cancelada y los fondos devueltos",
+      "emailUpdates": "Recibirás actualizaciones por correo sobre el estado de tu pedido"
+    },
+    "timeline": {
+      "paymentAuthorized": "Pago Autorizado",
+      "paymentAuthorizedDesc": "Tu pago está retenido de forma segura",
+      "staffReview": "Revisión del Staff",
+      "staffReviewDesc": "El staff está revisando tu pedido",
+      "ticketsSent": "Entradas Enviadas",
+      "ticketsSentDesc": "Recibirás las entradas por correo"
+    }
+  },
+  "cancel": {
+    "title": "Pago Cancelado",
+    "description": "Tu pago fue cancelado. No se realizaron cargos a tu cuenta.",
+    "tryAgain": "Intentar de Nuevo",
+    "returnToHome": "Volver al Inicio",
+    "whatHappensNow": "¿Qué sucede ahora?",
+    "orderCancelled": "Tu pedido ha sido cancelado",
+    "noPaymentProcessed": "No se procesó ningún pago",
+    "formDataSaved": "Tus datos del formulario se han guardado",
+    "tryWhenReady": "Puedes intentar de nuevo cuando estés listo",
+    "loading": "Cargando..."
+  },
+  "postPayment": {
+    "backToHome": "Volver al Inicio",
+    "paymentSuccessful": "¡Pago Exitoso!",
+    "ticketsSentEmail": "Tus entradas han sido enviadas a tu correo. Puedes verlas y descargarlas a continuación.",
+    "downloadAll": "Descargar Todo",
+    "yourTickets": "Tus Entradas",
+    "ticket": "entrada",
+    "tickets": "entradas",
+    "noTicketsFound": "No se encontraron entradas para este pedido.",
+    "nextSteps": "Próximos Pasos",
+    "ticketsSentToEmail": "Tus entradas han sido enviadas a tu dirección de correo",
+    "presentQRCode": "Presenta tu código QR en la entrada del venue",
+    "singleUseOnly": "Cada entrada solo se puede usar una vez",
+    "arriveEarly": "Llega temprano para evitar colas",
+    "loadingTickets": "Cargando tus entradas",
+    "pleaseWait": "Por favor espera mientras recuperamos tu pedido...",
+    "failedToLoad": "Error al cargar entradas",
+    "invalidOrderReference": "Referencia de pedido inválida",
+    "returnToHome": "Volver al Inicio"
+  },
+  "reservation": {
+    "bookingForm": "Formulario de reserva",
+    "bookNow": "Reservar ahora"
+  },
+  "error": {
+    "orderNotFound": "Pedido No Encontrado",
+    "orderNotFoundDesc": "No pudimos encontrar información del pedido. El enlace puede ser inválido o ha expirado.",
+    "returnToHome": "Volver al Inicio"
+  },
+  "loading": {
+    "order": "Cargando tu pedido..."
+  }
+}

@@ -1,39 +1,52 @@
-// pages/post-payment/post-payment.tsx - CORREGIDO
+// pages/post-payment/post-payment.tsx
+// SECURITY: Strict parameter validation to prevent XSS/IDOR attacks
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { Layout } from "../../components/layout/layout";
 import "./post-payment.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getTicketsByOrderId } from "../../controller/post-purchase-controller";
 import { getEventDetailedInfo } from "../../controller/purchase-pages-controller";
 import type { PurchasedTicketInfo, EventDetailedInfo } from "../../types/types";
 import { CheckCircle, Download, ChevronLeft, Loader } from "lucide-react";
 import { TicketCard } from "../../components/ticket-card/ticket-card";
+import { validateUUID, validateSlug } from "../../utils/security";
 
 export const PostPaymentPage = () => {
-  const { orderId, eventSlug } = useParams<{ orderId: string; eventSlug: string }>();
+  const { t, i18n } = useTranslation('payment');
+  const { lang, orderId: rawOrderId, eventSlug: rawEventSlug } = useParams<{ lang: string; orderId: string; eventSlug: string }>();
   const navigate = useNavigate();
+
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
+  // SECURITY: Validate and sanitize URL parameters
+  const validatedOrderId = useMemo(() => validateUUID(rawOrderId), [rawOrderId]);
+  const validatedEventSlug = useMemo(() => validateSlug(rawEventSlug), [rawEventSlug]);
+
   const [loading, setLoading] = useState(true);
   const [tickets, setTickets] = useState<PurchasedTicketInfo[]>([]);
   const [eventInfo, setEventInfo] = useState<EventDetailedInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!orderId) {
-      setError("Missing order information");
+    // SECURITY: Only proceed with validated parameters
+    if (!validatedOrderId) {
+      setError(t('postPayment.invalidOrderReference'));
       setLoading(false);
       return;
     }
 
-    // Obtener tickets
-    getTicketsByOrderId(orderId)
+    // SECURITY: Use validated orderId for API call
+    getTicketsByOrderId(validatedOrderId)
       .then((ticketsData) => {
         if (ticketsData?.tickets) {
           setTickets(ticketsData.tickets);
         }
-        
-        // Si tenemos eventSlug, obtener info del evento
-        if (eventSlug) {
-          return getEventDetailedInfo(eventSlug);
+
+        // SECURITY: Use validated eventSlug for API call
+        if (validatedEventSlug) {
+          return getEventDetailedInfo(validatedEventSlug);
         }
         return null;
       })
@@ -44,13 +57,13 @@ export const PostPaymentPage = () => {
         setLoading(false);
       })
       .catch(() => {
-        setError("Failed to load tickets");
+        setError(t('postPayment.failedToLoad'));
         setLoading(false);
       });
-  }, [orderId, eventSlug]);
+  }, [validatedOrderId, validatedEventSlug, t]);
 
   const handleBack = () => {
-    navigate('/');
+    navigate(buildUrl('/'));
   };
 
   const handleDownloadAll = () => {
@@ -67,8 +80,8 @@ export const PostPaymentPage = () => {
               <div className="post-payment-loading-spinner-wrapper">
                 <Loader className="post-payment-loading-spinner" />
               </div>
-              <h2 className="post-payment-loading-title">Loading your tickets</h2>
-              <p className="post-payment-loading-text">Please wait while we retrieve your order...</p>
+              <h2 className="post-payment-loading-title">{t('postPayment.loadingTickets')}</h2>
+              <p className="post-payment-loading-text">{t('postPayment.pleaseWait')}</p>
               <div className="post-payment-loading-dots">
                 <span></span>
                 <span></span>
@@ -90,12 +103,12 @@ export const PostPaymentPage = () => {
             <div className="post-payment-container">
               <button onClick={handleBack} className="post-payment-back-button">
                 <ChevronLeft />
-                Back to Home
+                {t('postPayment.backToHome')}
               </button>
               <div className="post-payment-error">
                 <p className="post-payment-error-text">{error}</p>
                 <button onClick={handleBack} className="post-payment-button">
-                  Return to Home
+                  {t('postPayment.returnToHome')}
                 </button>
               </div>
             </div>
@@ -124,47 +137,30 @@ export const PostPaymentPage = () => {
           <div className="post-payment-container">
             <button onClick={handleBack} className="post-payment-back-button">
               <ChevronLeft />
-              Back to Home
+              {t('postPayment.backToHome')}
             </button>
-
-            <div className="post-payment-steps">
-              <div className="post-payment-step post-payment-step-completed">
-                <div className="post-payment-step-number">1</div>
-                <div className="post-payment-step-label">Select Tickets</div>
-              </div>
-              <div className="post-payment-step-line post-payment-step-line-completed"></div>
-              <div className="post-payment-step post-payment-step-completed">
-                <div className="post-payment-step-number">2</div>
-                <div className="post-payment-step-label">Enter Data</div>
-              </div>
-              <div className="post-payment-step-line post-payment-step-line-completed"></div>
-              <div className="post-payment-step post-payment-step-completed">
-                <div className="post-payment-step-number">3</div>
-                <div className="post-payment-step-label">Payment</div>
-              </div>
-            </div>
 
             <div className="post-payment-success-banner">
               <div className="post-payment-success-icon">
                 <CheckCircle />
               </div>
               <div className="post-payment-success-content">
-                <h1 className="post-payment-success-title">Payment Successful!</h1>
+                <h1 className="post-payment-success-title">{t('postPayment.paymentSuccessful')}</h1>
                 <p className="post-payment-success-message">
-                  Your tickets have been sent to your email. You can view and download them below.
+                  {t('postPayment.ticketsSentEmail')}
                 </p>
               </div>
               <button onClick={handleDownloadAll} className="post-payment-download-button">
                 <Download />
-                Download All
+                {t('postPayment.downloadAll')}
               </button>
             </div>
 
             <div className="post-payment-tickets-section">
               <div className="post-payment-tickets-header">
-                <h2 className="post-payment-tickets-title">Your Tickets</h2>
+                <h2 className="post-payment-tickets-title">{t('postPayment.yourTickets')}</h2>
                 <span className="post-payment-tickets-count">
-                  {tickets.length} {tickets.length === 1 ? 'ticket' : 'tickets'}
+                  {tickets.length} {tickets.length === 1 ? t('postPayment.ticket') : t('postPayment.tickets')}
                 </span>
               </div>
 
@@ -176,18 +172,18 @@ export const PostPaymentPage = () => {
                 </div>
               ) : (
                 <div className="post-payment-no-tickets">
-                  <p>No tickets found for this order.</p>
+                  <p>{t('postPayment.noTicketsFound')}</p>
                 </div>
               )}
             </div>
 
             <div className="post-payment-instructions">
-              <h3 className="post-payment-instructions-title">Next Steps</h3>
+              <h3 className="post-payment-instructions-title">{t('postPayment.nextSteps')}</h3>
               <ul className="post-payment-instructions-list">
-                <li>Your tickets have been sent to your email address</li>
-                <li>Present your QR code at the venue entrance</li>
-                <li>Each ticket can only be used once</li>
-                <li>Arrive early to avoid queues</li>
+                <li>{t('postPayment.ticketsSentToEmail')}</li>
+                <li>{t('postPayment.presentQRCode')}</li>
+                <li>{t('postPayment.singleUseOnly')}</li>
+                <li>{t('postPayment.arriveEarly')}</li>
               </ul>
             </div>
           </div>

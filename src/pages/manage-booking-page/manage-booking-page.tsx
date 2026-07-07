@@ -1,7 +1,9 @@
 // pages/manage-booking-page/manage-booking-page.tsx
+// SECURITY: Validate URL parameters to prevent injection
 // @ts-nocheck
 // TODO: Fix type mismatches in this file
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
 import { Layout } from "../../components/layout/layout";
 import "./manage-booking-page.css";
 import { ReservationHeader } from "../../components/reservation-header/reservation-header";
@@ -21,12 +23,22 @@ import {
   getReservationDetails,
   modifyReservationGuests,
 } from "../../controller/manage-booking-page-controller";
+import { validateSlug, validateUUID } from "../../utils/security";
+import { useTranslation } from "react-i18next";
 
 export const ManageBookingPage = () => {
-  const { venueId, reservationId } = useParams<{
+  const { t, i18n } = useTranslation('common');
+  const { venueId: rawVenueId, reservationId: rawReservationId, lang } = useParams<{
     venueId: string;
     reservationId: string;
+    lang: string;
   }>();
+  // Language param available for future use
+  const _currentLang = lang || i18n.language || 'es';
+
+  // SECURITY: Validate URL parameters
+  const venueId = useMemo(() => validateSlug(rawVenueId), [rawVenueId]);
+  const reservationId = useMemo(() => validateUUID(rawReservationId), [rawReservationId]);
 
   const { notifications, showSuccess, showError, removeNotification } =
     useNotification();
@@ -123,11 +135,7 @@ export const ManageBookingPage = () => {
       });
     });
 
-    showSuccess(
-      `${guestNames.length} guest${
-        guestNames.length > 1 ? "s" : ""
-      } added successfully!`
-    );
+    showSuccess(t('booking.guestsAdded', { count: guestNames.length }));
   };
 
   const handleSaveChanges = async () => {
@@ -147,12 +155,12 @@ export const ManageBookingPage = () => {
 
         await fetchReservationDetails();
 
-        showSuccess("Changes saved successfully! Waiting for venue approval.");
+        showSuccess(t('booking.changesSaved'));
       }
     } catch (error: any) {
       console.error("Error saving changes:", error);
 
-      let errorMessage = "Error saving changes. Please try again.";
+      let errorMessage = t('booking.errorSaving');
 
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -173,13 +181,12 @@ export const ManageBookingPage = () => {
     setPendingChanges([]);
     setHasUnsavedChanges(false);
 
-    // Mostrar notificación de información
-    showSuccess("Changes cancelled successfully.");
+    showSuccess(t('booking.changesCancelled'));
   };
 
   const fetchReservationDetails = async () => {
     if (!reservationId) {
-      setError("Booking ID is required");
+      setError(t('booking.bookingIdRequired'));
       setLoading(false);
       return;
     }
@@ -195,12 +202,12 @@ export const ManageBookingPage = () => {
         setLocalAssistants([...response.booking.assistants]);
         setIsTable(response.booking.type === "table" ? "true" : "false");
       } else {
-        setError("Failed to load booking details");
-        showError("Failed to load booking details");
+        setError(t('booking.failedToLoad'));
+        showError(t('booking.failedToLoad'));
       }
     } catch (err: any) {
       console.error("Error fetching booking:", err);
-      const errorMessage = "Failed to load booking details";
+      const errorMessage = t('booking.failedToLoad');
       setError(errorMessage);
       showError(errorMessage);
     } finally {
@@ -234,7 +241,7 @@ export const ManageBookingPage = () => {
       ))}
 
       {loading ? (
-        <div>Loading...</div>
+        <div>{t('loading.default')}</div>
       ) : (
         <>
           {isOpen && (
@@ -257,7 +264,7 @@ export const ManageBookingPage = () => {
                 className="login-admin-button"
                 onClick={() => setIsOpen(true)}
               >
-                Login as Admin
+                {t('booking.loginAsAdmin')}
               </button>
             )}
 
@@ -275,7 +282,7 @@ export const ManageBookingPage = () => {
               }
             />
 
-            <p className="title-section">Assistants</p>
+            <p className="title-section">{t('booking.assistants')}</p>
 
             <div className="booking-info">
               <div className="assistants">
@@ -295,7 +302,7 @@ export const ManageBookingPage = () => {
                     onClick={() => setMoreParticipants(true)}
                     disabled={isSaving}
                   >
-                    Request more participants
+                    {t('booking.requestMoreParticipants')}
                   </button>
                 )}
 
@@ -308,39 +315,39 @@ export const ManageBookingPage = () => {
                       disabled={isSaving}
                     >
                       {isSaving
-                        ? "Saving..."
-                        : `Save Changes (${pendingChanges.length})`}
+                        ? t('booking.saving')
+                        : `${t('booking.saveChanges')} (${pendingChanges.length})`}
                     </button>
                     <button
                       className="cancel-changes-button"
                       onClick={handleCancelChanges}
                       disabled={isSaving}
                     >
-                      Cancel
+                      {t('booking.cancel')}
                     </button>
                   </div>
                 )}
               </div>
 
               <div className="booking-sum-up">
-                <p className="booking-sum-up-title">Information</p>
+                <p className="booking-sum-up-title">{t('booking.information')}</p>
                 <p className="info">
-                  <ClockIcon strokeColor="white" /> Cancel free ends: 48h before
+                  <ClockIcon strokeColor="white" /> {t('booking.cancelFreeEnds')}
                 </p>
                 <div className="total-paid">
-                  <p>Total paid</p>
+                  <p>{t('booking.totalPaid')}</p>
                   <strong>
                     {reservationData?.paymentSummary.totalPaid || 0} Q
                   </strong>
                 </div>
                 <p className="info">
-                  Total:{" "}
+                  {t('booking.total')}:{" "}
                   <strong>
                     {reservationData?.paymentSummary.totalAmount || 0} Q
                   </strong>
                 </p>
                 <p className="info">
-                  Pending:{" "}
+                  {t('booking.pending')}:{" "}
                   <strong>
                     {reservationData?.paymentSummary.totalPending || 0} Q
                   </strong>

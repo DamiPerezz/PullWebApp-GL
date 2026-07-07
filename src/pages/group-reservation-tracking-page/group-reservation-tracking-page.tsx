@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Users,
   CheckCircle,
@@ -40,6 +41,7 @@ interface Bottle {
   bottle_name: string;
   quantity: number;
   price: number;
+  image?: string;
 }
 
 interface Mixer {
@@ -74,23 +76,27 @@ interface GroupReservation {
 
 interface Perk {
   threshold: number;
-  name: string;
-  description: string;
+  nameKey: string;
+  descKey: string;
   icon: React.ReactNode;
 }
 
 const PERKS: Perk[] = [
-  { threshold: 4, name: 'Reserved Table', description: 'Private table', icon: <Gift size={16} /> },
-  { threshold: 6, name: 'Priority Entry', description: 'Skip the line', icon: <Zap size={16} /> },
-  { threshold: 8, name: 'Free Bottle', description: 'Complimentary', icon: <Wine size={16} /> },
-  { threshold: 10, name: 'VIP Host', description: 'Personal service', icon: <Crown size={16} /> },
-  { threshold: 12, name: 'Premium Area', description: 'Exclusive zone', icon: <Star size={16} /> }
+  { threshold: 4, nameKey: 'tracking.perks.reservedTable', descKey: 'tracking.perks.reservedTableDesc', icon: <Gift size={16} /> },
+  { threshold: 6, nameKey: 'tracking.perks.priorityEntry', descKey: 'tracking.perks.priorityEntryDesc', icon: <Zap size={16} /> },
+  { threshold: 8, nameKey: 'tracking.perks.freeBottle', descKey: 'tracking.perks.freeBottleDesc', icon: <Wine size={16} /> },
+  { threshold: 10, nameKey: 'tracking.perks.vipHost', descKey: 'tracking.perks.vipHostDesc', icon: <Crown size={16} /> },
+  { threshold: 12, nameKey: 'tracking.perks.premiumArea', descKey: 'tracking.perks.premiumAreaDesc', icon: <Star size={16} /> }
 ];
 
 export const GroupReservationTrackingPage = () => {
-  const { paymentLinkCode } = useParams<{ paymentLinkCode: string }>();
+  const { lang, paymentLinkCode } = useParams<{ lang: string; paymentLinkCode: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t, i18n } = useTranslation('group');
+
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   const [reservation, setReservation] = useState<GroupReservation | null>(null);
   const [eventImage, setEventImage] = useState<string | null>(null);
@@ -102,19 +108,19 @@ export const GroupReservationTrackingPage = () => {
   useEffect(() => {
     const success = searchParams.get('success');
     if (success === 'payment') {
-      setSuccessMessage('Payment complete! Your ticket has been sent to your email.');
+      setSuccessMessage(t('tracking.successBanner.paymentComplete'));
       // Clear the query param
       searchParams.delete('success');
       setSearchParams(searchParams, { replace: true });
       // Auto-dismiss after 8 seconds
       setTimeout(() => setSuccessMessage(null), 8000);
     } else if (success === 'data') {
-      setSuccessMessage('Info complete! Your ticket has been sent to your email.');
+      setSuccessMessage(t('tracking.successBanner.dataComplete'));
       searchParams.delete('success');
       setSearchParams(searchParams, { replace: true });
       setTimeout(() => setSuccessMessage(null), 8000);
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, t]);
 
   useEffect(() => {
     if (!paymentLinkCode) return;
@@ -134,7 +140,7 @@ export const GroupReservationTrackingPage = () => {
         }
         setLoading(false);
       } catch {
-        setError('Could not load reservation');
+        setError(t('tracking.errors.loadFailed'));
         setLoading(false);
       }
     };
@@ -204,8 +210,17 @@ export const GroupReservationTrackingPage = () => {
   };
 
   // Get counts
-  const getReadyCount = () => {
-    return reservation?.guests?.filter((g, i) => getGuestStatus(g, i) === 'ready').length || 0;
+  const getPaidCount = () => {
+    if (!reservation?.guests) return 0;
+    return reservation.guests.filter((guest, index) => {
+      // Organizer always counts as paid (index 0)
+      if (index === 0) return true;
+      // Host pays for this guest
+      if (guest.host_pays) return true;
+      // Guest paid themselves
+      if (guest.paid_at) return true;
+      return false;
+    }).length;
   };
 
   const getPaidAmount = () => {
@@ -224,7 +239,7 @@ export const GroupReservationTrackingPage = () => {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(i18n.language, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -261,9 +276,9 @@ export const GroupReservationTrackingPage = () => {
           <div className="grtrack-content">
             <div className="grtrack-error">
               <XCircle size={48} />
-              <h2>{error || 'Reservation not found'}</h2>
-              <button onClick={() => navigate('/venues')} className="grtrack-error-btn">
-                Back to home
+              <h2>{error || t('tracking.errors.notFound')}</h2>
+              <button onClick={() => navigate(buildUrl('/venues'))} className="grtrack-error-btn">
+                {t('tracking.backToHome')}
               </button>
             </div>
           </div>
@@ -272,7 +287,7 @@ export const GroupReservationTrackingPage = () => {
     );
   }
 
-  const readyCount = getReadyCount();
+  const paidCount = getPaidCount();
   const paidAmount = getPaidAmount();
   const progress = getPaymentProgress();
   const statusId = reservation.status_id;
@@ -306,7 +321,7 @@ export const GroupReservationTrackingPage = () => {
               </div>
               <div className="grtrack-organizer">
                 <User size={16} />
-                <span>Organized by <strong>{reservation.organizer_name}</strong></span>
+                <span>{t('tracking.organizedBy')} <strong>{reservation.organizer_name}</strong></span>
               </div>
             </header>
 
@@ -315,7 +330,7 @@ export const GroupReservationTrackingPage = () => {
               <div className="grtrack-banner grtrack-banner-success">
                 <PartyPopper size={22} />
                 <div>
-                  <h3>All Done!</h3>
+                  <h3>{t('tracking.successBanner.allDone')}</h3>
                   <p>{successMessage}</p>
                 </div>
                 <button
@@ -333,8 +348,8 @@ export const GroupReservationTrackingPage = () => {
               <div className="grtrack-banner grtrack-banner-pending">
                 <Clock size={22} />
                 <div>
-                  <h3>Awaiting Staff Approval</h3>
-                  <p>Your reservation is being reviewed. You'll receive an email when approved.</p>
+                  <h3>{t('tracking.statusBanner.pending')}</h3>
+                  <p>{t('tracking.statusBanner.pendingDesc')}</p>
                 </div>
               </div>
             )}
@@ -343,8 +358,8 @@ export const GroupReservationTrackingPage = () => {
               <div className="grtrack-banner grtrack-banner-approved">
                 <CheckCircle size={22} />
                 <div>
-                  <h3>Reservation Approved</h3>
-                  <p>Guests can complete their details and receive their tickets.</p>
+                  <h3>{t('tracking.statusBanner.approved')}</h3>
+                  <p>{t('tracking.statusBanner.approvedDesc')}</p>
                 </div>
               </div>
             )}
@@ -353,8 +368,8 @@ export const GroupReservationTrackingPage = () => {
               <div className="grtrack-banner grtrack-banner-rejected">
                 <XCircle size={22} />
                 <div>
-                  <h3>Reservation Rejected</h3>
-                  <p>Your reservation could not be approved. Contact the venue for more info.</p>
+                  <h3>{t('tracking.statusBanner.rejected')}</h3>
+                  <p>{t('tracking.statusBanner.rejectedDesc')}</p>
                 </div>
               </div>
             )}
@@ -365,7 +380,7 @@ export const GroupReservationTrackingPage = () => {
               <section className="grtrack-section grtrack-column-left">
                 <div className="grtrack-section-header">
                   <Users size={20} />
-                  <h2>Guest List ({reservation.guest_count})</h2>
+                  <h2>{t('tracking.guestList', { count: reservation.guest_count })}</h2>
                 </div>
 
                 <div className="grtrack-guests">
@@ -375,7 +390,7 @@ export const GroupReservationTrackingPage = () => {
 
                     const guestName = guest.name && guest.last_name
                       ? `${guest.name} ${guest.last_name}`
-                      : guest.name || guest.email || `Guest ${index + 1}`;
+                      : guest.name || guest.email || t('tracking.guestFallback', { number: index + 1 });
 
                     const guestEmail = guestType === 'organizer'
                       ? reservation.organizer_email
@@ -397,13 +412,13 @@ export const GroupReservationTrackingPage = () => {
                             <h3 className="grtrack-guest-name">
                               {guestType === 'organizer' ? reservation.organizer_name : guestName}
                               {guestType === 'organizer' && (
-                                <span className="grtrack-badge grtrack-badge-organizer">Organizer</span>
+                                <span className="grtrack-badge grtrack-badge-organizer">{t('tracking.badges.organizer')}</span>
                               )}
                               {guestType === 'host_paid' && (
-                                <span className="grtrack-badge grtrack-badge-hostpaid">Paid by organizer</span>
+                                <span className="grtrack-badge grtrack-badge-hostpaid">{t('tracking.badges.hostPaid')}</span>
                               )}
                             </h3>
-                            <p className="grtrack-guest-email">{guestEmail || 'Email pending'}</p>
+                            <p className="grtrack-guest-email">{guestEmail || t('tracking.emailPending')}</p>
                             {guestType === 'self_pay' && !guest.paid_at && (
                               <span className="grtrack-guest-amount">Q{(guest.amount_due || 0).toFixed(2)}</span>
                             )}
@@ -414,34 +429,34 @@ export const GroupReservationTrackingPage = () => {
                           {status === 'ready' && (
                             <span className="grtrack-status-badge grtrack-status-ready">
                               <CheckCircle size={16} />
-                              {guest.ticket_id ? 'Ticket ready' : 'Ready'}
+                              {guest.ticket_id ? t('tracking.status.ticketReady') : t('tracking.status.ready')}
                             </span>
                           )}
 
                           {status === 'needs_data' && (
                             <button
-                              onClick={() => navigate(`/group/guest/${guest.id}/complete`)}
+                              onClick={() => navigate(buildUrl(`/group/guest/${guest.id}/complete?vc=${guest.verification_code}`))}
                               className="grtrack-action-btn grtrack-action-data"
                             >
                               <FileText size={16} />
-                              Complete info
+                              {t('tracking.status.needsData')}
                             </button>
                           )}
 
                           {status === 'needs_payment' && (
                             <button
-                              onClick={() => navigate(`/group/guest/${guest.id}/complete`)}
+                              onClick={() => navigate(buildUrl(`/group/guest/${guest.id}/complete?vc=${guest.verification_code}`))}
                               className="grtrack-action-btn grtrack-action-pay"
                             >
                               <CreditCard size={16} />
-                              Pay Q{(guest.amount_due || 0).toFixed(2)}
+                              {t('tracking.status.needsPayment', { price: `Q${(guest.amount_due || 0).toFixed(2)}` })}
                             </button>
                           )}
 
                           {status === 'waiting' && (
                             <span className="grtrack-status-badge grtrack-status-waiting">
                               <Clock size={16} />
-                              Awaiting approval
+                              {t('tracking.status.waiting')}
                             </span>
                           )}
                         </div>
@@ -456,14 +471,14 @@ export const GroupReservationTrackingPage = () => {
                 <div className="grtrack-progress-card">
               <div className="grtrack-progress-header">
                 <div className="grtrack-progress-info">
-                  <h2 className="grtrack-progress-title">Group Progress</h2>
+                  <h2 className="grtrack-progress-title">{t('tracking.groupProgress')}</h2>
                   <p className="grtrack-progress-subtitle">
-                    {readyCount} of {reservation.guest_count} guests ready
+                    {t('tracking.guestsPaid', { paid: paidCount, total: reservation.guest_count })}
                   </p>
                 </div>
                 <div className="grtrack-progress-amount">
                   <span className="grtrack-progress-paid">Q{paidAmount.toFixed(2)}</span>
-                  <span className="grtrack-progress-total">of Q{(reservation.total_amount || 0).toFixed(2)}</span>
+                  <span className="grtrack-progress-total">{t('tracking.ofAmount', { amount: (reservation.total_amount || 0).toFixed(2) })}</span>
                 </div>
               </div>
 
@@ -480,7 +495,7 @@ export const GroupReservationTrackingPage = () => {
                   <span className="grtrack-progressbar-percent">{Math.round(progress)}%</span>
                   <span className="grtrack-progressbar-count">
                     <Users size={14} />
-                    {reservation.guest_count} people
+                    {reservation.guest_count} {t('tracking.people')}
                   </span>
                 </div>
               </div>
@@ -506,8 +521,8 @@ export const GroupReservationTrackingPage = () => {
                           >
                             <div className="grtrack-perk-card-icon">{perk.icon}</div>
                             <div className="grtrack-perk-card-content">
-                              <span className="grtrack-perk-card-name">{perk.name}</span>
-                              <span className="grtrack-perk-card-desc">{perk.description} · {perk.threshold} people</span>
+                              <span className="grtrack-perk-card-name">{t(perk.nameKey)}</span>
+                              <span className="grtrack-perk-card-desc">{t(perk.descKey)} · {perk.threshold} {t('tracking.people')}</span>
                             </div>
                             <div className="grtrack-perk-card-status">
                               {unlocked ? (
@@ -523,52 +538,57 @@ export const GroupReservationTrackingPage = () => {
                     {nextPerk && (
                       <div className="grtrack-next-perk-hint">
                         <Zap size={14} />
-                        <span>Next: <strong>{nextPerk.name}</strong> — invite {nextPerk.threshold - guestCount} more {nextPerk.threshold - guestCount !== 1 ? 'people' : 'person'}</span>
+                        <span dangerouslySetInnerHTML={{ __html: t('tracking.perks.nextPerk', {
+                          perk: t(nextPerk.nameKey),
+                          count: nextPerk.threshold - guestCount,
+                          pluralPerson: (nextPerk.threshold - guestCount) !== 1 ? t('tracking.perks.people') : t('tracking.perks.person')
+                        }) }} />
                       </div>
                     )}
                   </div>
                 );
               })()}
 
+              {/* Bottles Section - Inside Progress Card */}
+              {reservation.bottles && reservation.bottles.length > 0 && (
+                <div className="grtrack-bottles-section">
+                  <div className="grtrack-bottles-header">
+                    <Wine size={18} />
+                    <h3>{t('tracking.bottlesIncluded')}</h3>
+                  </div>
+                  <div className="grtrack-bottles-list">
+                    {reservation.bottles.map((bottle, index) => (
+                      <div key={index} className="grtrack-bottle-item">
+                        <div className="grtrack-bottle-img-container">
+                          {bottle.image ? (
+                            <img
+                              src={bottle.image}
+                              alt={bottle.bottle_name}
+                              className="grtrack-bottle-img"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="grtrack-bottle-placeholder">
+                              <Wine size={24} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="grtrack-bottle-details">
+                          <span className="grtrack-bottle-qty-badge">{bottle.quantity}x</span>
+                          <span className="grtrack-bottle-name">{bottle.bottle_name}</span>
+                        </div>
+                        <div className="grtrack-bottle-price">
+                          Q{((bottle.price || 0) * (bottle.quantity || 1)).toFixed(0)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
                 </div>
               </div>
             </div>
-
-            {/* Bottles Section */}
-            {reservation.bottles && reservation.bottles.length > 0 && (
-              <section className="grtrack-section">
-                <div className="grtrack-section-header">
-                  <Wine size={20} />
-                  <h2>Bottles Included</h2>
-                </div>
-                <div className="grtrack-items">
-                  {reservation.bottles.map((bottle, index) => (
-                    <div key={index} className="grtrack-item">
-                      <span className="grtrack-item-qty">{bottle.quantity}x</span>
-                      <span className="grtrack-item-name">{bottle.bottle_name}</span>
-                      <span className="grtrack-item-price">Q{((bottle.price || 0) * (bottle.quantity || 0)).toFixed(2)}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Mixers Section */}
-            {reservation.mixers && reservation.mixers.length > 0 && (
-              <section className="grtrack-section">
-                <div className="grtrack-section-header">
-                  <h2>Mixers Included</h2>
-                </div>
-                <div className="grtrack-items">
-                  {reservation.mixers.map((mixer, index) => (
-                    <div key={index} className="grtrack-item">
-                      <span className="grtrack-item-qty">{mixer.quantity}x</span>
-                      <span className="grtrack-item-name">{mixer.mixer_name}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
           </div>
         </div>

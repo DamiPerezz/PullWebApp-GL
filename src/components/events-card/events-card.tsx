@@ -1,29 +1,43 @@
+// PERFORMANCE: Memoized to prevent unnecessary re-renders in event lists
+import { memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NavLink, useParams } from 'react-router-dom';
 import './events-card.css'
 import { CalendarIcon, ClockIcon, LocationIcon, HangerIcon } from '../../icons/icons';
-import { NavLink } from 'react-router-dom';
 import type { EventInfo } from '../../types/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ImageOff } from 'lucide-react';
 import { formatEventDateShort } from '../../utils/dateFormatter';
 
-export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVenueEventPage?: boolean }) => {
+export const EventCard = memo(({ event, isVenueEventPage }: { event: EventInfo, isVenueEventPage?: boolean }) => {
+    const { t, i18n } = useTranslation('common');
+    const { lang } = useParams<{ lang: string }>();
+    const currentLang = lang || i18n.language || 'es';
+    const [imageError, setImageError] = useState(false);
 
-    const dressCode = event.dress_code || 'No dress code specified';
+    const dressCode = event.dress_code || t('event.noDressCode');
 
     const open = event.start_time.slice(0, 5);
     const close = event.end_time.slice(0, 5);
 
     return (
-        <NavLink to={`/event/${event.event_slug}`} className={isVenueEventPage ? "event-card venue-event-card" : "event-card"}>
+        <NavLink to={`/${currentLang}/event/${event.event_slug}`} className={isVenueEventPage ? "event-card venue-event-card" : "event-card"}>
             <div className="event-card-inner">
                 <div className="event-card-bg-gradient" />
-                
+
                 <div className="event-card-content">
                     <div className="event-card-image-wrapper">
-                        <img 
-                            src={event.event_img} 
-                            alt={event.event_name}
-                            className="event-card-image"
-                        />
+                        {imageError ? (
+                            <div className="event-card-image-placeholder">
+                                <ImageOff size={24} />
+                            </div>
+                        ) : (
+                            <img
+                                src={event.event_img}
+                                alt={event.event_name}
+                                className="event-card-image"
+                                onError={() => setImageError(true)}
+                            />
+                        )}
                         {event.min_price && (
                             <div className="event-card-price">
                                 <span className="event-card-price-value">€{event.min_price}</span>
@@ -39,11 +53,11 @@ export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVen
                                     <span>{formatEventDateShort(event.event_date)}</span>
                                 </div>
                                 <div className="event-card-badge event-card-time-badge">
-                                    <ClockIcon strokeColor="rgb(34, 211, 238)" />
+                                    <ClockIcon strokeColor="rgb(59, 130, 246)" />
                                     <span>{open} - {close}</span>
                                 </div>
                             </div>
-                            
+
                             <h3 className="event-card-title">{event.event_name}</h3>
 
                             <div className="event-card-details">
@@ -53,14 +67,14 @@ export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVen
                                 </div>
 
                                 <div className="event-card-detail-item">
-                                    <HangerIcon strokeColor="rgb(232, 121, 249)" />
+                                    <HangerIcon strokeColor="rgb(168, 85, 255)" />
                                     <span>{dressCode}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="event-card-button">
-                            View Details
+                            {t('buttons.viewDetails')}
                             <ArrowRight />
                         </div>
                     </div>
@@ -68,4 +82,4 @@ export const EventCard = ({ event, isVenueEventPage }: { event: EventInfo, isVen
             </div>
         </NavLink>
     )
-}
+});

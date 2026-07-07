@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { AddUserIcon, CreditCardIcon, DeleteUserIcon } from "../../icons/icons";
 import "./assistant-card.css";
 
@@ -20,6 +21,7 @@ export const AssistantCard = ({
   onRemove?: (id: string) => void;
   onRestore?: (id: string) => void;
 }) => {
+  const { t } = useTranslation('common');
   const isPendingRemove = data.status === "pending_remove";
   const isPendingAdd = data.status === "pending_add";
   const isAccepted = data.status === "confirmed";
@@ -39,15 +41,15 @@ export const AssistantCard = ({
         <p>{data.name}</p>
 
         {isPendingAdd && (
-          <span className="status-badge pending-add">Pending Add</span>
+          <span className="status-badge pending-add">{t('assistant.pendingAdd')}</span>
         )}
 
         {isPendingRemove && (
-          <span className="status-badge pending-remove">Pending Remove</span>
+          <span className="status-badge pending-remove">{t('assistant.pendingRemove')}</span>
         )}
 
         {isAccepted && data.paidAt === null && (
-          <span className="status-badge unpaid">To Pay</span>
+          <span className="status-badge unpaid">{t('assistant.toPay')}</span>
         )}
       </div>
 
@@ -58,7 +60,7 @@ export const AssistantCard = ({
               <button
                 className="delete"
                 onClick={() => onRemove?.(data.id)}
-                title={isPendingAdd ? "Cancel addition" : "Mark for removal"}
+                title={isPendingAdd ? t('assistant.cancelAddition') : t('assistant.markForRemoval')}
               >
                 <DeleteUserIcon strokeColor="white" />
               </button>
@@ -68,7 +70,7 @@ export const AssistantCard = ({
               <button
                 className="restore"
                 onClick={() => onRestore?.(data.id)}
-                title="Cancel removal"
+                title={t('assistant.cancelRemoval')}
               >
                 <AddUserIcon strokeColor="white" />
               </button>

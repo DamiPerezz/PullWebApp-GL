@@ -1,16 +1,20 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '../../components/layout/layout';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import './not-found-page.css';
 
 export const NotFoundPage = () => {
+  const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
+  const currentLang = lang || 'es';
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/');
+      navigate(`/${currentLang}/venues/aurora-hall/events`);
     }
   };
 
@@ -25,12 +29,12 @@ export const NotFoundPage = () => {
               <AlertTriangle className="not-found-icon" />
             </div>
 
-            <div className="not-found-error-code">404</div>
+            <div className="not-found-error-code">{t('notFound.title')}</div>
 
-            <h1 className="not-found-title">Page Not Found</h1>
+            <h1 className="not-found-title">{t('notFound.heading')}</h1>
 
             <p className="not-found-description">
-              The page you're looking for doesn't exist or has been moved.
+              {t('notFound.description')}
             </p>
 
             <button
@@ -38,7 +42,7 @@ export const NotFoundPage = () => {
               onClick={handleGoBack}
             >
               <ArrowLeft />
-              Go Back
+              {t('buttons.goBack')}
             </button>
           </div>
         </div>

@@ -3,10 +3,11 @@
     position: relative;
     width: 100%;
     padding: 1.125rem;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(15, 15, 21, 0.5);
-    backdrop-filter: blur(48px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(64px);
+    -webkit-backdrop-filter: blur(64px);
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -30,57 +31,44 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
-    background: linear-gradient(to right, rgba(139, 92, 246, 0), rgba(139, 92, 246, 0.6), rgba(217, 70, 239, 0.6), rgba(217, 70, 239, 0));
+    height: 1px;
+    background: linear-gradient(to right, rgba(139, 92, 246, 0), rgba(139, 92, 246, 0.4), rgba(217, 70, 239, 0.4), rgba(217, 70, 239, 0));
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .ticket-type-card:hover {
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .ticket-type-card:hover::after {
-    opacity: 1;
+    opacity: 0.5;
 }
 
-/* Women Ticket Variant */
-.ticket-women::before {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, transparent 50%, rgba(219, 39, 119, 0.08) 100%);
+/* Individual Ticket Variant - Purple (matches section icon) */
+.ticket-individual-purple::before {
+    background: linear-gradient(135deg, rgba(168, 85, 255, 0.08) 0%, transparent 50%, rgba(139, 92, 246, 0.08) 100%);
 }
 
-.ticket-women::after {
-    background: linear-gradient(to right, rgba(236, 72, 153, 0), rgba(236, 72, 153, 0.6), rgba(219, 39, 119, 0.6), rgba(219, 39, 119, 0));
+.ticket-individual-purple::after {
+    background: linear-gradient(to right, rgba(168, 85, 255, 0), rgba(168, 85, 255, 0.4), rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0));
 }
 
-.ticket-women:hover {
-    border-color: rgba(236, 72, 153, 0.5);
+.ticket-individual-purple:hover {
+    border-color: rgba(168, 85, 255, 0.25);
 }
 
-/* Men Ticket Variant */
-.ticket-men::before {
+/* Group Ticket Variant - Blue (matches section icon) */
+.ticket-group-blue::before {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, transparent 50%, rgba(37, 99, 235, 0.08) 100%);
 }
 
-.ticket-men::after {
-    background: linear-gradient(to right, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.6), rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0));
+.ticket-group-blue::after {
+    background: linear-gradient(to right, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.4), rgba(37, 99, 235, 0));
 }
 
-.ticket-men:hover {
-    border-color: rgba(59, 130, 246, 0.5);
-}
-
-/* Group Ticket Variant - Subtle Purple Touches */
-.ticket-group::before {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, transparent 50%, rgba(167, 139, 250, 0.08) 100%);
-}
-
-.ticket-group::after {
-    background: linear-gradient(to right, rgba(139, 92, 246, 0), rgba(139, 92, 246, 0.6), rgba(167, 139, 250, 0.6), rgba(167, 139, 250, 0));
-}
-
-.ticket-group:hover {
-    border-color: rgba(139, 92, 246, 0.5);
+.ticket-group-blue:hover {
+    border-color: rgba(59, 130, 246, 0.25);
 }
 
 .ticket-type-card-header {
@@ -104,16 +92,24 @@
     flex-shrink: 0;
 }
 
+.ticket-icon-purple {
+    color: rgb(168, 85, 255);
+}
+
+.ticket-icon-blue {
+    color: rgb(59, 130, 246);
+}
+
 .ticket-icon-women {
     color: rgb(236, 72, 153);
 }
 
 .ticket-icon-men {
-    color: rgb(59, 130, 246);
+    color: rgb(168, 85, 255);
 }
 
 .ticket-icon-group {
-    color: rgb(139, 92, 246);
+    color: rgb(59, 130, 246);
 }
 
 .ticket-type-card-info {
@@ -132,33 +128,12 @@
     transition: all 0.3s ease;
 }
 
-.ticket-type-card:hover .ticket-type-card-title {
-    color: transparent;
-    background: linear-gradient(to right, rgb(167, 139, 250), rgb(232, 121, 249));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.ticket-individual-purple:hover .ticket-type-card-title {
+    color: rgb(196, 181, 253);
 }
 
-.ticket-women:hover .ticket-type-card-title {
-    background: linear-gradient(to right, rgb(236, 72, 153), rgb(219, 39, 119));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.ticket-men:hover .ticket-type-card-title {
-    background: linear-gradient(to right, rgb(59, 130, 246), rgb(37, 99, 235));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.ticket-group:hover .ticket-type-card-title {
-    background: linear-gradient(to right, rgb(139, 92, 246), rgb(167, 139, 250));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.ticket-group-blue:hover .ticket-type-card-title {
+    color: rgb(147, 197, 253);
 }
 
 .ticket-type-card-availability {
@@ -207,9 +182,9 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.ticket-group .ticket-group-features {
-    background: rgba(139, 92, 246, 0.05);
-    border: 1px solid rgba(139, 92, 246, 0.15);
+.ticket-group-blue .ticket-group-features {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
 .ticket-group-feature {
@@ -241,52 +216,36 @@
 }
 
 .ticket-type-card-price {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(196, 181, 253);
     margin: 0;
     padding: 0.5rem 0.875rem;
     border-radius: 0.5rem;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.15));
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.15));
     border: 1px solid rgba(139, 92, 246, 0.3);
-    backdrop-filter: blur(8px);
     flex-shrink: 0;
     transition: all 0.3s ease;
 }
 
-.ticket-women .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0.15));
-    border: 1px solid rgba(236, 72, 153, 0.3);
+.ticket-individual-purple .ticket-type-card-price {
+    background: linear-gradient(135deg, rgba(168, 85, 255, 0.15), rgba(139, 92, 246, 0.15));
+    border: 1px solid rgba(168, 85, 255, 0.3);
+    color: rgb(196, 181, 253);
 }
 
-.ticket-men .ticket-type-card-price {
+.ticket-group-blue .ticket-type-card-price {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
     border: 1px solid rgba(59, 130, 246, 0.3);
+    color: rgb(147, 197, 253);
 }
 
-.ticket-group .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.15));
-    border: 1px solid rgba(139, 92, 246, 0.3);
+.ticket-individual-purple:hover .ticket-type-card-price {
+    border-color: rgba(168, 85, 255, 0.4);
 }
 
-.ticket-type-card:hover .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(217, 70, 239, 0.25));
-    border-color: rgba(139, 92, 246, 0.5);
-}
-
-.ticket-women:hover .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(219, 39, 119, 0.25));
-    border-color: rgba(236, 72, 153, 0.5);
-}
-
-.ticket-men:hover .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.25));
-    border-color: rgba(59, 130, 246, 0.5);
-}
-
-.ticket-group:hover .ticket-type-card-price {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(167, 139, 250, 0.25));
-    border-color: rgba(139, 92, 246, 0.5);
+.ticket-group-blue:hover .ticket-type-card-price {
+    border-color: rgba(59, 130, 246, 0.4);
 }
 
 .ticket-group-capacity {
@@ -295,9 +254,9 @@
     gap: 0.5rem;
     padding: 0.5rem 0.875rem;
     border-radius: 0.5rem;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.15));
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    color: rgb(196, 181, 253);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: rgb(147, 197, 253);
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -306,12 +265,11 @@
 .ticket-group-capacity svg {
     width: 1rem;
     height: 1rem;
-    color: rgb(167, 139, 250);
+    color: rgb(59, 130, 246);
 }
 
-.ticket-group:hover .ticket-group-capacity {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(167, 139, 250, 0.25));
-    border-color: rgba(139, 92, 246, 0.5);
+.ticket-group-blue:hover .ticket-group-capacity {
+    border-color: rgba(59, 130, 246, 0.4);
 }
 
 .ticket-type-card-button {
@@ -319,7 +277,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    padding: 0.5rem 0.875rem;
     border-radius: 0.5rem;
     background: rgba(139, 92, 246, 0.2);
     backdrop-filter: blur(12px);
@@ -333,15 +291,15 @@
     flex-shrink: 0;
 }
 
-.ticket-women .ticket-type-card-button {
-    background: rgba(236, 72, 153, 0.2);
+.ticket-individual-purple .ticket-type-card-button {
+    background: rgba(168, 85, 255, 0.2);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(236, 72, 153, 0.4);
+    border: 1px solid rgba(168, 85, 255, 0.4);
     color: white;
 }
 
-.ticket-men .ticket-type-card-button {
+.ticket-group-blue .ticket-type-card-button {
     background: rgba(59, 130, 246, 0.2);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -349,37 +307,17 @@
     color: white;
 }
 
-.ticket-group .ticket-type-card-button {
-    background: rgba(139, 92, 246, 0.2);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(139, 92, 246, 0.4);
-    color: white;
+.ticket-individual-purple:hover .ticket-type-card-button {
+    border-color: rgba(168, 85, 255, 0.5);
 }
 
-.ticket-type-card:hover .ticket-type-card-button {
-    background: rgba(139, 92, 246, 0.3);
-    border-color: rgba(139, 92, 246, 0.6);
-}
-
-.ticket-women:hover .ticket-type-card-button {
-    background: rgba(236, 72, 153, 0.3);
-    border-color: rgba(236, 72, 153, 0.6);
-}
-
-.ticket-men:hover .ticket-type-card-button {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.6);
-}
-
-.ticket-group:hover .ticket-type-card-button {
-    background: rgba(139, 92, 246, 0.3);
-    border-color: rgba(139, 92, 246, 0.6);
+.ticket-group-blue:hover .ticket-type-card-button {
+    border-color: rgba(59, 130, 246, 0.5);
 }
 
 .ticket-type-card-button svg {
-    width: 1.125rem;
-    height: 1.125rem;
+    width: 1rem;
+    height: 1rem;
 }
 
 /* Unavailable Ticket Styles */
@@ -422,6 +360,14 @@
 }
 
 .ticket-type-card-unavailable .ticket-type-card-description {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.ticket-type-card-unavailable .ticket-icon-purple,
+.ticket-type-card-unavailable .ticket-icon-blue,
+.ticket-type-card-unavailable .ticket-icon-women,
+.ticket-type-card-unavailable .ticket-icon-men,
+.ticket-type-card-unavailable .ticket-icon-group {
     color: rgba(255, 255, 255, 0.4);
 }
 

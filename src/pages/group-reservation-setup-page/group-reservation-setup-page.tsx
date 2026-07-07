@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Plus, Minus, ShoppingCart, User, AlertCircle, Wine, X, GlassWater, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ChevronLeft, ChevronRight, Plus, Minus, ShoppingCart, User, AlertCircle, Wine, X, GlassWater, Check, Search, SlidersHorizontal } from 'lucide-react';
 import { Layout } from '../../components/layout/layout';
 import { EventInfoCard } from '../../components/event-info-card/event-info-card';
+import { UserDetailsForm } from '../../components/user-details-form/user-details-form';
+import { CustomDropdown } from '../../components/custom-dropdown/custom-dropdown';
 import type { EventDetailedInfo, VIPBottle, VIPMixer, TicketType } from '../../types/types';
 import { getEventDetailedInfo, getTicketTypes } from '../../controller/event-controller';
 import { getAvailableBottles, getAvailableMixers } from '../../controller/group-reservation-controller';
-import { PHONE_PREFIX_OPTIONS } from '../../types/types';
 import './group-reservation-setup-page.css';
 
 interface BottleSelection {
@@ -18,8 +20,11 @@ interface BottleSelection {
 const SERVICE_FEE_PERCENTAGE = 0.112; // 11.2%
 
 export const GroupReservationSetupPage = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId, lang } = useParams<{ eventId: string; lang: string }>();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('group');
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   const [eventInfo, setEventInfo] = useState<EventDetailedInfo | null>(null);
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
@@ -34,18 +39,19 @@ export const GroupReservationSetupPage = () => {
   const WOMEN_PRICE = hasGenderPricing ? (groupTicket?.female_price ?? 0) : (groupTicket?.ticket_price ?? 0);
   const currencySymbol = groupTicket?.currency === 'USD' ? '$' : groupTicket?.currency === 'EUR' ? '€' : 'Q';
 
+  // Dynamic min/max guests from ticket type
+  const MIN_GUESTS = groupTicket?.min_quantity || 4;
+  const MAX_GUESTS = groupTicket?.max_quantity || 30;
+
   // Bottle filters
   const [bottleTypeFilter, setBottleTypeFilter] = useState<string>('all');
   const [bottleSearchFilter, setBottleSearchFilter] = useState<string>('');
 
-  // Organizer data (counts as first entry)
-  const [name, setName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phonePrefix, setPhonePrefix] = useState('+502');
-  const [birthDate, setBirthDate] = useState('');
-  const [gender, setGender] = useState(''); // 'male' or 'female' - organizer's gender
+  // Organizer form ref
+  const organizerFormRef = useRef<{ submit: (onSubmit: (data: any) => void) => void }>(null);
+
+  // Gender state (separate for pricing display - UserDetailsForm will handle the form value)
+  const [gender, setGender] = useState<'male' | 'female' | ''>('');
 
   // Additional guests (beyond the organizer)
   const [additionalMen, setAdditionalMen] = useState(0);
@@ -59,8 +65,12 @@ export const GroupReservationSetupPage = () => {
   const [mixerModalOpen, setMixerModalOpen] = useState(false);
   const [mixerModalBottleId, setMixerModalBottleId] = useState<string | null>(null);
 
-  // Form validation errors
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  // Gender validation error
+  const [genderError, setGenderError] = useState<string>('');
+
+  // Reservation metadata (optional — defaults applied on submit if empty)
+  const [reservationName, setReservationName] = useState<string>('');
+  const [reservationDescription, setReservationDescription] = useState<string>('');
 
   useEffect(() => {
     if (!eventId) return;
@@ -234,71 +244,9 @@ export const GroupReservationSetupPage = () => {
   };
 
   // Get unique bottle types for filter
-  const getBottleTypes = () => {
-    const types = new Set(bottles.map(b => b.type).filter(Boolean));
+  const getBottleTypes = (): string[] => {
+    const types = new Set(bottles.map(b => b.type).filter((t): t is string => typeof t === 'string' && t.length > 0));
     return Array.from(types);
-  };
-
-  // Validate organizer form
-  const validateOrganizerForm = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    // Name validation
-    if (!name?.trim()) {
-      errors.name = 'Name is required';
-    }
-
-    // Last name validation
-    if (!lastName?.trim()) {
-      errors.lastName = 'Last name is required';
-    }
-
-    // Email validation
-    if (!email?.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Invalid email format';
-    }
-
-    // Phone validation
-    if (!phone?.trim()) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^\d{6,15}$/.test(phone)) {
-      errors.phone = 'Phone must be 6-15 digits';
-    }
-
-    // Birth date validation
-    if (!birthDate?.trim()) {
-      errors.birthDate = 'Date of birth is required';
-    } else {
-      const birthDateObj = new Date(birthDate);
-      const today = new Date();
-      const age = today.getFullYear() - birthDateObj.getFullYear();
-      if (birthDateObj > today) {
-        errors.birthDate = 'Date cannot be in the future';
-      } else if (age < 18) {
-        errors.birthDate = 'Must be 18 years or older';
-      }
-    }
-
-    // Gender validation (already selected in step 1)
-    if (!gender) {
-      errors.gender = 'Gender is required';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Clear error when user types
-  const clearError = (field: string) => {
-    if (formErrors[field]) {
-      setFormErrors(prev => {
-        const updated = { ...prev };
-        delete updated[field];
-        return updated;
-      });
-    }
   };
 
   const handleContinue = () => {
@@ -306,52 +254,63 @@ export const GroupReservationSetupPage = () => {
     const totalMen = getTotalMen();
     const totalWomen = getTotalWomen();
 
-    // Validate form
-    if (!validateOrganizerForm()) {
+    // Validate guest count first
+    if (!gender) {
+      setGenderError(t('setup.selectGender'));
       return;
     }
 
-    if (totalGuests < 4) {
-      alert('Minimum 4 guests required for group reservation');
+    if (totalGuests < MIN_GUESTS) {
+      alert(t('setup.minGuests', { count: MIN_GUESTS }));
       return;
     }
 
-    if (totalGuests > 30) {
-      alert('Maximum 30 guests allowed');
+    if (totalGuests > MAX_GUESTS) {
+      alert(t('setup.maxGuests', { count: MAX_GUESTS }));
       return;
     }
 
     // Validate all bottles have mixers selected
     if (selectedBottles.length > 0 && mixers.length > 0 && !allBottlesHaveMixers()) {
       const bottlesWithoutMixer = getBottlesWithoutMixer();
-      alert(`Please select a mixer for: ${bottlesWithoutMixer.map(b => b.bottle.name).join(', ')}`);
+      alert(`${t('setup.selectMixerRequired')}: ${bottlesWithoutMixer.map(b => b.bottle.name).join(', ')}`);
       return;
     }
 
-    navigate(`/event/${eventId}/group/guests`, {
-      state: {
-        eventInfo,
-        guestCount: totalGuests,
-        menCount: totalMen,
-        womenCount: totalWomen,
-        menPrice: MEN_PRICE,
-        womenPrice: WOMEN_PRICE,
-        hasGenderPricing,
-        currency: groupTicket?.currency || 'GTQ',
-        currencySymbol,
-        groupTicketId: groupTicket?.ticket_type_id,
-        selectedBottles,
-        totalBottlesCost: calculateBottlesTotal(),
-        organizerData: {
-          name,
-          last_name: lastName,
-          email,
-          phone,
-          phone_prefix: phonePrefix,
-          birth_date: birthDate,
-          gender
+    // Validate and submit organizer form
+    organizerFormRef.current?.submit((formData) => {
+      const organizer = formData.usuarios[0];
+
+      navigate(buildUrl(`/event/${eventId}/group/guests`), {
+        state: {
+          eventInfo,
+          guestCount: totalGuests,
+          menCount: totalMen,
+          womenCount: totalWomen,
+          menPrice: MEN_PRICE,
+          womenPrice: WOMEN_PRICE,
+          hasGenderPricing,
+          currency: groupTicket?.currency || 'GTQ',
+          currencySymbol,
+          groupTicketId: groupTicket?.ticket_type_id,
+          selectedBottles,
+          totalBottlesCost: calculateBottlesTotal(),
+          organizerData: {
+            name: organizer.owner_name,
+            last_name: organizer.owner_last_name,
+            email: organizer.owner_email,
+            phone: organizer.owner_phone,
+            phone_prefix: organizer.owner_phone_prefix,
+            birth_date: organizer.owner_birthdate,
+            gender: organizer.owner_gender
+          },
+          // Optional reservation metadata — defaults applied if empty.
+          reservationName: reservationName.trim() ||
+            `Mesa de ${organizer.owner_name || 'la noche'}`,
+          reservationDescription: reservationDescription.trim() ||
+            `Reserva grupal para ${eventInfo?.event_name || 'el evento'} — ${totalGuests} personas.`,
         }
-      }
+      });
     });
   };
 
@@ -377,7 +336,7 @@ export const GroupReservationSetupPage = () => {
   const totalGuests = getTotalGuests();
   const totalMen = getTotalMen();
   const totalWomen = getTotalWomen();
-  const canContinue = name && lastName && email && gender && totalGuests >= 4 && totalGuests <= 30 && allBottlesHaveMixers();
+  const canContinue = gender && totalGuests >= MIN_GUESTS && totalGuests <= MAX_GUESTS && allBottlesHaveMixers();
 
   return (
     <Layout>
@@ -390,95 +349,97 @@ export const GroupReservationSetupPage = () => {
 
         <div className="group-setup-content">
           <div className="group-setup-container">
-            {/* Timeline - At the Top */}
-            <div className="group-setup-steps">
-              <div className="group-setup-step group-setup-step-active">
-                <div className="group-setup-step-number">1</div>
-                <div className="group-setup-step-label">Configuration</div>
-              </div>
-              <div className="group-setup-step-line"></div>
-              <div className="group-setup-step">
-                <div className="group-setup-step-number">2</div>
-                <div className="group-setup-step-label">Guest Details</div>
-              </div>
-              <div className="group-setup-step-line"></div>
-              <div className="group-setup-step">
-                <div className="group-setup-step-number">3</div>
-                <div className="group-setup-step-label">Confirmation</div>
-              </div>
-            </div>
-
-            {/* Event Details */}
             <EventInfoCard eventInfo={eventInfo} />
 
             <div className="group-setup-grid">
               <div className="group-setup-left">
-                {/* Step 1: Organizer Gender Selection (First Entry) */}
+                {/* Section 1: Organizer Details - Using UserDetailsForm */}
+                <div className="organizer-form-wrapper">
+                  <UserDetailsForm
+                    ref={organizerFormRef}
+                    quantity={1}
+                    minAge={eventInfo?.min_age}
+                    customTitle={t('setup.organizerDetails')}
+                    sectionNumber={1}
+                    onGenderChange={(g) => { setGender(g as 'male' | 'female'); setGenderError(''); }}
+                  />
+                  {genderError && <p className="user-form-error" style={{ marginTop: '0.5rem', paddingLeft: '1.5rem' }}>{genderError}</p>}
+                </div>
+
+                {/* Section 2: Group Configuration - Guests + Bottles */}
                 <div className="user-details-form">
                   <h4>
-                    <span className="user-details-form-number">1</span>
-                    Organizer (Your Entry)
+                    <span className="user-details-form-number">2</span>
+                    {t('setup.groupConfiguration')}
                   </h4>
                   <div className="sep"></div>
 
-                  <div className="form-content-container">
-                    <div className="form-field" style={{ gridColumn: '1 / -1' }}>
-                      <label>
-                        <User size={14} style={{ marginRight: '0.25rem' }} />
-                        Select your gender <span className="form-field-required">*</span>
+                  {/* Reservation metadata — optional. Backend applies defaults
+                      when blank ("Mesa de {organizador}" + autogenerated
+                      description). Lives inside section 2 to inherit its
+                      form-field input styling. */}
+                  <div
+                    className="form-content-container"
+                    style={{ gridTemplateColumns: '1fr', marginBottom: '1.25rem' }}
+                  >
+                    <div className="form-field">
+                      <label htmlFor="reservation-name">
+                        Nombre de la reserva
+                        <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)', marginLeft: '0.25rem', fontWeight: 400 }}>
+                          (opcional)
+                        </span>
                       </label>
-                      <div className="organizer-gender-selection">
-                        <div
-                          className={`organizer-gender-option ${gender === 'male' ? 'selected' : ''}`}
-                          onClick={() => setGender('male')}
-                        >
-                          <div className="organizer-gender-radio">
-                            {gender === 'male' && <div className="organizer-gender-radio-dot" />}
-                          </div>
-                          <div className="organizer-gender-info">
-                            <span className="organizer-gender-label">Men</span>
-                            <span className="organizer-gender-price">{currencySymbol}{MEN_PRICE}</span>
-                          </div>
-                        </div>
-                        <div
-                          className={`organizer-gender-option ${gender === 'female' ? 'selected' : ''}`}
-                          onClick={() => setGender('female')}
-                        >
-                          <div className="organizer-gender-radio">
-                            {gender === 'female' && <div className="organizer-gender-radio-dot" />}
-                          </div>
-                          <div className="organizer-gender-info">
-                            <span className="organizer-gender-label">Women</span>
-                            <span className="organizer-gender-price">{currencySymbol}{WOMEN_PRICE}</span>
-                          </div>
-                        </div>
-                      </div>
+                      <input
+                        id="reservation-name"
+                        type="text"
+                        value={reservationName}
+                        maxLength={80}
+                        placeholder="Ej: Cumpleaños de María"
+                        onChange={(e) => setReservationName(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label htmlFor="reservation-description">
+                        Descripción
+                        <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)', marginLeft: '0.25rem', fontWeight: 400 }}>
+                          (opcional)
+                        </span>
+                      </label>
+                      <textarea
+                        id="reservation-description"
+                        rows={3}
+                        maxLength={240}
+                        placeholder="Cuéntale al venue qué celebran, si quieren mesa cerca de la pista, etc."
+                        value={reservationDescription}
+                        onChange={(e) => setReservationDescription(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.875rem 1rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1.5px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '0.625rem',
+                          color: 'white',
+                          fontSize: '0.9375rem',
+                          fontFamily: 'inherit',
+                          resize: 'vertical',
+                          minHeight: '88px',
+                          boxSizing: 'border-box',
+                          transition: 'all 0.2s ease',
+                        }}
+                      />
                     </div>
                   </div>
 
-                  {gender && (
-                    <p className="group-setup-helper-text" style={{ marginTop: '1rem' }}>
-                      Your entry as organizer is included ({gender === 'male' ? 'Men' : 'Women'} - {currencySymbol}{gender === 'male' ? MEN_PRICE : WOMEN_PRICE})
-                    </p>
-                  )}
-                </div>
-
-                {/* Step 2: Additional Guests */}
-                {gender && (
-                  <div className="user-details-form">
-                    <h4>
-                      <span className="user-details-form-number">2</span>
-                      Additional Guests
-                    </h4>
-                    <div className="sep"></div>
-
-                    <div className="form-content-container">
+                  {/* Guest Counters */}
+                  <div className="group-config-guests">
+                    <div className="group-config-guests-grid">
                       {/* Additional Men */}
-                      <div className="form-field">
-                        <label>
-                          <User size={14} style={{ marginRight: '0.25rem' }} />
-                          Men <span style={{ color: '#60a5fa', fontSize: '0.875rem' }}>({currencySymbol}{MEN_PRICE} each)</span>
-                        </label>
+                      <div className="group-config-guest-item group-config-guest-men">
+                        <div className="group-config-guest-label">
+                          <User size={16} />
+                          <span>{t('setup.men')}</span>
+                          <span className="group-config-guest-price">{currencySymbol}{MEN_PRICE}</span>
+                        </div>
                         <div className="ticket-counter ticket-counter-men">
                           <button
                             onClick={() => setAdditionalMen(Math.max(0, additionalMen - 1))}
@@ -487,23 +448,25 @@ export const GroupReservationSetupPage = () => {
                           >
                             <Minus size={18} />
                           </button>
-                          <span className="ticket-counter-value">{additionalMen}</span>
+                          <span className="ticket-counter-value">{gender === 'male' ? additionalMen + 1 : additionalMen}</span>
                           <button
                             onClick={() => setAdditionalMen(additionalMen + 1)}
                             className="ticket-counter-btn"
-                            disabled={totalGuests >= 30}
+                            disabled={totalGuests >= MAX_GUESTS}
                           >
                             <Plus size={18} />
                           </button>
                         </div>
+                        {gender === 'male' && <span className="group-config-includes-you">{t('setup.includesYou')}</span>}
                       </div>
 
                       {/* Additional Women */}
-                      <div className="form-field">
-                        <label>
-                          <User size={14} style={{ marginRight: '0.25rem' }} />
-                          Women <span style={{ color: '#ec4899', fontSize: '0.875rem' }}>({currencySymbol}{WOMEN_PRICE} each)</span>
-                        </label>
+                      <div className="group-config-guest-item group-config-guest-women">
+                        <div className="group-config-guest-label">
+                          <User size={16} />
+                          <span>{t('setup.women')}</span>
+                          <span className="group-config-guest-price">{currencySymbol}{WOMEN_PRICE}</span>
+                        </div>
                         <div className="ticket-counter ticket-counter-women">
                           <button
                             onClick={() => setAdditionalWomen(Math.max(0, additionalWomen - 1))}
@@ -512,315 +475,206 @@ export const GroupReservationSetupPage = () => {
                           >
                             <Minus size={18} />
                           </button>
-                          <span className="ticket-counter-value">{additionalWomen}</span>
+                          <span className="ticket-counter-value">{gender === 'female' ? additionalWomen + 1 : additionalWomen}</span>
                           <button
                             onClick={() => setAdditionalWomen(additionalWomen + 1)}
                             className="ticket-counter-btn"
-                            disabled={totalGuests >= 30}
+                            disabled={totalGuests >= MAX_GUESTS}
                           >
                             <Plus size={18} />
                           </button>
                         </div>
+                        {gender === 'female' && <span className="group-config-includes-you">{t('setup.includesYou')}</span>}
                       </div>
                     </div>
 
-                    {totalGuests < 4 && (
+                    {totalGuests > 0 && totalGuests < MIN_GUESTS && (
                       <div className="group-setup-warning-box">
                         <AlertCircle size={18} />
-                        <span>Minimum 4 guests required for group reservation ({4 - totalGuests} more needed)</span>
+                        <span>{t('setup.minGuests', { count: MIN_GUESTS })} {t('setup.moreNeeded', { count: MIN_GUESTS - totalGuests })}</span>
                       </div>
                     )}
-                    {totalGuests > 30 && (
+                    {totalGuests > MAX_GUESTS && (
                       <div className="group-setup-error-box">
                         <AlertCircle size={18} />
-                        <span>Maximum 30 guests allowed</span>
+                        <span>{t('setup.maxGuests', { count: MAX_GUESTS })}</span>
                       </div>
                     )}
                   </div>
-                )}
 
-                {/* Bottles Selection (Optional) */}
-                {gender && (
-                  <div className="user-details-form">
-                    <h4>
-                      <span className="user-details-form-number">3</span>
-                      <Wine size={20} style={{ marginLeft: '0.5rem' }} />
-                      Select Bottles (Optional)
-                    </h4>
-                    <div className="sep"></div>
-
-                    {bottles.length === 0 ? (
-                      <div className="group-setup-no-results">
-                        <Wine size={48} />
-                        <p>No bottles available for this event</p>
+                  {/* Bottles Section */}
+                  {bottles.length > 0 && (
+                    <>
+                      <div className="group-config-bottles-header">
+                        <Wine size={20} />
+                        <span>{t('setup.addBottles')}</span>
+                        <span className="group-config-bottles-optional">{t('setup.optional')}</span>
                       </div>
-                    ) : (
-                      <>
-                        {/* Filters */}
-                        <div className="group-setup-beverage-filters">
-                          <div className="group-setup-filter-search">
-                            <input
-                              type="text"
-                              placeholder="Search by name or brand..."
-                              value={bottleSearchFilter}
-                              onChange={(e) => {
-                                setBottleSearchFilter(e.target.value);
-                                setBottleCarouselIndex(0);
-                              }}
-                              className="group-setup-search-input"
-                            />
-                          </div>
-                          <div className="group-setup-filter-type">
-                            <select
-                              value={bottleTypeFilter}
-                              onChange={(e) => {
-                                setBottleTypeFilter(e.target.value);
-                                setBottleCarouselIndex(0);
-                              }}
-                              className="group-setup-type-select"
-                            >
-                              <option value="all">All types</option>
-                              {getBottleTypes().map(type => (
-                                <option key={type} value={type}>
-                                  {type}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+
+                      {/* Filters */}
+                      <div className="group-setup-beverage-filters">
+                        <div className="group-setup-filter-search">
+                          <Search size={18} className="group-setup-filter-icon" />
+                          <input
+                            type="text"
+                            placeholder={t('setup.searchBottles')}
+                            value={bottleSearchFilter}
+                            onChange={(e) => {
+                              setBottleSearchFilter(e.target.value);
+                              setBottleCarouselIndex(0);
+                            }}
+                            className="group-setup-search-input"
+                          />
                         </div>
+                        <CustomDropdown
+                          value={bottleTypeFilter}
+                          onChange={(value) => {
+                            setBottleTypeFilter(value);
+                            setBottleCarouselIndex(0);
+                          }}
+                          options={[
+                            { value: 'all', label: t('setup.allTypes') },
+                            ...getBottleTypes().map(type => ({ value: type, label: type }))
+                          ]}
+                          icon={<SlidersHorizontal size={16} />}
+                        />
+                      </div>
 
-                        {getFilteredBottles().length === 0 ? (
-                          <div className="group-setup-no-results">
-                            <Wine size={48} />
-                            <p>No bottles found with the applied filters</p>
-                          </div>
-                        ) : (
-                          <div className="group-setup-carousel">
-                            <button
-                              onClick={handleBottleCarouselPrev}
-                              disabled={bottleCarouselIndex === 0}
-                              className="group-setup-carousel-btn prev"
+                      {getFilteredBottles().length === 0 ? (
+                        <div className="group-setup-no-results">
+                          <Wine size={48} />
+                          <p>{t('setup.noBottlesFound')}</p>
+                        </div>
+                      ) : (
+                        <div className="group-setup-carousel">
+                          <button
+                            onClick={handleBottleCarouselPrev}
+                            disabled={bottleCarouselIndex === 0}
+                            className="group-setup-carousel-btn prev"
+                          >
+                            <ChevronLeft size={24} />
+                          </button>
+
+                          <div className="group-setup-carousel-content">
+                            <div
+                              className="group-setup-carousel-track"
+                              style={{ transform: `translateX(-${bottleCarouselIndex * (100 / 2)}%)` }}
                             >
-                              <ChevronLeft size={24} />
-                            </button>
-
-                            <div className="group-setup-carousel-content">
-                              <div
-                                className="group-setup-carousel-track"
-                                style={{ transform: `translateX(-${bottleCarouselIndex * (100 / 2)}%)` }}
-                              >
-                                {getFilteredBottles().map(bottle => {
-                                  const selected = selectedBottles.find(b => b.bottle.id === bottle.id);
-                                  return (
-                                    <div key={bottle.id} className={`group-setup-bottle-card-small ${selected ? 'selected' : ''}`}>
-                                      <div className="group-setup-bottle-top-row">
-                                        <div className="group-setup-bottle-image-wrapper-small">
-                                          {bottle.image ? (
-                                            <img src={bottle.image} alt={bottle.name} className="group-setup-bottle-image-small" />
-                                          ) : (
-                                            <div className="group-setup-bottle-placeholder-small">
-                                              <Wine size={36} />
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="group-setup-bottle-info-small">
-                                          <h4>{bottle.name}</h4>
-                                          {bottle.brand && <p className="group-setup-bottle-brand-small">{bottle.brand}</p>}
-                                          <p className="group-setup-bottle-price-small">{currencySymbol}{bottle.price.toFixed(2)}</p>
-                                        </div>
-                                      </div>
-
-                                      <div className="group-setup-bottle-bottom-row">
-                                        <span className="group-setup-bottle-type-badge-small">
-                                          {bottle.type || '—'}
-                                        </span>
-                                        {selected ? (
-                                          <div className="group-setup-bottle-controls-small">
-                                            <button onClick={() => handleRemoveBottle(bottle.id)} className="group-setup-bottle-btn-small minus">
-                                              <Minus size={14} />
-                                            </button>
-                                            <span className="group-setup-bottle-quantity-small">{selected.quantity}</span>
-                                            <button onClick={() => handleAddBottle(bottle)} className="group-setup-bottle-btn-small plus">
-                                              <Plus size={14} />
-                                            </button>
-                                          </div>
+                              {getFilteredBottles().map(bottle => {
+                                const selected = selectedBottles.find(b => b.bottle.id === bottle.id);
+                                return (
+                                  <div key={bottle.id} className={`group-setup-bottle-card-small ${selected ? 'selected' : ''}`}>
+                                    <div className="group-setup-bottle-top-row">
+                                      <div className="group-setup-bottle-image-wrapper-small">
+                                        {bottle.image ? (
+                                          <img src={bottle.image} alt={bottle.name} className="group-setup-bottle-image-small" />
                                         ) : (
-                                          <button onClick={() => handleAddBottle(bottle)} className="group-setup-add-bottle-btn-small">
-                                            <Plus size={14} />
-                                            Add
-                                          </button>
+                                          <div className="group-setup-bottle-placeholder-small">
+                                            <Wine size={36} />
+                                          </div>
                                         )}
                                       </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={handleBottleCarouselNext}
-                              disabled={bottleCarouselIndex >= getFilteredBottles().length - 2}
-                              className="group-setup-carousel-btn next"
-                            >
-                              <ChevronRight size={24} />
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Selected Bottles Summary with Mixer Selection */}
-                        {selectedBottles.length > 0 && mixers.length > 0 && (
-                          <div className="group-setup-selected-bottles-summary">
-                            <h5>Selected Bottles <span className="form-field-required">*</span></h5>
-                            {!allBottlesHaveMixers() && (
-                              <div className="group-setup-warning-box" style={{ marginBottom: '1rem' }}>
-                                <AlertCircle size={18} />
-                                <span>Please select a mixer for each bottle to continue</span>
-                              </div>
-                            )}
-                            <div className="group-setup-selected-bottles-list">
-                              {selectedBottles.map((selection) => (
-                                <div key={selection.bottle.id} className="group-setup-selected-bottle-item">
-                                  <div className="group-setup-selected-bottle-info">
-                                    <span className="group-setup-selected-bottle-name">
-                                      {selection.bottle.name}
-                                    </span>
-                                    <span className="group-setup-selected-bottle-qty">
-                                      x{selection.quantity}
-                                    </span>
-                                  </div>
-                                  <div className="group-setup-selected-bottle-mixer">
-                                    {selection.mixer ? (
-                                      <div className="group-setup-selected-mixer">
-                                        <GlassWater size={14} />
-                                        <span className="group-setup-selected-mixer-name">{selection.mixer.name}</span>
-                                        <button
-                                          onClick={() => openMixerModal(selection.bottle.id)}
-                                          className="group-setup-change-mixer-btn"
-                                        >
-                                          Change
-                                        </button>
-                                        <button
-                                          onClick={() => handleRemoveMixer(selection.bottle.id)}
-                                          className="group-setup-remove-mixer-btn"
-                                        >
-                                          <X size={12} />
-                                        </button>
+                                      <div className="group-setup-bottle-info-small">
+                                        <h4>{bottle.name}</h4>
+                                        {bottle.brand && <p className="group-setup-bottle-brand-small">{bottle.brand}</p>}
+                                        <p className="group-setup-bottle-price-small">{currencySymbol}{bottle.price.toFixed(2)}</p>
                                       </div>
-                                    ) : (
+                                    </div>
+
+                                    <div className="group-setup-bottle-bottom-row">
+                                      <span className="group-setup-bottle-type-badge-small">
+                                        {bottle.type || '—'}
+                                      </span>
+                                      {selected ? (
+                                        <div className="group-setup-bottle-controls-small">
+                                          <button onClick={() => handleRemoveBottle(bottle.id)} className="group-setup-bottle-btn-small minus">
+                                            <Minus size={14} />
+                                          </button>
+                                          <span className="group-setup-bottle-quantity-small">{selected.quantity}</span>
+                                          <button onClick={() => handleAddBottle(bottle)} className="group-setup-bottle-btn-small plus">
+                                            <Plus size={14} />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button onClick={() => handleAddBottle(bottle)} className="group-setup-add-bottle-btn-small">
+                                          <Plus size={14} />
+                                          {t('setup.add')}
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={handleBottleCarouselNext}
+                            disabled={bottleCarouselIndex >= getFilteredBottles().length - 2}
+                            className="group-setup-carousel-btn next"
+                          >
+                            <ChevronRight size={24} />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Selected Bottles Summary with Mixer Selection */}
+                      {selectedBottles.length > 0 && mixers.length > 0 && (
+                        <div className="group-setup-selected-bottles-summary">
+                          <h5>{t('setup.selectedBottles')} <span className="form-field-required">*</span></h5>
+                          {!allBottlesHaveMixers() && (
+                            <div className="group-setup-warning-box" style={{ marginBottom: '1rem' }}>
+                              <AlertCircle size={18} />
+                              <span>{t('setup.selectMixerRequired')}</span>
+                            </div>
+                          )}
+                          <div className="group-setup-selected-bottles-list">
+                            {selectedBottles.map((selection) => (
+                              <div key={selection.bottle.id} className="group-setup-selected-bottle-item">
+                                <div className="group-setup-selected-bottle-info">
+                                  <span className="group-setup-selected-bottle-name">
+                                    {selection.bottle.name}
+                                  </span>
+                                  <span className="group-setup-selected-bottle-qty">
+                                    x{selection.quantity}
+                                  </span>
+                                </div>
+                                <div className="group-setup-selected-bottle-mixer">
+                                  {selection.mixer ? (
+                                    <div className="group-setup-selected-mixer">
+                                      <GlassWater size={14} />
+                                      <span className="group-setup-selected-mixer-name">{selection.mixer.name}</span>
                                       <button
                                         onClick={() => openMixerModal(selection.bottle.id)}
-                                        className="group-setup-select-mixer-btn group-setup-select-mixer-btn-required"
+                                        className="group-setup-change-mixer-btn"
                                       >
-                                        <AlertCircle size={14} />
-                                        Select Mixer *
+                                        {t('setup.change')}
                                       </button>
-                                    )}
-                                  </div>
+                                      <button
+                                        onClick={() => handleRemoveMixer(selection.bottle.id)}
+                                        className="group-setup-remove-mixer-btn"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => openMixerModal(selection.bottle.id)}
+                                      className="group-setup-select-mixer-btn group-setup-select-mixer-btn-required"
+                                    >
+                                      <AlertCircle size={14} />
+                                      {t('setup.selectMixer')} *
+                                    </button>
+                                  )}
                                 </div>
-                              ))}
-                            </div>
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* Organizer Information */}
-                {gender && (
-                  <div className="user-details-form">
-                    <h4>
-                      <span className="user-details-form-number">4</span>
-                      Organizer Information
-                    </h4>
-                    <div className="sep"></div>
-
-                    <div className="form-content-container">
-                      <div className="form-field">
-                        <label>
-                          Name <span className="form-field-required">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Enter name"
-                          value={name}
-                          onChange={(e) => { setName(e.target.value); clearError('name'); }}
-                        />
-                        {formErrors.name && <p className="user-form-error">{formErrors.name}</p>}
-                      </div>
-
-                      <div className="form-field">
-                        <label>
-                          Last Name <span className="form-field-required">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Enter last name"
-                          value={lastName}
-                          onChange={(e) => { setLastName(e.target.value); clearError('lastName'); }}
-                        />
-                        {formErrors.lastName && <p className="user-form-error">{formErrors.lastName}</p>}
-                      </div>
-
-                      <div className="form-row">
-                        <div className="form-field">
-                          <label>
-                            Phone <span className="form-field-required">*</span>
-                          </label>
-                          <div className="phone-input-container">
-                            <div className="phone-prefix-select">
-                              <select
-                                value={phonePrefix}
-                                onChange={(e) => setPhonePrefix(e.target.value)}
-                              >
-                                {PHONE_PREFIX_OPTIONS.map((option) => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.flag} {option.value}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="phone-number-input">
-                              <input
-                                type="tel"
-                                placeholder="612345678"
-                                value={phone}
-                                onChange={(e) => { setPhone(e.target.value); clearError('phone'); }}
-                              />
-                            </div>
-                          </div>
-                          {formErrors.phone && <p className="user-form-error">{formErrors.phone}</p>}
                         </div>
-
-                        <div className="form-field">
-                          <label>
-                            Date of Birth <span className="form-field-required">*</span>
-                          </label>
-                          <input
-                            type="date"
-                            value={birthDate}
-                            onChange={(e) => { setBirthDate(e.target.value); clearError('birthDate'); }}
-                            max={new Date().toISOString().split('T')[0]}
-                          />
-                          {formErrors.birthDate && <p className="user-form-error">{formErrors.birthDate}</p>}
-                        </div>
-                      </div>
-
-                      <div className="form-field form-field-full">
-                        <label>
-                          Email <span className="form-field-required">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          placeholder="email@example.com"
-                          value={email}
-                          onChange={(e) => { setEmail(e.target.value); clearError('email'); }}
-                        />
-                        {formErrors.email && <p className="user-form-error">{formErrors.email}</p>}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Right Side - Summary */}
@@ -828,7 +682,7 @@ export const GroupReservationSetupPage = () => {
                 <div className="group-receipt">
                   <div className="group-receipt-card">
                     <div className="group-receipt-header">
-                      <h3 className="group-receipt-title">Order Summary</h3>
+                      <h3 className="group-receipt-title">{t('summary.title')}</h3>
                       <ShoppingCart className="group-receipt-icon" />
                     </div>
 
@@ -838,8 +692,8 @@ export const GroupReservationSetupPage = () => {
                           {totalMen > 0 && (
                             <div className="group-receipt-item">
                               <div className="group-receipt-item-info">
-                                <div className="group-receipt-item-name">Men Entry</div>
-                                <div className="group-receipt-item-quantity">{totalMen}x {totalMen > 1 ? 'tickets' : 'ticket'}</div>
+                                <div className="group-receipt-item-name">{t('summary.menEntry')}</div>
+                                <div className="group-receipt-item-quantity">{totalMen}x {totalMen > 1 ? t('summary.tickets') : t('summary.ticket')}</div>
                               </div>
                               <div className="group-receipt-item-price">
                                 <div className="group-receipt-item-amount">{currencySymbol}{(totalMen * MEN_PRICE).toFixed(2)}</div>
@@ -849,8 +703,8 @@ export const GroupReservationSetupPage = () => {
                           {totalWomen > 0 && (
                             <div className="group-receipt-item">
                               <div className="group-receipt-item-info">
-                                <div className="group-receipt-item-name">Women Entry</div>
-                                <div className="group-receipt-item-quantity">{totalWomen}x {totalWomen > 1 ? 'tickets' : 'ticket'}</div>
+                                <div className="group-receipt-item-name">{t('summary.womenEntry')}</div>
+                                <div className="group-receipt-item-quantity">{totalWomen}x {totalWomen > 1 ? t('summary.tickets') : t('summary.ticket')}</div>
                               </div>
                               <div className="group-receipt-item-price">
                                 <div className="group-receipt-item-amount">{currencySymbol}{(totalWomen * WOMEN_PRICE).toFixed(2)}</div>
@@ -865,7 +719,7 @@ export const GroupReservationSetupPage = () => {
                               <div key={b.bottle.id} className="group-receipt-item">
                                 <div className="group-receipt-item-info">
                                   <div className="group-receipt-item-name">{b.bottle.name}</div>
-                                  <div className="group-receipt-item-quantity">{b.quantity}x bottle{b.quantity > 1 ? 's' : ''}</div>
+                                  <div className="group-receipt-item-quantity">{b.quantity}x {b.quantity > 1 ? t('summary.bottles') : t('summary.bottle')}</div>
                                 </div>
                                 <div className="group-receipt-item-price">
                                   <div className="group-receipt-item-amount">{currencySymbol}{(b.bottle.price * b.quantity).toFixed(2)}</div>
@@ -879,15 +733,15 @@ export const GroupReservationSetupPage = () => {
 
                         <div className="group-receipt-totals">
                           <div className="group-receipt-subtotal">
-                            <span>Subtotal</span>
+                            <span>{t('summary.subtotal')}</span>
                             <span>{currencySymbol}{calculateSubtotal().toFixed(2)}</span>
                           </div>
                           <div className="group-receipt-fee">
-                            <span>Service Fee</span>
+                            <span>{t('summary.serviceFee')}</span>
                             <span>{currencySymbol}{calculateServiceFee().toFixed(2)}</span>
                           </div>
                           <div className="group-receipt-total">
-                            <span>Total</span>
+                            <span>{t('summary.total')}</span>
                             <span className="group-receipt-total-amount">{currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                           </div>
                         </div>
@@ -896,19 +750,19 @@ export const GroupReservationSetupPage = () => {
 
                     {!gender && (
                       <p className="group-receipt-placeholder">
-                        Select your gender to see the summary
+                        {t('summary.fillDetails')}
                       </p>
                     )}
-
-                    <button
-                      onClick={handleContinue}
-                      className="group-receipt-button"
-                      disabled={!canContinue}
-                    >
-                      Continue to Guest Details
-                      <ChevronRight className="group-receipt-button-icon" />
-                    </button>
                   </div>
+
+                  <button
+                    onClick={handleContinue}
+                    className="group-receipt-button"
+                    disabled={!canContinue}
+                  >
+                    {t('summary.continueToGuests')}
+                    <ChevronRight className="group-receipt-button-icon" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -923,7 +777,7 @@ export const GroupReservationSetupPage = () => {
             <div className="mixer-modal-header">
               <h3>
                 <GlassWater size={20} />
-                Select Mixer
+                {t('setup.selectMixer')}
               </h3>
               <button onClick={closeMixerModal} className="mixer-modal-close">
                 <X size={20} />
@@ -932,7 +786,7 @@ export const GroupReservationSetupPage = () => {
 
             <div className="mixer-modal-subtitle">
               {mixerModalBottleId && (
-                <span>For: {selectedBottles.find(b => b.bottle.id === mixerModalBottleId)?.bottle.name}</span>
+                <span>{t('setup.for')}: {selectedBottles.find(b => b.bottle.id === mixerModalBottleId)?.bottle.name}</span>
               )}
             </div>
 
@@ -963,7 +817,7 @@ export const GroupReservationSetupPage = () => {
                     </div>
                     <div className="mixer-modal-item-info">
                       <span className="mixer-modal-item-name">{mixer.name}</span>
-                      <span className="mixer-modal-item-free">Free</span>
+                      <span className="mixer-modal-item-free">{t('setup.free')}</span>
                     </div>
                   </div>
                 );

@@ -1,0 +1,63 @@
+{
+  "details": {
+    "eventDescription": "Descripción del Evento",
+    "readMore": "Leer más",
+    "aboutThisEvent": "Acerca de este evento",
+    "getDirections": "Cómo Llegar",
+    "availableTickets": "Entradas Disponibles",
+    "individualTickets": "Entradas",
+    "groupTickets": "Grupos",
+    "guestLists": "Listas",
+    "soldOut": "Agotado",
+    "minAge": "{{age}}+",
+    "dateFormat": {
+      "weekday": "long",
+      "year": "numeric",
+      "month": "long",
+      "day": "numeric"
+    },
+    "vipOnly": {
+      "title": "Reserva VIP",
+      "description": "Este evento requiere reserva previa. Contacta con el local por WhatsApp para organizar tu reserva VIP.",
+      "contactButton": "Contactar por WhatsApp",
+      "whatsappMessage": "Hola! Me gustaría hacer una reserva para el evento: {{eventName}}",
+      "noContact": "Contacta directamente con el local para hacer tu reserva."
+    }
+  },
+  "card": {
+    "buyTickets": "Comprar Entradas",
+    "viewEvent": "Ver Evento",
+    "freeEntry": "Entrada Gratis",
+    "from": "Desde"
+  },
+  "calendar": {
+    "title": "Calendario de Eventos",
+    "noEvents": "No hay eventos programados",
+    "selectDate": "Selecciona una fecha para ver eventos"
+  },
+  "venue": {
+    "upcomingEvents": "Próximos Eventos",
+    "noUpcomingEvents": "No hay próximos eventos",
+    "noEventsAvailable": "No hay eventos disponibles",
+    "checkBackLater": "Vuelve más tarde para ver nuevos eventos",
+    "allEvents": "Todos los Eventos",
+    "calendar": "Calendario",
+    "information": "Información",
+    "viewEventCalendar": "Ver Calendario de Eventos"
+  },
+  "ticketType": {
+    "available": "disponibles",
+    "perPerson": "por persona",
+    "soldOut": "Agotado",
+    "getTickets": "Obtener Entradas",
+    "groupReservation": "Reserva Grupal",
+    "minGuests": "Mínimo {{min}} personas",
+    "pricePerPerson": "{{price}} / persona"
+  },
+  "allEvents": {
+    "title": "Todos los Eventos",
+    "backToVenue": "Volver al local",
+    "noEvents": "No se encontraron eventos",
+    "showing": "Mostrando {{count}} eventos"
+  }
+}

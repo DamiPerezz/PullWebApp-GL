@@ -1,7 +1,8 @@
 // components/cookie-banner/cookie-banner.tsx
-// Cookie Consent Banner for Pull
+// Cookie Consent Banner for Pull with i18n support
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCookieConsent, type CookiePreferences } from '../../context/CookieConsentContext';
 import {
   Cookie,
@@ -16,6 +17,10 @@ import {
 import './cookie-banner.css';
 
 export const CookieBanner = () => {
+  const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || 'es';
+
   const {
     preferences,
     showBanner,
@@ -33,6 +38,9 @@ export const CookieBanner = () => {
     analytics: preferences.analytics,
     marketing: preferences.marketing,
   });
+
+  // Helper to build language-prefixed URLs
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   // Reset local prefs when modal opens
   const handleOpenConfig = () => {
@@ -68,9 +76,9 @@ export const CookieBanner = () => {
               </div>
               <div className="cookie-banner__text">
                 <p className="cookie-banner__message">
-                  We use cookies to enhance your experience. By continuing to browse, you accept our{' '}
-                  <Link to="/cookie-policy" className="cookie-banner__link">
-                    cookie policy
+                  {t('cookies.banner.message')}{' '}
+                  <Link to={buildUrl("/cookie-policy")} className="cookie-banner__link">
+                    {t('cookies.banner.policy')}
                   </Link>.
                 </p>
               </div>
@@ -80,20 +88,20 @@ export const CookieBanner = () => {
                 className="cookie-banner__btn cookie-banner__btn--secondary"
                 onClick={rejectNonEssential}
               >
-                Necessary only
+                {t('buttons.necessaryOnly')}
               </button>
               <button
                 className="cookie-banner__btn cookie-banner__btn--tertiary"
                 onClick={handleOpenConfig}
               >
                 <Settings size={16} />
-                Customize
+                {t('buttons.customize')}
               </button>
               <button
                 className="cookie-banner__btn cookie-banner__btn--primary"
                 onClick={acceptAll}
               >
-                Accept all
+                {t('buttons.acceptAll')}
               </button>
             </div>
           </div>
@@ -112,7 +120,7 @@ export const CookieBanner = () => {
                 <div className="cookie-modal__icon">
                   <Cookie size={24} />
                 </div>
-                <h2 className="cookie-modal__title">Cookie Settings</h2>
+                <h2 className="cookie-modal__title">{t('cookies.modal.title')}</h2>
               </div>
               <button className="cookie-modal__close" onClick={closeConfigModal}>
                 <X size={20} />
@@ -121,13 +129,9 @@ export const CookieBanner = () => {
 
             {/* Description */}
             <div className="cookie-modal__description">
-              <p>
-                We use cookies and similar technologies to enhance your experience on our platform.
-                You can choose which categories of cookies you want to allow. Necessary cookies are
-                essential for the site to function and cannot be disabled.
-              </p>
-              <Link to="/cookie-policy" className="cookie-modal__policy-link" onClick={closeConfigModal}>
-                View full cookie policy
+              <p>{t('cookies.modal.description')}</p>
+              <Link to={buildUrl("/cookie-policy")} className="cookie-modal__policy-link" onClick={closeConfigModal}>
+                {t('cookies.modal.viewPolicy')}
                 <ChevronRight size={16} />
               </Link>
             </div>
@@ -142,9 +146,9 @@ export const CookieBanner = () => {
                       <Shield size={20} />
                     </div>
                     <div className="cookie-category__text">
-                      <h3 className="cookie-category__name">Necessary Cookies</h3>
+                      <h3 className="cookie-category__name">{t('cookies.modal.necessary.title')}</h3>
                       <span className="cookie-category__badge cookie-category__badge--required">
-                        Always active
+                        {t('cookies.modal.necessary.badge')}
                       </span>
                     </div>
                   </div>
@@ -153,8 +157,7 @@ export const CookieBanner = () => {
                   </div>
                 </div>
                 <p className="cookie-category__description">
-                  Essential for the site to function. Includes authentication,
-                  security, and basic preferences. Without these cookies, the site cannot work properly.
+                  {t('cookies.modal.necessary.description')}
                 </p>
               </div>
 
@@ -166,9 +169,9 @@ export const CookieBanner = () => {
                       <BarChart3 size={20} />
                     </div>
                     <div className="cookie-category__text">
-                      <h3 className="cookie-category__name">Analytics Cookies</h3>
+                      <h3 className="cookie-category__name">{t('cookies.modal.analytics.title')}</h3>
                       <span className="cookie-category__badge cookie-category__badge--optional">
-                        Optional
+                        {t('cookies.modal.analytics.badge')}
                       </span>
                     </div>
                   </div>
@@ -182,8 +185,7 @@ export const CookieBanner = () => {
                   </label>
                 </div>
                 <p className="cookie-category__description">
-                  Help us understand how you interact with the site, which pages you visit, and
-                  where we can improve. We use Google Analytics 4 with anonymized data.
+                  {t('cookies.modal.analytics.description')}
                 </p>
               </div>
 
@@ -195,9 +197,9 @@ export const CookieBanner = () => {
                       <Megaphone size={20} />
                     </div>
                     <div className="cookie-category__text">
-                      <h3 className="cookie-category__name">Marketing Cookies</h3>
+                      <h3 className="cookie-category__name">{t('cookies.modal.marketing.title')}</h3>
                       <span className="cookie-category__badge cookie-category__badge--optional">
-                        Optional
+                        {t('cookies.modal.marketing.badge')}
                       </span>
                     </div>
                   </div>
@@ -211,8 +213,7 @@ export const CookieBanner = () => {
                   </label>
                 </div>
                 <p className="cookie-category__description">
-                  Allow personalized ads and measure the effectiveness of advertising campaigns.
-                  We currently do not use marketing cookies, but may implement them in the future.
+                  {t('cookies.modal.marketing.description')}
                 </p>
               </div>
             </div>
@@ -223,28 +224,25 @@ export const CookieBanner = () => {
                 className="cookie-modal__btn cookie-modal__btn--secondary"
                 onClick={rejectNonEssential}
               >
-                Reject optional
+                {t('cookies.modal.rejectOptional')}
               </button>
               <button
                 className="cookie-modal__btn cookie-modal__btn--primary"
                 onClick={handleSavePreferences}
               >
-                Save preferences
+                {t('cookies.modal.savePreferences')}
               </button>
               <button
                 className="cookie-modal__btn cookie-modal__btn--accept-all"
                 onClick={acceptAll}
               >
-                Accept all
+                {t('buttons.acceptAll')}
               </button>
             </div>
 
             {/* Footer note */}
             <div className="cookie-modal__footer">
-              <p>
-                You can change your preferences at any time from the
-                "Cookie settings" link in the footer.
-              </p>
+              <p>{t('cookies.modal.footerNote')}</p>
             </div>
           </div>
         </div>
@@ -255,12 +253,13 @@ export const CookieBanner = () => {
 
 // Export a button to open settings from footer
 export const CookieSettingsButton = () => {
+  const { t } = useTranslation();
   const { openConfigModal } = useCookieConsent();
 
   return (
     <button className="cookie-settings-btn" onClick={openConfigModal}>
       <Cookie size={14} />
-      Cookie settings
+      {t('footer.cookies')}
     </button>
   );
 };

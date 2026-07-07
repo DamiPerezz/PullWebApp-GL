@@ -1,0 +1,271 @@
+{
+  "tracking": {
+    "errors": {
+      "loadFailed": "Failed to load VIP list",
+      "notFound": "VIP list not found",
+      "rsvpFailed": "Failed to confirm attendance",
+      "emailAlreadyRegistered": "A guest is already registered with this email"
+    },
+    "backToHome": "Back to home",
+    "organizedBy": "Organized by",
+    "type": {
+      "table": "Table",
+      "bar": "Bar"
+    },
+    "defaultTitle": {
+      "table": "{{host}}'s Table Reservation",
+      "bar": "{{host}}'s Bar Reservation"
+    },
+    "defaultDescription": "Join our VIP list and enjoy an exclusive experience with consumables included.",
+    "pricePerPerson": "Price per person",
+    "includesFee": "Includes management fee",
+    "orderSummary": {
+      "title": "Order Summary",
+      "menPrice": "Men",
+      "womenPrice": "Women",
+      "consumables": "Consumables",
+      "managementFee": "Fee",
+      "consumablesIncluded": "Consumables Included",
+      "feeNote": "Includes {{percentage}}% service fee",
+      "basePrice": "Base price",
+      "serviceFee": "Service fee",
+      "total": "Total"
+    },
+    "successBanner": {
+      "allDone": "All done!",
+      "rsvpComplete": "Your attendance has been confirmed",
+      "paymentComplete": "Your payment has been processed successfully"
+    },
+    "statusBanner": {
+      "open": "List Open",
+      "openDesc": "Join the list! Confirm your attendance now.",
+      "closed": "List Closed - Time to Pay",
+      "closedDesc": "The list has been closed. Pay before {{deadline}}",
+      "completed": "Reservation Completed",
+      "completedDesc": "This reservation has been finalized."
+    },
+    "deadline": {
+      "expired": "Time expired",
+      "daysRemaining": "{{days}} days remaining",
+      "hoursRemaining": "{{hours}}h {{minutes}}m remaining"
+    },
+    "rsvp": {
+      "joinButton": "Confirm Attendance",
+      "title": "Confirm your attendance",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Your last name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "Phone number",
+      "birthDate": "Date of birth",
+      "birthDatePlaceholder": "DD / MM / YYYY",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "doneTitle": "You're on the list!",
+      "doneMessage": "We'll notify you when payment opens.",
+      "quotaFull": "Full",
+      "listFull": "List is Full",
+      "listFullDesc": "All spots have been taken for this event.",
+      "menQuotaFull": "No more spots available for men. You can only register as female.",
+      "womenQuotaFull": "No more spots available for women. You can only register as male.",
+      "allQuotasFull": "All spots have been taken. No more guests can be added."
+    },
+    "rsvpSuccess": {
+      "title": "Confirmed!",
+      "message": "You're on the list. We'll notify you when it's time to pay."
+    },
+    "celebration": {
+      "thanks": "Thanks {{name}}!",
+      "guest": "friend",
+      "youAdded": "You've contributed to the pot",
+      "nowHave": "You now have",
+      "inConsumables": "in consumables",
+      "bottlesUnlocked": "{{count}} bottles unlocked",
+      "awesome": "Awesome!"
+    },
+    "consumables": {
+      "title": "Consumables",
+      "perPerson": "Per person",
+      "goal": "Goal",
+      "joinCta": "Join and unlock more bottles"
+    },
+    "paymentProgress": {
+      "title": "Consumables Pot",
+      "subtitle": "Group contributions",
+      "expected": "Goal",
+      "collected": "Pot",
+      "paidOf": "{{paid}} of {{total}} have paid",
+      "percentage": "{{percent}}% complete",
+      "transferring": "Transferring..."
+    },
+    "confirmed": "Confirmed",
+    "guestsConfirmed": "{{confirmed}} of {{total}} confirmed",
+    "men": "Men",
+    "women": "Women",
+    "guestList": "Guest list",
+    "hostBadge": "Host",
+    "peopleConfirmed": "{{count}} people confirmed",
+    "peoplePaid": "{{count}} people have paid",
+    "paid": "Paid",
+    "pending": "Pending",
+    "findPayment": {
+      "title": "Ready to pay?",
+      "description": "Enter your email to access your personal payment link.",
+      "emailPlaceholder": "Enter your email",
+      "button": "Go to Payment",
+      "notFound": "No confirmed guest found with this email",
+      "alreadyPaid": "You have already paid for this event"
+    }
+  },
+  "payment": {
+    "errors": {
+      "loadFailed": "Failed to load payment data",
+      "notFound": "Guest not found",
+      "paymentFailed": "Failed to process payment"
+    },
+    "backToHome": "Back to home",
+    "hero": {
+      "joiningList": "You're joining the list of",
+      "tableReservation": "VIP Table Reservation",
+      "barReservation": "VIP Bar Reservation",
+      "guestGreeting": "{{name}}, it's time to confirm your contribution to {{host}}'s reservation 🎉"
+    },
+    "greeting": "Hi {{name}}!",
+    "subtitle": "It's time to pay for your entry",
+    "type": {
+      "table": "Table",
+      "bar": "Bar"
+    },
+    "deadline": {
+      "title": "Deadline",
+      "daysRemaining": "{{days}} days remaining",
+      "hoursRemaining": "{{hours}}h {{minutes}}m remaining"
+    },
+    "priceBreakdown": "Price breakdown",
+    "entry": "Entry",
+    "managementFee": "Management fee (15%)",
+    "total": "Total",
+    "payNow": "Pay {{amount}}",
+    "secureNote": "Secure payment processed by Stripe",
+    "success": {
+      "title": "Payment Confirmed!",
+      "message": "Your ticket is ready. See you at the event!",
+      "emailSent": "We've sent your ticket by email",
+      "viewList": "View the list"
+    },
+    "alreadyPaid": {
+      "title": "Already paid!",
+      "message": "Your ticket is already confirmed.",
+      "viewList": "View the list"
+    },
+    "expired": {
+      "title": "Time expired",
+      "message": "The payment deadline has passed."
+    }
+  },
+  "bottleSelection": {
+    "title": "Select Your Bottles",
+    "subtitle": "Choose bottles for your reservation",
+    "hostGreeting": "Hi {{name}}! Select your bottles",
+    "budget": "Your Budget",
+    "available": "Available",
+    "selected": "Selected",
+    "remaining": "Remaining",
+    "availableBottles": "Available Bottles",
+    "filterByType": "Filter by type",
+    "allTypes": "All",
+    "add": "Add",
+    "yourSelection": "Your Selection",
+    "total": "Total",
+    "consumableSpent": "Consumable credit spent",
+    "remainingCredit": "Remaining credit",
+    "remainingCreditNote": "This credit will be available to use at the venue on the day of the event",
+    "confirm": "Confirm Selection",
+    "confirmNote": "You can only select once. Choose wisely!",
+    "success": {
+      "title": "Bottles Confirmed!",
+      "message": "Your selection has been saved. We'll have your bottles ready!",
+      "yourSelection": "Your Selection",
+      "emailSent": "Confirmation email sent"
+    },
+    "errors": {
+      "invalidToken": "Invalid selection link",
+      "loadFailed": "Failed to load bottle selection data",
+      "notFound": "Selection link not found or expired",
+      "saveFailed": "Failed to save your selection"
+    }
+  },
+  "edit": {
+    "hostMode": "Host Mode",
+    "title": "Manage VIP List",
+    "subtitle": "Manage your guest list",
+    "notFound": "List not found",
+    "checkCode": "Please check that your edit code is correct",
+    "listClosed": "This list is closed. No changes can be made.",
+    "reservationInfo": "Reservation Info",
+    "edit": "Edit",
+    "listName": "List name",
+    "listNamePlaceholder": "Name for your list",
+    "description": "Description",
+    "descriptionPlaceholder": "Reservation description",
+    "type": "Type",
+    "table": "Table",
+    "bar": "Bar",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "guestList": "Guest list",
+    "addGuest": "Add",
+    "addNewGuest": "Add new guest",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Guest's first name",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Guest's last name",
+    "email": "Email",
+    "emailPlaceholder": "email@example.com",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "add": "Add",
+    "adding": "Adding...",
+    "addGuestError": "Failed to add guest",
+    "guestAlreadyExists": "A guest with this email already exists",
+    "noGuests": "No confirmed guests",
+    "addedByHost": "Host",
+    "shareTrackingLink": "Share this link with your guests:",
+    "viewTrackingPage": "View tracking page",
+    "expectedGuests": "Expected Guests",
+    "men": "Men",
+    "women": "Women",
+    "hostBadge": "Host",
+    "paid": "Paid",
+    "markNotComing": "Mark as not coming",
+    "markNotComingError": "Failed to update guest",
+    "notComing": "Not coming",
+    "notComingBadge": "Not coming"
+  },
+  "roulette": {
+    "title": "What bottle could you unlock?",
+    "subtitle": "Discover which premium bottle you could get",
+    "currentBudget": "Current consumables",
+    "potential": "Potential",
+    "spinning": "Spinning...",
+    "spin": "SPIN!",
+    "youCouldWin": "You could get!",
+    "unlockNext": "Unlock something better!",
+    "addMore": "Add more friends to reach",
+    "needMore": "You only need",
+    "more": "more",
+    "spinAgain": "Spin again",
+    "noBottles": "No bottles available at this time",
+    "notEnough": "Add more friends!",
+    "notEnoughDesc": "You need more consumables to unlock your first bottle",
+    "firstBottle": "First available bottle"
+  }
+}

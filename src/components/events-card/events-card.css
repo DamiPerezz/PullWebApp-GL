@@ -11,7 +11,7 @@
     position: relative;
     padding: 0;
     border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     background: rgba(10, 10, 15, 0.5);
     backdrop-filter: blur(64px);
     -webkit-backdrop-filter: blur(64px);
@@ -20,8 +20,7 @@
 }
 
 .event-card:hover .event-card-inner {
-    border-color: rgba(168, 85, 255, 0.5);
-    box-shadow: 0 8px 32px rgba(168, 85, 255, 0.2), 0 0 20px rgba(168, 85, 255, 0.1);
+    border-color: rgba(168, 85, 255, 0.3);
 }
 
 .event-card-bg-gradient {
@@ -49,6 +48,7 @@
     height: 120px;
     flex-shrink: 0;
     overflow: hidden;
+    border-radius: 1rem 0 0 1rem;
 }
 
 .event-card-image {
@@ -56,6 +56,23 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    border-radius: 1rem 0 0 1rem;
+}
+
+.event-card-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.9) 0%, rgba(20, 20, 30, 0.95) 100%);
+    color: rgba(255, 255, 255, 0.3);
+    border-radius: 1rem 0 0 1rem;
+}
+
+.event-card-image-placeholder svg {
+    width: 24px;
+    height: 24px;
 }
 
 .event-card-price {
@@ -114,9 +131,9 @@
 }
 
 .event-card-time-badge {
-    background: linear-gradient(to right, rgba(34, 211, 238, 0.25), rgba(6, 182, 212, 0.25));
-    border: 1px solid rgba(34, 211, 238, 0.5);
-    color: rgb(103, 232, 249);
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: rgb(147, 197, 253);
 }
 
 .event-card-badge svg {
@@ -229,6 +246,13 @@
     height: 100%;
     object-fit: cover;
     object-position: center center;
+}
+
+.venue-event-card .event-card-image-placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .venue-event-card .event-card-info {

@@ -1,0 +1,80 @@
+{
+  "card": {
+    "free": "FREE",
+    "spots": "{{available}} available",
+    "signUp": "Sign Up",
+    "full": "List Full",
+    "maleOnly": "Men Only",
+    "femaleOnly": "Women Only"
+  },
+  "signup": {
+    "title": "Your Details",
+    "guestCount": "Companions",
+    "guestCountHelp": "How many people are coming with you?",
+    "submit": "Confirm Registration",
+    "summary": "Summary",
+    "responsible": "Responsible",
+    "companions": "Companions",
+    "totalPeople": "Total people",
+    "price": "Price",
+    "email": "Email",
+    "genderRequired": "Please select your gender",
+    "genderRestricted": "This list has a gender restriction",
+    "error": "Error signing up. Please try again.",
+    "errorEmailExists": "This email is already registered on this list. Use a different email or check your previous registration.",
+    "errorInvalidData": "The information entered is not valid. Please check and try again.",
+    "errorListNotFound": "This list is no longer available.",
+    "pendingNote": "Your request will be reviewed by staff. We'll notify you by email when it's approved."
+  },
+  "confirmation": {
+    "title": "Registration Successful!",
+    "description": "Your request has been submitted and is pending staff approval.",
+    "pendingApproval": "Pending Approval",
+    "pendingDescription": "Your registration is being reviewed by the venue team. We'll notify you by email when there's an update.",
+    "timeline": {
+      "registered": "Registered",
+      "registeredDesc": "Your request has been received",
+      "staffReview": "Staff Review",
+      "staffReviewDesc": "The team is reviewing your request",
+      "approved": "Approved",
+      "approvedDesc": "You'll receive your ticket by email"
+    },
+    "code": "Verification Code",
+    "copy": "Copy",
+    "copied": "Copied",
+    "codeHint": "Save this code to check the status of your registration",
+    "details": "Registration Details",
+    "list": "List",
+    "responsible": "Responsible",
+    "totalPeople": "Total people",
+    "people": "people",
+    "importantInfo": "Important Information",
+    "infoList": {
+      "registered": "Your registration has been received and is under review",
+      "staffReview": "The venue staff will review your request",
+      "approved": "If approved, you'll receive your ticket by email",
+      "emailUpdates": "We'll keep you informed about the status of your request"
+    },
+    "returnToVenue": "Return to Venue",
+    "notFound": "Registration not found",
+    "notFoundDescription": "No information found for this registration",
+    "goHome": "Go Home"
+  },
+  "status": {
+    "pending": "Pending approval",
+    "approved": "Approved!",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "notFoundTitle": "Registration not found",
+    "notFoundDescription": "No information found for this verification code",
+    "verificationCode": "Code",
+    "ticketReady": "Your ticket is ready. Check your email.",
+    "cancel": "Cancel Registration",
+    "cancelConfirmTitle": "Cancel registration?",
+    "cancelConfirmText": "Are you sure you want to cancel your registration on this list? This action cannot be undone.",
+    "keepSignup": "No, keep it",
+    "confirmCancel": "Yes, cancel",
+    "cancelling": "Cancelling...",
+    "viewEvent": "View Event"
+  }
+}

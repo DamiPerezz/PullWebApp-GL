@@ -1,16 +1,21 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ClockIcon, LocationIcon } from "../../icons/icons";
 import "./venues-card.css";
 import type { VenueInfo } from "../../types/types";
 import { ArrowRight, Calendar } from "lucide-react";
 
 export const VenuesCard = ({ venue }: { venue: VenueInfo }) => {
+  const { t, i18n } = useTranslation('common');
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
+
   const open = venue.open_time.slice(0, 5);
   const close = venue.close_time.slice(0, 5);
 
   return (
     <NavLink
-      to={`/venues/${venue.slug}/events`}
+      to={`/${currentLang}/venues/${venue.slug}/events`}
       className="venues-card-container"
     >
       <div className="venues-card-inner">
@@ -33,7 +38,7 @@ export const VenuesCard = ({ venue }: { venue: VenueInfo }) => {
               <div className="venues-card-details">
                 <p className="venues-card-detail-item">
                   <ClockIcon
-                    strokeColor="rgb(34, 211, 238)"
+                    strokeColor="rgb(59, 130, 246)"
                     className="icon-clock"
                   />
                   <span>
@@ -55,11 +60,11 @@ export const VenuesCard = ({ venue }: { venue: VenueInfo }) => {
               <div className="venues-card-footer-info">
                 <Calendar />
                 <span className="venues-card-footer-text">
-                  View upcoming events
+                  {t('venue.viewUpcoming')}
                 </span>
               </div>
               <div className="venues-card-button">
-                <span>View events</span>
+                <span>{t('venue.viewEvents')}</span>
                 <ArrowRight />
               </div>
             </div>

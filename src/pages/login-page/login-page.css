@@ -147,19 +147,35 @@
   color: #ffffff;
 }
 
-.login-page__social-btn--google:hover {
+.login-page__social-btn--google:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-.login-page__social-btn--apple {
-  background: #ffffff;
-  border: 1px solid #ffffff;
-  color: #000000;
+.login-page__social-btn--google.login-page__social-btn--loading {
+  cursor: wait;
+  opacity: 0.7;
 }
 
-.login-page__social-btn--apple:hover {
-  background: rgba(255, 255, 255, 0.9);
+.login-page__social-btn--google.login-page__social-btn--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Google Sign-In Button Container */
+.login-page__google-btn-container {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-page__google-btn-container > div {
+  width: 100% !important;
+  max-width: 400px;
+  display: flex !important;
+  justify-content: center !important;
 }
 
 /* ========================================

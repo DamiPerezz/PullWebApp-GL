@@ -10,8 +10,19 @@ export const apiClient = axios.create({
     },
     // SECURITY: Enable cookies for all requests (HttpOnly cookie authentication)
     // The server sets/reads the authentication cookie automatically
-    withCredentials: true
+    withCredentials: true,
+    // SECURITY: Timeout to prevent hung requests (30 seconds)
+    timeout: 30000,
+    // SECURITY: Limit max content length to prevent DoS (10MB)
+    maxContentLength: 10 * 1024 * 1024,
+    maxBodyLength: 10 * 1024 * 1024,
 });
+
+// Request interceptor - SECURITY: No logging of request data (PCI-DSS compliance)
+apiClient.interceptors.request.use(
+    (config) => config,
+    (error) => Promise.reject(error)
+);
 
 // Response interceptor for handling auth errors
 // NOTE: We do NOT redirect on 401 here because:

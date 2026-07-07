@@ -14,6 +14,7 @@ interface User {
   profile_image?: string;
   birth_date?: string;
   gender?: string;
+  created_at?: string;
   total_spent: number;
   average_spend: number;
   tags: string[];
@@ -237,6 +238,83 @@ export const authService = {
       return response.data.success === true;
     } catch {
       return false;
+    }
+  },
+
+  // ========================================
+  // GOOGLE OAUTH METHODS
+  // ========================================
+
+  /**
+   * Obtiene el Google Client ID del servidor
+   * Esto permite que el frontend inicialice Google Sign-In sin hardcodear el client ID
+   */
+  getGoogleClientId: async (): Promise<{ success: boolean; client_id?: string; error?: string }> => {
+    try {
+      const response = await apiClient.get('/user-auth/google/client-id');
+      return {
+        success: true,
+        client_id: response.data.client_id,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Google OAuth not available',
+      };
+    }
+  },
+
+  /**
+   * Genera un nonce para protección CSRF en el flujo OAuth
+   * SECURITY: El nonce se almacena en una cookie HttpOnly del servidor
+   */
+  getGoogleNonce: async (): Promise<{ success: boolean; nonce?: string; error?: string }> => {
+    try {
+      const response = await apiClient.get('/user-auth/google/nonce');
+      return {
+        success: true,
+        nonce: response.data.nonce,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Failed to generate nonce',
+      };
+    }
+  },
+
+  /**
+   * Inicia sesión con Google OAuth
+   * SECURITY:
+   * - El credential (ID token) de Google se envía al servidor para verificación
+   * - El servidor verifica el token con Google antes de crear la sesión
+   * - La sesión se establece mediante una cookie HttpOnly (no tokens en frontend)
+   * - Email es el identificador único - los datos del usuario se asocian al email
+   */
+  loginWithGoogle: async (credential: string, nonce?: string): Promise<AuthResponse> => {
+    try {
+      const response = await apiClient.post('/user-auth/google/login', {
+        credential,
+        nonce,
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Google login failed');
+      }
+
+      // SECURITY: El servidor establece la cookie HttpOnly
+      const { user, is_new_user, message } = response.data;
+
+      return {
+        success: true,
+        user,
+        message: message || (is_new_user ? 'Account created successfully' : 'Login successful'),
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Google login failed',
+      };
     }
   },
 };

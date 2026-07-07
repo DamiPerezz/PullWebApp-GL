@@ -1,0 +1,607 @@
+/* pages/guest-list-confirmation-page/guest-list-confirmation-page.css */
+.gl-confirm-wrapper {
+    flex: 1;
+    position: relative;
+    background: transparent;
+}
+
+.gl-confirm-bg-blur {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(24px) brightness(0.4);
+    transform: scale(1.1);
+    z-index: 0;
+}
+
+.gl-confirm-bg-blur::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
+    pointer-events: none;
+}
+
+.gl-confirm-bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(217, 70, 239, 0.1) 0%, transparent 50%);
+    z-index: 0;
+}
+
+.gl-confirm-bg-overlay-dark {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.gl-confirm-bg-overlay-error {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(251, 146, 60, 0.08) 0%, transparent 50%);
+    z-index: 0;
+}
+
+.gl-confirm-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.gl-confirm-container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+}
+
+/* Header Section */
+.gl-confirm-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.gl-confirm-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.2));
+    border: 2px solid rgba(52, 211, 153, 0.4);
+    margin-bottom: 1.5rem;
+}
+
+.gl-confirm-icon {
+    width: 3rem;
+    height: 3rem;
+    color: rgb(52, 211, 153);
+}
+
+.gl-confirm-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+}
+
+.gl-confirm-description {
+    margin-bottom: 0;
+}
+
+.gl-confirm-description p {
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Two-column grid */
+.gl-confirm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+}
+
+.gl-confirm-grid-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.gl-confirm-grid-left .gl-confirm-status-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.gl-confirm-grid-left .gl-confirm-status-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.gl-confirm-grid-left .gl-confirm-timeline {
+    flex: 1;
+}
+
+.gl-confirm-grid-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Status Card */
+.gl-confirm-status-card {
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.gl-confirm-status-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+    margin-bottom: 1.5rem;
+}
+
+.gl-confirm-status-header svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: rgb(251, 191, 36);
+}
+
+.gl-confirm-status-header span {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: rgb(253, 224, 71);
+}
+
+.gl-confirm-status-body > p {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Timeline */
+.gl-confirm-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 0.625rem;
+}
+
+.gl-timeline-step {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+    padding: 0.75rem 0;
+}
+
+.gl-timeline-dot {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Completed step */
+.gl-timeline-step-completed .gl-timeline-dot {
+    background: rgba(52, 211, 153, 0.15);
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.gl-timeline-step-completed .gl-timeline-dot::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    color: rgb(52, 211, 153);
+    font-weight: bold;
+}
+
+/* Current step */
+.gl-timeline-step-current .gl-timeline-dot {
+    background: rgba(251, 191, 36, 0.2) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    animation: gl-pulse-yellow 2s infinite;
+}
+
+.gl-timeline-step-current .gl-timeline-dot::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: rgb(251, 191, 36);
+}
+
+@keyframes gl-pulse-yellow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(251, 191, 36, 0);
+    }
+}
+
+/* Pending step */
+.gl-timeline-step-pending .gl-timeline-dot {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.gl-timeline-content {
+    flex: 1;
+    padding-top: 0.125rem;
+}
+
+.gl-timeline-content h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 0.25rem 0;
+}
+
+.gl-timeline-content p {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+.gl-timeline-step-completed .gl-timeline-content h4 {
+    color: rgba(110, 231, 183, 0.85);
+}
+
+.gl-timeline-step-current .gl-timeline-content h4 {
+    color: rgb(253, 224, 71);
+}
+
+.gl-timeline-step-pending .gl-timeline-content h4 {
+    color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.gl-timeline-step-pending .gl-timeline-content p {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Verification Code Card */
+.gl-confirm-code-card {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    text-align: center;
+}
+
+.gl-confirm-code-label {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 0.75rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+}
+
+.gl-confirm-code-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gl-confirm-code-number {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 600;
+    font-family: monospace;
+    margin: 0;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, rgb(167, 139, 250), rgb(217, 70, 239));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gl-confirm-code-copy {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 0.5rem;
+    color: rgb(167, 139, 250);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gl-confirm-code-copy:hover {
+    background: rgba(139, 92, 246, 0.2);
+}
+
+.gl-confirm-code-copy.copied {
+    background: rgba(52, 211, 153, 0.1);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: rgb(52, 211, 153);
+}
+
+.gl-confirm-code-copy svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.gl-confirm-code-hint {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 1rem 0 0 0;
+    line-height: 1.5;
+}
+
+/* Details Card */
+.gl-confirm-details-card {
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.gl-confirm-details-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    margin: 0 0 1rem 0;
+}
+
+.gl-confirm-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gl-confirm-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gl-confirm-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.gl-confirm-detail-label svg {
+    color: rgb(167, 139, 250);
+}
+
+.gl-confirm-detail-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+}
+
+.gl-confirm-detail-highlight {
+    color: rgb(167, 139, 250);
+}
+
+/* Info Box */
+.gl-confirm-info-box {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.gl-confirm-info-box h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgb(147, 197, 253);
+    margin: 0 0 1rem 0;
+}
+
+.gl-confirm-info-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gl-confirm-info-box li {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.gl-confirm-info-box li::before {
+    content: '•';
+    position: absolute;
+    left: 0.5rem;
+    color: rgb(96, 165, 250);
+}
+
+/* Actions */
+.gl-confirm-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.gl-confirm-actions .gl-confirm-button {
+    flex: 1;
+}
+
+.gl-confirm-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.625rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.gl-confirm-button-primary {
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(217, 70, 239, 0.3));
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    color: white;
+}
+
+.gl-confirm-button-primary:hover {
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.4), rgba(217, 70, 239, 0.4));
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.gl-confirm-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Error State */
+.gl-confirm-error-card {
+    background: rgba(15, 15, 21, 0.8);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    backdrop-filter: blur(48px);
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.gl-confirm-error-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(251, 146, 60, 0.15));
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.gl-confirm-error-icon {
+    width: 3rem;
+    height: 3rem;
+    color: rgb(248, 113, 113);
+}
+
+.gl-confirm-error-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+}
+
+.gl-confirm-error-description {
+    font-size: 1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0 0 2rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gl-confirm-container {
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .gl-confirm-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gl-confirm-title {
+        font-size: 1.75rem;
+    }
+
+    .gl-confirm-description p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .gl-confirm-container {
+        padding: 2rem 1.1rem 2rem;
+    }
+
+    .gl-confirm-icon-wrapper {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .gl-confirm-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .gl-confirm-title {
+        font-size: 1.5rem;
+    }
+
+    .gl-confirm-status-card,
+    .gl-confirm-code-card,
+    .gl-confirm-details-card,
+    .gl-confirm-info-box {
+        padding: 1.25rem;
+    }
+
+    .gl-confirm-code-number {
+        font-size: 1.25rem;
+    }
+
+    .gl-confirm-error-card {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .gl-confirm-container {
+        padding: 2rem 2rem 3rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gl-timeline-step-current .gl-timeline-dot {
+        animation: none;
+    }
+}

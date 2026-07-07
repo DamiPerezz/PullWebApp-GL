@@ -1,0 +1,56 @@
+{
+  "purchase": {
+    "title": "Purchase Tickets",
+    "selectTickets": "Select Tickets",
+    "attendeeDetails": "Attendee Details",
+    "review": "Review",
+    "payment": "Payment",
+    "quantity": "Quantity",
+    "ticketsSelected": "{{count}} ticket selected",
+    "ticketsSelected_plural": "{{count}} tickets selected",
+    "maxTickets": "Maximum {{max}} tickets per order",
+    "minTickets": "Minimum {{min}} tickets required",
+    "perPerson": "per person",
+    "groupNote": "Maximum {{max}} tickets. Download your ticket from the confirmation email."
+  },
+  "userForm": {
+    "title": "Attendee Details",
+    "attendee": "Attendee {{number}}",
+    "sameAsFirst": "Same as first attendee",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "birthDate": "Birth Date",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "preferNotToSay": "Prefer not to say",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "summary": {
+    "title": "Order Summary",
+    "tickets": "Tickets",
+    "subtotal": "Subtotal",
+    "serviceFee": "Service Fee",
+    "total": "Total",
+    "proceedToPayment": "Proceed to Payment",
+    "free": "Free"
+  },
+  "prePurchase": {
+    "title": "Get Tickets",
+    "selectQuantity": "Select Quantity",
+    "continue": "Continue",
+    "ticketInfo": "Ticket Information",
+    "includes": "Includes",
+    "restrictions": "Restrictions"
+  },
+  "errors": {
+    "title": "Error",
+    "invalidParams": "Invalid ticket parameters. Please try again.",
+    "loadingFailed": "Failed to load ticket information. Please try again.",
+    "backToEvents": "Back to Events"
+  }
+}

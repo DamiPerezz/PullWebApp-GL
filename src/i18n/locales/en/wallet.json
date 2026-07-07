@@ -1,0 +1,73 @@
+{
+  "locale": "en",
+  "title": "My Wallet",
+  "loading": "Loading your wallet...",
+  "noTickets": "No tickets found",
+  "noActiveTickets": "You don't have any active tickets",
+  "noUsedTickets": "You don't have any used tickets",
+  "tabs": {
+    "active": "Active",
+    "used": "Used"
+  },
+  "buttons": {
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes"
+  },
+  "profile": {
+    "memberSince": "Member since",
+    "recentlyJoined": "Recently joined",
+    "vip": "VIP",
+    "member": "Member"
+  },
+  "stats": {
+    "tickets": "Tickets",
+    "attended": "Attended",
+    "spent": "Spent",
+    "avgPerEvent": "Avg/Event"
+  },
+  "details": {
+    "email": "Email",
+    "phone": "Phone",
+    "birthDate": "Birth Date",
+    "gender": "Gender",
+    "notSet": "Not set",
+    "interests": "Interests"
+  },
+  "tickets": {
+    "title": "My Tickets",
+    "ticket": "Ticket",
+    "validated": "Validated",
+    "download": "Download PDF",
+    "generalAdmission": "General Admission"
+  },
+  "spending": {
+    "title": "Spending by Venue",
+    "totalSpent": "Total Spent",
+    "tickets": "Tickets"
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "birthDate": "Birth Date",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "firstNamePlaceholder": "Your first name",
+    "lastNamePlaceholder": "Your last name",
+    "phonePlaceholder": "Your phone number"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "preferNotToSay": "Prefer not to say"
+  },
+  "errors": {
+    "loadTickets": "Failed to load your tickets",
+    "downloadPdf": "Failed to download ticket PDF",
+    "updateProfile": "Failed to update profile"
+  }
+}

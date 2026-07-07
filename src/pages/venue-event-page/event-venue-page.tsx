@@ -9,9 +9,13 @@ import type { EventInfo, VenueEventInfo } from "../../types/types";
 import { MapPin, ChevronRight, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Layout } from "../../components/layout/layout";
+import { useTranslation } from "react-i18next";
 
 export const VenueEventsPage = () => {
-  const { venueId } = useParams<{ venueId: string }>();
+  const { t, i18n } = useTranslation('events');
+  const { venueId, lang } = useParams<{ venueId: string; lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
   const [events, setAllEvents] = useState<EventInfo[]>([]);
   const [venueInfo, setVenueInfo] = useState<VenueEventInfo | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
@@ -25,7 +29,18 @@ export const VenueEventsPage = () => {
 
     getEventsByVenue(venueId)
       .then((events) => {
-        const sortedEvents = [...events].sort((a, b) => {
+        // Filter out past events
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcomingEvents = events.filter((event: EventInfo) => {
+          const eventDate = new Date(event.event_date);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate >= today;
+        });
+
+        // Sort by date ascending
+        const sortedEvents = [...upcomingEvents].sort((a, b) => {
           const dateA = new Date(a.event_date).getTime();
           const dateB = new Date(b.event_date).getTime();
           return dateA - dateB;
@@ -39,6 +54,10 @@ export const VenueEventsPage = () => {
     getVenueInfo(venueId)
       .then((venue) => {
         setVenueInfo(venue);
+        // Store venue name for navbar display
+        if (venue?.name) {
+          sessionStorage.setItem('lastVenueName', venue.name);
+        }
         setIsLoading(false);
       })
       .catch(() => {
@@ -50,7 +69,6 @@ export const VenueEventsPage = () => {
   const close = venueInfo?.close_time?.slice(0, 5) || "";
 
   const displayedEvents = events.slice(0, maxEventsToShow);
-  const hasMoreEvents = events.length > maxEventsToShow;
 
   return (
     <Layout>
@@ -82,7 +100,7 @@ export const VenueEventsPage = () => {
               <div className="venue-page-grid">
                 <div className="venue-events-section">
                   <h2 className="venue-events-title">
-                    Upcoming Events
+                    {t('venue.upcomingEvents')}
                   </h2>
                   <div className="venue-events-list">
                     {events.length !== 0 ? (
@@ -92,24 +110,24 @@ export const VenueEventsPage = () => {
                         ))}
                         <div className="venue-events-buttons">
                           <Link
-                            to={`/venues/${venueId}/all-events`}
+                            to={buildUrl(`/venues/${venueId}/all-events`)}
                             className="venue-btn venue-btn--purple"
                           >
-                            <span>All Events</span>
+                            <span>{t('venue.allEvents')}</span>
                             <ChevronRight size={18} />
                           </Link>
                           <Link
-                            to={`/venues/${venueId}/calendar`}
+                            to={buildUrl(`/venues/${venueId}/calendar`)}
                             className="venue-btn venue-btn--cyan"
                           >
                             <Calendar size={18} />
-                            <span>Calendar</span>
+                            <span>{t('venue.calendar')}</span>
                           </Link>
                         </div>
                       </>
                     ) : (
                       <div className="venue-events-empty">
-                        <p>No events available</p>
+                        <p>{t('venue.noEventsAvailable')}</p>
                       </div>
                     )}
                   </div>
@@ -117,8 +135,8 @@ export const VenueEventsPage = () => {
 
                 <div className="venue-info-section">
                   <div className="venue-info-card">
-                    <h3 className="venue-card-title">Information</h3>
-                    
+                    <h3 className="venue-card-title">{t('venue.information')}</h3>
+
                     {venueInfo?.description && (
                       <>
                         <p className="venue-description-text">{venueInfo.description}</p>
@@ -128,11 +146,11 @@ export const VenueEventsPage = () => {
 
                     <div className="venue-info-details">
                       <div className="venue-info-detail-item">
-                        <ClockIcon strokeColor="rgb(34, 211, 238)" />
+                        <ClockIcon strokeColor="rgb(59, 130, 246)" />
                         <span>{open} - {close}</span>
                       </div>
                       <div className="venue-info-detail-item">
-                        <EmailIcon strokeColor="rgb(232, 121, 249)" />
+                        <EmailIcon strokeColor="rgb(168, 85, 255)" />
                         <span>{venueInfo?.email}</span>
                       </div>
                       <a
@@ -144,15 +162,15 @@ export const VenueEventsPage = () => {
                         rel="noopener noreferrer"
                       >
                         <MapPin size={16} />
-                        <span>Get Directions</span>
+                        <span>{t('details.getDirections')}</span>
                         <ChevronRight size={14} className="venue-info-link-arrow" />
                       </a>
                       <Link
-                        to={`/venues/${venueId}/calendar`}
+                        to={buildUrl(`/venues/${venueId}/calendar`)}
                         className="venue-info-link"
                       >
                         <Calendar size={16} />
-                        <span>View Event Calendar</span>
+                        <span>{t('venue.viewEventCalendar')}</span>
                         <ChevronRight size={14} className="venue-info-link-arrow" />
                       </Link>
                     </div>

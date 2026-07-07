@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next";
 import { CalendarIcon, ClockIcon, GoBackIcon, LocationIcon } from "../../icons/icons"
 
 import './reservation-header.css'
@@ -16,6 +17,10 @@ export const ReservationHeader = (
             isWithTime?: boolean
         }) => {
 
+    const { t, i18n } = useTranslation('common');
+    const { lang } = useParams<{ lang: string }>();
+    const currentLang = lang || i18n.language || 'es';
+
     const name = id.replace(/-/g, ' ');
 
     const [isTableBooking, setIsTableBooking] = useState<boolean>(table == "true");
@@ -27,8 +32,8 @@ export const ReservationHeader = (
     return (
         <div className="reservation-header-container">
             <div className="reservation-header">
-                {!isPaymentPage && <NavLink to={`/venues/${id}/events`} className="reservation-header-link"><GoBackIcon strokeColor="white" /></NavLink>}
-                <p>{isTableBooking ? "Table" : "Bar"} booking for {name}</p>
+                {!isPaymentPage && <NavLink to={`/${currentLang}/venues/${id}/events`} className="reservation-header-link"><GoBackIcon strokeColor="white" /></NavLink>}
+                <p>{isTableBooking ? t('venue.table') : t('venue.bar')} {t('venue.bookingFor')} {name}</p>
             </div>
             <div className="venue-info-header">
                 <img src="https://i.etsystatic.com/34752464/r/il/33cf3a/3925609298/il_570xN.3925609298_fv2t.jpg" alt="Arriba" />

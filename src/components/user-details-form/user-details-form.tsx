@@ -1,17 +1,35 @@
-// user-details-form.tsx
+﻿// user-details-form.tsx
+// SECURITY: Input validation and sanitization for user data
 import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import "./user-details-form.css";
-import { PHONE_PREFIX_OPTIONS, GENDER_OPTIONS } from "../../types/types";
+import { GENDER_OPTIONS } from "../../types/types";
+import { PhonePrefixSelector } from "../phone-prefix-selector/phone-prefix-selector";
+import { BirthDatePicker, parseMinAge } from "../birth-date-picker/birth-date-picker";
 import { User } from "lucide-react";
+import {
+  sanitizeName,
+  validateEmail,
+  validatePhone,
+  validateBirthdate,
+  SECURITY_CONSTANTS
+} from "../../utils/security";
 
 type UserDetailsFormProps = {
   quantity: number;
   initialData?: any;
   ticketGender?: 'male' | 'female' | null;
+  minAge?: number | string;
+  customTitle?: string;
+  sectionNumber?: number;
+  onGenderChange?: (gender: string) => void;
 };
 
 export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => void) => void }, UserDetailsFormProps>(
-  ({ quantity, initialData, ticketGender }, ref) => {
+  ({ quantity, initialData, ticketGender, minAge, customTitle, sectionNumber, onGenderChange }, ref) => {
+    const { t } = useTranslation('common');
+    // Parse minAge once - handles "+21", "18+", "21 years", etc.
+    const parsedMinAge = parseMinAge(minAge);
     const [formData, setFormData] = useState<any[]>([]);
     const [errors, setErrors] = useState<Record<number, Record<string, string>>>({});
 
@@ -29,9 +47,9 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
           owner_email: existingData.owner_email || "",
           owner_phone: existingData.owner_phone || "",
           owner_phone_prefix: existingData.owner_phone_prefix || "+502",
-          owner_dpi: existingData.owner_dpi || "",
           owner_birthdate: existingData.owner_birthdate || "",
           owner_gender: existingData.owner_gender || ticketGender || "",
+          owner_instagram: existingData.owner_instagram || "",
         };
       });
 
@@ -39,9 +57,23 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
     }, [quantity, initialData, ticketGender]);
 
     const handleInputChange = (index: number, field: string, value: string) => {
+      // SECURITY: Sanitize input based on field type
+      let sanitizedValue = value;
+
+      if (field === "owner_name" || field === "owner_last_name") {
+        // Sanitize names - only allow letters, spaces, hyphens, apostrophes
+        sanitizedValue = sanitizeName(value);
+      } else if (field === "owner_phone") {
+        // Only allow digits for phone
+        sanitizedValue = value.replace(/\D/g, '').slice(0, SECURITY_CONSTANTS.MAX_PHONE_LENGTH);
+      } else if (field === "owner_email") {
+        // Trim and lowercase email, limit length
+        sanitizedValue = value.trim().toLowerCase().slice(0, SECURITY_CONSTANTS.MAX_EMAIL_LENGTH);
+      }
+
       setFormData((prev) => {
         const updated = [...prev];
-        updated[index] = { ...updated[index], [field]: value };
+        updated[index] = { ...updated[index], [field]: sanitizedValue };
         return updated;
       });
 
@@ -55,6 +87,11 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
         }
         return updated;
       });
+
+      // Notify parent when gender changes
+      if (field === "owner_gender" && onGenderChange) {
+        onGenderChange(value);
+      }
     };
 
     const validate = (): boolean => {
@@ -63,37 +100,47 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
       formData.forEach((data, index) => {
         const ticketErrors: Record<string, string> = {};
 
+        // SECURITY: Validate name using sanitized check
         if (!data.owner_name?.trim()) {
-          ticketErrors.owner_name = "Name is required";
+          ticketErrors.owner_name = t('validation.nameRequired');
+        } else if (data.owner_name.trim().length < 2) {
+          ticketErrors.owner_name = t('validation.nameMinLength');
         }
-        
+
+        // SECURITY: Validate last name
         if (!data.owner_last_name?.trim()) {
-          ticketErrors.owner_last_name = "Last name is required";
+          ticketErrors.owner_last_name = t('validation.lastNameRequired');
+        } else if (data.owner_last_name.trim().length < 2) {
+          ticketErrors.owner_last_name = t('validation.lastNameMinLength');
         }
-        
+
+        // SECURITY: Validate email using security utility
         if (!data.owner_email?.trim()) {
-          ticketErrors.owner_email = "Email is required";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.owner_email)) {
-          ticketErrors.owner_email = "Invalid email format";
+          ticketErrors.owner_email = t('validation.emailRequired');
+        } else if (!validateEmail(data.owner_email)) {
+          ticketErrors.owner_email = t('validation.emailInvalid');
         }
 
+        // SECURITY: Validate phone using security utility
         if (!data.owner_phone?.trim()) {
-          ticketErrors.owner_phone = "Phone number is required";
-        } else if (!/^\d{6,15}$/.test(data.owner_phone)) {
-          ticketErrors.owner_phone = "Phone must be 6-15 digits";
+          ticketErrors.owner_phone = t('validation.phoneRequired');
+        } else if (!validatePhone(data.owner_phone)) {
+          ticketErrors.owner_phone = t('validation.phoneInvalid');
         }
 
+        // SECURITY: Validate birthdate using security utility
         if (!data.owner_birthdate?.trim()) {
-          ticketErrors.owner_birthdate = "Date of birth is required";
+          ticketErrors.owner_birthdate = t('validation.birthDateRequired');
         } else {
-          const birthDate = new Date(data.owner_birthdate);
-          const today = new Date();
-          const age = today.getFullYear() - birthDate.getFullYear();
-          if (birthDate > today) {
-            ticketErrors.owner_birthdate = "Date cannot be in the future";
-          } else if (age < 18) {
-            ticketErrors.owner_birthdate = "Must be 18 years or older";
+          const birthdateValidation = validateBirthdate(data.owner_birthdate, parsedMinAge);
+          if (!birthdateValidation.isValid && birthdateValidation.error) {
+            ticketErrors.owner_birthdate = birthdateValidation.error;
           }
+        }
+
+        // Validate gender is required
+        if (!data.owner_gender?.trim()) {
+          ticketErrors.owner_gender = t('validation.genderRequired');
         }
 
         if (Object.keys(ticketErrors).length > 0) {
@@ -120,8 +167,8 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
         {formData.map((data, index) => (
           <div key={index} className="user-details-form">
             <h4>
-              <span className="user-details-form-number">{index + 1}</span>
-              Attendee {index + 1} Details
+              <span className="user-details-form-number">{sectionNumber ?? index + 1}</span>
+              {customTitle || t('userForm.attendeeDetails', { number: index + 1 })}
             </h4>
 
             <div className="sep"></div>
@@ -129,11 +176,11 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
             <div className="form-content-container">
               <div className="form-field">
                 <label>
-                  Name <span className="form-field-required">*</span>
+                  {t('userForm.name')} <span className="form-field-required">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter name"
+                  placeholder={t('userForm.enterName')}
                   value={data.owner_name}
                   onChange={(e) => handleInputChange(index, "owner_name", e.target.value)}
                   maxLength={50}
@@ -143,11 +190,11 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
 
               <div className="form-field">
                 <label>
-                  Last Name <span className="form-field-required">*</span>
+                  {t('userForm.lastName')} <span className="form-field-required">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter last name"
+                  placeholder={t('userForm.enterLastName')}
                   value={data.owner_last_name}
                   onChange={(e) => handleInputChange(index, "owner_last_name", e.target.value)}
                   maxLength={50}
@@ -157,7 +204,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
 
               <div className="form-field">
                 <label>
-                  Email <span className="form-field-required">*</span>
+                  {t('userForm.email')} <span className="form-field-required">*</span>
                 </label>
                 <input
                   type="email"
@@ -171,21 +218,13 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
 
               <div className="form-field">
                 <label>
-                  Phone <span className="form-field-required">*</span>
+                  {t('userForm.phone')} <span className="form-field-required">*</span>
                 </label>
                 <div className="phone-input-container">
-                  <div className="phone-prefix-select">
-                    <select
-                      value={data.owner_phone_prefix}
-                      onChange={(e) => handleInputChange(index, "owner_phone_prefix", e.target.value)}
-                    >
-                      {PHONE_PREFIX_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.flag} {option.value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <PhonePrefixSelector
+                    value={data.owner_phone_prefix}
+                    onChange={(value) => handleInputChange(index, "owner_phone_prefix", value)}
+                  />
                   <div className="phone-number-input">
                     <input
                       type="tel"
@@ -201,21 +240,36 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
 
               <div className="form-field">
                 <label>
-                  Date of Birth <span className="form-field-required">*</span>
+                  {t('userForm.dateOfBirth')} <span className="form-field-required">*</span>
                 </label>
-                <input
-                  type="date"
+                <BirthDatePicker
                   value={data.owner_birthdate}
-                  onChange={(e) => handleInputChange(index, "owner_birthdate", e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
+                  onChange={(value) => handleInputChange(index, "owner_birthdate", value)}
+                  minAge={minAge}
+                  placeholder="DD/MM/YYYY"
+                  error={errors[index]?.owner_birthdate}
                 />
                 {errors[index]?.owner_birthdate && <p className="user-form-error">{errors[index].owner_birthdate}</p>}
               </div>
 
               <div className="form-field">
                 <label>
+                  Instagram <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)', marginLeft: '0.25rem' }}>(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="@usuario"
+                  value={data.owner_instagram || ''}
+                  onChange={(e) => handleInputChange(index, "owner_instagram", e.target.value.slice(0, 50))}
+                  maxLength={50}
+                />
+              </div>
+
+              <div className="form-field">
+                <label>
                   <User size={14} style={{ marginRight: '0.25rem' }} />
-                  Gender {ticketGender && <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)' }}>(Required by ticket type)</span>}
+                  {t('userForm.gender')} <span className="form-field-required">*</span>
+                  {ticketGender && <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)', marginLeft: '0.5rem' }}>{t('userForm.requiredByTicket')}</span>}
                 </label>
                 <div className="gender-selection">
                   {availableGenderOptions.map((option) => (
@@ -235,6 +289,7 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
                     </div>
                   ))}
                 </div>
+                {errors[index]?.owner_gender && <p className="user-form-error">{errors[index].owner_gender}</p>}
               </div>
             </div>
           </div>

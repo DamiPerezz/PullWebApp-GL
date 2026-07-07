@@ -1,6 +1,7 @@
 // login-pop-up.tsx
 // SECURITY: Authentication via HttpOnly cookies - no localStorage for tokens
 import { useForm } from "react-hook-form";
+import { useTranslation } from 'react-i18next';
 import { CloseXIcon } from "../../icons/icons";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -19,6 +20,7 @@ export const LoginPopUp = ({
   onClose: () => void;
   handleAdminStatusChange: (isAdmin: boolean) => void;
 }) => {
+  const { t } = useTranslation('common');
   const { reservationId } = useParams<{ reservationId: string }>();
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export const LoginPopUp = ({
   const onSubmit = async (data: LoginFormData) => {
     try {
       if (!reservationId) {
-        setAuthError("Reservation ID not found");
+        setAuthError(t('login.reservationNotFound'));
         return;
       }
 
@@ -49,18 +51,18 @@ export const LoginPopUp = ({
         onClose();
         reset();
       } else {
-        setAuthError("Authentication failed");
+        setAuthError(t('login.authFailed'));
       }
     } catch (error: any) {
       // Handle different types of errors
       if (error.response?.status === 401) {
-        setAuthError("DPI o contraseña incorrectos");
+        setAuthError(t('login.wrongCredentials'));
       } else if (error.response?.status === 404) {
-        setAuthError("Reserva no encontrada");
+        setAuthError(t('login.notFound'));
       } else if (error.response?.data?.error) {
         setAuthError(error.response.data.error);
       } else {
-        setAuthError("Error de conexión. Intenta nuevamente.");
+        setAuthError(t('login.connectionError'));
       }
     }
   };
@@ -68,22 +70,22 @@ export const LoginPopUp = ({
   return (
     <div className="login-pop-up">
       <div className="login-pop-up-content">
-        <h2>Login for manage your reservation</h2>
+        <h2>{t('login.title')}</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           {authError && <div className="auth-error-message">{authError}</div>}
           <div>
-            <label htmlFor="dpi">DPI:</label>
+            <label htmlFor="dpi">{t('login.dpi')}:</label>
             <input
               type="text"
               id="dpi"
               {...register("dpi", {
-                required: "El DPI es requerido",
+                required: t('login.dpiRequired'),
                 pattern: {
                   value: /^\d{13}$/,
-                  message: "El DPI debe tener exactamente 13 números",
+                  message: t('login.dpiFormat'),
                 },
               })}
-              placeholder="Ingresa tu DPI (13 dígitos)"
+              placeholder={t('login.dpiPlaceholder')}
               maxLength={13}
               autoComplete="off"
             />
@@ -92,18 +94,18 @@ export const LoginPopUp = ({
             )}
           </div>
           <div>
-            <label htmlFor="password">Contraseña:</label>
+            <label htmlFor="password">{t('login.password')}:</label>
             <input
               type="password"
               id="password"
               {...register("password", {
-                required: "La contraseña es requerida",
+                required: t('login.passwordRequired'),
                 minLength: {
                   value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres",
+                  message: t('login.passwordMinLength'),
                 },
               })}
-              placeholder="Ingresa tu contraseña"
+              placeholder={t('login.passwordPlaceholder')}
               autoComplete="current-password"
             />
             {errors.password && (
@@ -115,7 +117,7 @@ export const LoginPopUp = ({
             disabled={isSubmitting}
             className="submit-button"
           >
-            {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+            {isSubmitting ? t('login.loggingIn') : t('login.loginButton')}
           </button>
         </form>
         <button className="close-button" onClick={onClose}>

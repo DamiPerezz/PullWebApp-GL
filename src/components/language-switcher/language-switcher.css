@@ -1,0 +1,140 @@
+/* language-switcher.css */
+
+.language-switcher {
+  position: relative;
+}
+
+.language-switcher__trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.language-switcher__trigger:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.language-switcher__trigger--open {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.language-switcher__globe {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.language-switcher__flag {
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.language-switcher__code {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.language-switcher__arrow {
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.language-switcher__arrow--open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.language-switcher__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  z-index: 1000;
+  animation: dropdown-fade-in 0.15s ease;
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  text-align: left;
+}
+
+.language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.language-switcher__option--active {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.language-switcher__option--active:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.language-switcher__option-flag {
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.language-switcher__option-label {
+  flex: 1;
+}
+
+.language-switcher__option-check {
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .language-switcher__trigger {
+    padding: 5px 8px;
+    gap: 4px;
+  }
+
+  .language-switcher__globe {
+    display: none;
+  }
+
+  .language-switcher__code {
+    font-size: 12px;
+  }
+
+  .language-switcher__dropdown {
+    min-width: 140px;
+  }
+}

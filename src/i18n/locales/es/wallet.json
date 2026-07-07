@@ -1,0 +1,73 @@
+{
+  "locale": "es",
+  "title": "Mi Cartera",
+  "loading": "Cargando tu cartera...",
+  "noTickets": "No se encontraron entradas",
+  "noActiveTickets": "No tienes entradas activas",
+  "noUsedTickets": "No tienes entradas usadas",
+  "tabs": {
+    "active": "Activas",
+    "used": "Usadas"
+  },
+  "buttons": {
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "saveChanges": "Guardar Cambios"
+  },
+  "profile": {
+    "memberSince": "Miembro desde",
+    "recentlyJoined": "Unido recientemente",
+    "vip": "VIP",
+    "member": "Miembro"
+  },
+  "stats": {
+    "tickets": "Entradas",
+    "attended": "Asistidos",
+    "spent": "Gastado",
+    "avgPerEvent": "Prom/Evento"
+  },
+  "details": {
+    "email": "Correo",
+    "phone": "Telefono",
+    "birthDate": "Fecha de Nacimiento",
+    "gender": "Genero",
+    "notSet": "No establecido",
+    "interests": "Intereses"
+  },
+  "tickets": {
+    "title": "Mis Entradas",
+    "ticket": "Entrada",
+    "validated": "Validada",
+    "download": "Descargar PDF",
+    "generalAdmission": "Entrada General"
+  },
+  "spending": {
+    "title": "Gasto por Local",
+    "totalSpent": "Total Gastado",
+    "tickets": "Entradas"
+  },
+  "editProfile": {
+    "title": "Editar Perfil",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Numero de Telefono",
+    "birthDate": "Fecha de Nacimiento",
+    "gender": "Genero",
+    "male": "Masculino",
+    "female": "Femenino",
+    "firstNamePlaceholder": "Tu nombre",
+    "lastNamePlaceholder": "Tu apellido",
+    "phonePlaceholder": "Tu numero de telefono"
+  },
+  "gender": {
+    "male": "Masculino",
+    "female": "Femenino",
+    "other": "Otro",
+    "preferNotToSay": "Prefiero no decir"
+  },
+  "errors": {
+    "loadTickets": "Error al cargar tus entradas",
+    "downloadPdf": "Error al descargar el PDF",
+    "updateProfile": "Error al actualizar el perfil"
+  }
+}

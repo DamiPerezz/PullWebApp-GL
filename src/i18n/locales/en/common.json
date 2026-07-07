@@ -1,0 +1,265 @@
+﻿{
+    "nav":  {
+                "events":  "Events",
+                "help":  "Help",
+                "wallet":  "Wallet",
+                "logout":  "Logout",
+                "back":  "Back"
+            },
+    "buttons":  {
+                    "back":  "Back",
+                    "next":  "Next",
+                    "cancel":  "Cancel",
+                    "save":  "Save",
+                    "continue":  "Continue",
+                    "confirm":  "Confirm",
+                    "goBack":  "Go Back",
+                    "tryAgain":  "Try Again",
+                    "viewDetails":  "View Details",
+                    "buyNow":  "Buy Now",
+                    "reserveNow":  "Reserve Now",
+                    "download":  "Download",
+                    "edit":  "Edit",
+                    "saveChanges":  "Save Changes",
+                    "acceptAll":  "Accept all",
+                    "customize":  "Customize",
+                    "necessaryOnly":  "Necessary only",
+                    "returnHome":  "Return to Home",
+                    "returnToVenue":  "Return to Venue",
+                    "copyReference":  "Copy Reference"
+                },
+    "loading":  {
+                    "default":  "Loading...",
+                    "wallet":  "Loading your wallet...",
+                    "order":  "Loading your order...",
+                    "tickets":  "Loading tickets...",
+                    "account":  "Loading your account..."
+                },
+    "errors":  {
+                   "default":  "Something went wrong",
+                   "loadFailed":  "Failed to load data",
+                   "tryAgainLater":  "Please try again later",
+                   "invalidLink":  "Invalid or expired link",
+                   "orderNotFound":  "Order not found",
+                   "pageNotFound":  "Page not found"
+               },
+    "form":  {
+                 "email":  "Email",
+                 "phone":  "Phone",
+                 "firstName":  "First Name",
+                 "lastName":  "Last Name",
+                 "birthDate":  "Birth Date",
+                 "gender":  "Gender",
+                 "male":  "Male",
+                 "female":  "Female",
+                 "other":  "Other",
+                 "preferNotToSay":  "Prefer not to say",
+                 "required":  "Required",
+                 "optional":  "Optional",
+                 "notSet":  "Not set"
+             },
+    "footer":  {
+                   "copyright":  "© {{year}} Pull",
+                   "privacy":  "Privacy",
+                   "terms":  "Terms",
+                   "cookies":  "Cookies"
+               },
+    "support":  {
+                    "needHelp":  "Need Help?",
+                    "sendMessage":  "Send us a message and we\u0027ll get back to you as soon as possible.",
+                    "yourEmail":  "Your Email",
+                    "subject":  "Subject",
+                    "message":  "Message",
+                    "placeholder":  {
+                                        "email":  "your@email.com",
+                                        "subject":  "What do you need help with?",
+                                        "message":  "Describe your issue or question..."
+                                    },
+                    "sendButton":  "Send Message",
+                    "sending":  "Sending...",
+                    "messageSent":  "Message Sent!",
+                    "responseTime":  "We\u0027ll get back to you within 24-48 hours.",
+                    "estimatedTime":  "Estimated response time: 24-48 hours"
+                },
+    "cookies":  {
+                    "banner":  {
+                                   "message":  "We use cookies to enhance your experience. By continuing to browse, you accept our",
+                                   "policy":  "cookie policy"
+                               },
+                    "modal":  {
+                                  "title":  "Cookie Settings",
+                                  "description":  "We use cookies and similar technologies to enhance your experience on our platform. You can choose which categories of cookies you want to allow. Necessary cookies are essential for the site to function and cannot be disabled.",
+                                  "viewPolicy":  "View full cookie policy",
+                                  "necessary":  {
+                                                    "title":  "Necessary Cookies",
+                                                    "badge":  "Always active",
+                                                    "description":  "Essential for the site to function. Includes authentication, security, and basic preferences."
+                                                },
+                                  "analytics":  {
+                                                    "title":  "Analytics Cookies",
+                                                    "badge":  "Optional",
+                                                    "description":  "Help us understand how you interact with the site. We use Google Analytics 4 with anonymized data."
+                                                },
+                                  "marketing":  {
+                                                    "title":  "Marketing Cookies",
+                                                    "badge":  "Optional",
+                                                    "description":  "Allow personalized ads and measure advertising effectiveness. Currently not in use."
+                                                },
+                                  "rejectOptional":  "Reject optional",
+                                  "savePreferences":  "Save preferences",
+                                  "footerNote":  "You can change your preferences at any time from the \"Cookie settings\" link in the footer."
+                              }
+                },
+    "notFound":  {
+                     "title":  "404",
+                     "heading":  "Page Not Found",
+                     "description":  "The page you\u0027re looking for doesn\u0027t exist or has been moved."
+                 },
+    "validation":  {
+                       "nameRequired":  "Name is required",
+                       "nameMinLength":  "Name must be at least 2 characters",
+                       "lastNameRequired":  "Last name is required",
+                       "lastNameMinLength":  "Last name must be at least 2 characters",
+                       "emailRequired":  "Email is required",
+                       "emailInvalid":  "Invalid email format",
+                       "phoneRequired":  "Phone number is required",
+                       "phoneInvalid":  "Phone must be 6-15 digits",
+                       "birthDateRequired":  "Date of birth is required",
+                       "genderRequired":  "Gender is required"
+                   },
+    "booking":  {
+                    "assistants":  "Assistants",
+                    "loginAsAdmin":  "Login as Admin",
+                    "requestMoreParticipants":  "Request more participants",
+                    "saveChanges":  "Save Changes",
+                    "saving":  "Saving...",
+                    "cancel":  "Cancel",
+                    "information":  "Information",
+                    "cancelFreeEnds":  "Cancel free ends: 48h before",
+                    "totalPaid":  "Total paid",
+                    "total":  "Total",
+                    "pending":  "Pending",
+                    "guestsAdded":  "{{count}} guest added successfully!",
+                    "guestsAdded_plural":  "{{count}} guests added successfully!",
+                    "changesSaved":  "Changes saved successfully! Waiting for venue approval.",
+                    "changesCancelled":  "Changes cancelled successfully.",
+                    "errorSaving":  "Error saving changes. Please try again.",
+                    "bookingIdRequired":  "Booking ID is required",
+                    "failedToLoad":  "Failed to load booking details"
+                },
+    "venues":  {
+                   "title":  "Venues",
+                   "discoverTitle":  "Discover",
+                   "discoverHighlight":  "amazing",
+                   "discoverTitleEnd":  "venues",
+                   "subtitle":  "Explore the best venues in your city",
+                   "loading":  "Loading venues...",
+                   "empty":  "No venues available at the moment",
+                   "seo":  {
+                               "title":  "Nightclubs \u0026 Venues",
+                               "description":  "Discover the best nightclubs, bars and venues in Guatemala. Reserve VIP tables, buy tickets and experience the best Guatemalan nightlife.",
+                               "keywords":  "guatemala nightclubs, guatemala venues, guatemala bars, guatemala nightlife, night clubs, reserve vip table",
+                               "ogTitle":  "Best Nightclubs \u0026 Venues in Guatemala",
+                               "ogDescription":  "Explore the most exclusive nightclubs in Guatemala. Reserve your VIP table and experience unforgettable nights."
+                           }
+               },
+    "assistant":  {
+                      "pendingAdd":  "Pending Add",
+                      "pendingRemove":  "Pending Remove",
+                      "toPay":  "To Pay",
+                      "cancelAddition":  "Cancel addition",
+                      "markForRemoval":  "Mark for removal",
+                      "cancelRemoval":  "Cancel removal"
+                  },
+    "login":  {
+                  "title":  "Login to manage your reservation",
+                  "dpi":  "DPI",
+                  "password":  "Password",
+                  "dpiPlaceholder":  "Enter your DPI (13 digits)",
+                  "passwordPlaceholder":  "Enter your password",
+                  "loginButton":  "Login",
+                  "loggingIn":  "Logging in...",
+                  "dpiRequired":  "DPI is required",
+                  "dpiFormat":  "DPI must be exactly 13 digits",
+                  "passwordRequired":  "Password is required",
+                  "passwordMinLength":  "Password must be at least 6 characters",
+                  "reservationNotFound":  "Reservation ID not found",
+                  "authFailed":  "Authentication failed",
+                  "wrongCredentials":  "Incorrect DPI or password",
+                  "notFound":  "Reservation not found",
+                  "connectionError":  "Connection error. Please try again."
+              },
+    "participants":  {
+                         "addMore":  "Add More Participants",
+                         "guestName":  "Guest {{number}} Name",
+                         "enterGuestName":  "Enter guest name",
+                         "addAnother":  "+ Add Another Guest",
+                         "addGuest":  "Add {{count}} Guest",
+                         "addGuests":  "Add {{count}} Guests"
+                     },
+    "ticketCard":  {
+                       "onlyLeft":  "Only {{count}} left",
+                       "guests":  "{{min}}-{{max}} guests",
+                       "buy":  "Buy",
+                       "reserveNow":  "Reserve Now",
+                       "premiumBottle":  "Premium bottle service available",
+                       "dedicatedArea":  "Dedicated group area",
+                       "easyPayment":  "Easy payment split"
+                   },
+    "userForm":  {
+                     "attendeeDetails":  "Attendee {{number}} Details",
+                     "name":  "Name",
+                     "lastName":  "Last Name",
+                     "email":  "Email",
+                     "phone":  "Phone",
+                     "dateOfBirth":  "Date of Birth",
+                     "gender":  "Gender",
+                     "enterName":  "Enter name",
+                     "enterLastName":  "Enter last name",
+                     "requiredByTicket":  "(Required by ticket type)"
+                 },
+    "receipt":  {
+                    "orderSummary":  "Order Summary",
+                    "ticket":  "ticket",
+                    "tickets":  "tickets",
+                    "perTicket":  "per ticket",
+                    "subtotal":  "Subtotal",
+                    "serviceFee":  "Service Fee",
+                    "total":  "Total",
+                    "continueToData":  "Continue to Data"
+                },
+    "qr":  {
+               "validated":  "Validated",
+               "date":  "Date",
+               "downloadPdf":  "Download PDF",
+               "dateTbd":  "Date TBD",
+               "event":  "Event",
+               "name":  "Name",
+               "location":  "Location",
+               "valid":  "Valid",
+               "presentCode":  "Present this code at entrance",
+               "generalAdmission":  "General Admission"
+           },
+    "venue":  {
+                  "bookingFor":  "booking for",
+                  "table":  "Table",
+                  "bar":  "Bar",
+                  "viewEvents":  "View events",
+                  "viewUpcoming":  "View upcoming events"
+              },
+    "zones":  {
+                  "standard":  "Standard",
+                  "vip":  "VIP",
+                  "vipPremium":  "VIP Premium",
+                  "selectTable":  "Select Table"
+              },
+    "event":  {
+                  "readMore":  "Read more",
+                  "noDressCode":  "No dress code specified",
+                  "reservationNotFound":  "Reservation not found",
+                  "aboutEvent":  "About this event",
+                  "backToHome":  "Back to home",
+                  "getDirections": "Get directions",
+                  "description": "Description"
+              }
+}

@@ -1,0 +1,46 @@
+{
+  "home": {
+    "title": "Pull Events - Compra Entradas para Eventos en Guatemala",
+    "description": "Descubre y compra entradas para los mejores eventos, fiestas y conciertos en Guatemala. Rápido, seguro y fácil.",
+    "keywords": "eventos guatemala, entradas guatemala, fiestas guatemala, conciertos guatemala, vida nocturna guatemala"
+  },
+  "venue": {
+    "title": "{{venueName}} - Eventos y Entradas | Pull Events",
+    "description": "Compra entradas para eventos en {{venueName}}. Ve próximos eventos, fiestas y conciertos.",
+    "keywords": "{{venueName}}, eventos {{venueName}}, entradas {{venueName}}, fiestas {{location}}"
+  },
+  "event": {
+    "title": "{{eventName}} | Pull Events",
+    "description": "Compra entradas para {{eventName}}. {{date}} en {{location}}.",
+    "keywords": "{{eventName}}, entradas {{eventName}}, eventos {{location}}"
+  },
+  "wallet": {
+    "title": "Mi Cartera - Mis Entradas | Pull Events",
+    "description": "Gestiona tus entradas y ve tu historial de compras en Pull Events."
+  },
+  "login": {
+    "title": "Iniciar Sesión | Pull Events",
+    "description": "Inicia sesión en tu cuenta de Pull Events para gestionar tus entradas y compras."
+  },
+  "privacy": {
+    "title": "Política de Privacidad | Pull Events",
+    "description": "Conoce cómo Pull Events protege tu información personal y privacidad."
+  },
+  "terms": {
+    "title": "Términos de Servicio | Pull Events",
+    "description": "Lee los términos y condiciones para usar la plataforma Pull Events."
+  },
+  "cookies": {
+    "title": "Política de Cookies | Pull Events",
+    "description": "Conoce cómo Pull Events utiliza cookies para mejorar tu experiencia."
+  },
+  "notFound": {
+    "title": "Página No Encontrada | Pull Events",
+    "description": "La página que buscas no existe o ha sido movida."
+  },
+  "common": {
+    "siteName": "Pull Events",
+    "defaultDescription": "La mejor plataforma para comprar entradas de eventos en Guatemala",
+    "locale": "es_GT"
+  }
+}

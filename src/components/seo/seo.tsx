@@ -1,5 +1,7 @@
-// components/seo/seo.tsx - Componente SEO Dinámico para React 19
+// components/seo/seo.tsx - Componente SEO Dinámico para React 19 con i18n
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 interface SEOProps {
   title?: string;
@@ -21,8 +23,8 @@ const SITE_NAME = "Pull Events";
 
 export const SEO = ({
   title,
-  description = "Compra entradas para las mejores fiestas, discotecas y eventos VIP en Guatemala. Reserva mesas VIP, botellas premium y accede a los eventos más exclusivos.",
-  keywords = "entradas guatemala, fiestas guatemala, discotecas guatemala, eventos vip guatemala, vida nocturna guatemala",
+  description,
+  keywords,
   canonicalUrl,
   ogTitle,
   ogDescription,
@@ -32,13 +34,37 @@ export const SEO = ({
   noIndex = false,
   structuredData,
 }: SEOProps) => {
+  const { i18n } = useTranslation('seo');
+  const location = useLocation();
+  const currentLang = i18n.language || 'es';
+
+  // Default descriptions based on language
+  const defaultDescription = currentLang === 'es'
+    ? "Compra entradas para las mejores fiestas, discotecas y eventos VIP en Guatemala. Reserva mesas VIP, botellas premium y accede a los eventos más exclusivos."
+    : "Buy tickets for the best parties, clubs and VIP events in Guatemala. Reserve VIP tables, premium bottles and access the most exclusive events.";
+
+  const defaultKeywords = currentLang === 'es'
+    ? "entradas guatemala, fiestas guatemala, discotecas guatemala, eventos vip guatemala, vida nocturna guatemala"
+    : "tickets guatemala, parties guatemala, clubs guatemala, vip events guatemala, nightlife guatemala";
+
+  const finalDescription = description || defaultDescription;
+  const finalKeywords = keywords || defaultKeywords;
+
   const fullTitle = title
     ? `${title} | ${SITE_NAME}`
-    : `${SITE_NAME} - Compra Entradas para Fiestas, Discotecas y Eventos VIP en Guatemala`;
+    : currentLang === 'es'
+      ? `${SITE_NAME} - Compra Entradas para Fiestas, Discotecas y Eventos VIP en Guatemala`
+      : `${SITE_NAME} - Buy Tickets for Parties, Clubs and VIP Events in Guatemala`;
 
   const finalOgTitle = ogTitle || title || fullTitle;
-  const finalOgDescription = ogDescription || description;
-  const finalCanonical = canonicalUrl || (typeof window !== "undefined" ? window.location.href : BASE_URL);
+  const finalOgDescription = ogDescription || finalDescription;
+
+  // Build canonical URL with language prefix
+  const pathWithoutLang = location.pathname.replace(/^\/(en|es)/, '');
+  const finalCanonical = canonicalUrl || `${BASE_URL}/${currentLang}${pathWithoutLang}`;
+
+  // Determine og:locale based on current language
+  const ogLocale = currentLang === 'es' ? 'es_GT' : 'en_US';
 
   useEffect(() => {
     // Update document title
@@ -57,23 +83,39 @@ export const SEO = ({
     };
 
     // Helper to update or create link tag
-    const setLink = (rel: string, href: string) => {
-      let element = document.querySelector(`link[rel="${rel}"]`);
+    const setLink = (rel: string, href: string, hreflang?: string) => {
+      const selector = hreflang
+        ? `link[rel="${rel}"][hreflang="${hreflang}"]`
+        : `link[rel="${rel}"]:not([hreflang])`;
+      let element = document.querySelector(selector);
       if (!element) {
         element = document.createElement("link");
         element.setAttribute("rel", rel);
+        if (hreflang) element.setAttribute("hreflang", hreflang);
         document.head.appendChild(element);
       }
       element.setAttribute("href", href);
     };
 
     // Primary SEO meta tags
-    setMeta("description", description);
-    setMeta("keywords", keywords);
+    setMeta("description", finalDescription);
+    setMeta("keywords", finalKeywords);
     setMeta("robots", noIndex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1");
+
+    // Language meta tag
+    setMeta("language", currentLang);
+    document.documentElement.lang = currentLang;
 
     // Canonical URL
     setLink("canonical", finalCanonical);
+
+    // Hreflang tags for SEO
+    const esUrl = `${BASE_URL}/es${pathWithoutLang}`;
+    const enUrl = `${BASE_URL}/en${pathWithoutLang}`;
+
+    setLink("alternate", esUrl, "es");
+    setLink("alternate", enUrl, "en");
+    setLink("alternate", esUrl, "x-default"); // Default to Spanish for Guatemala market
 
     // Open Graph tags
     setMeta("og:title", finalOgTitle, true);
@@ -82,7 +124,8 @@ export const SEO = ({
     setMeta("og:url", finalCanonical, true);
     setMeta("og:type", ogType, true);
     setMeta("og:site_name", SITE_NAME, true);
-    setMeta("og:locale", "es_GT", true);
+    setMeta("og:locale", ogLocale, true);
+    setMeta("og:locale:alternate", currentLang === 'es' ? "en_US" : "es_GT", true);
 
     // Twitter Card tags
     setMeta("twitter:card", twitterCard);
@@ -109,16 +152,19 @@ export const SEO = ({
     };
   }, [
     fullTitle,
-    description,
-    keywords,
+    finalDescription,
+    finalKeywords,
     finalCanonical,
     finalOgTitle,
     finalOgDescription,
     ogImage,
     ogType,
+    ogLocale,
     twitterCard,
     noIndex,
     structuredData,
+    currentLang,
+    pathWithoutLang,
   ]);
 
   return null;

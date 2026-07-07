@@ -1,4 +1,43 @@
 // types/types.tsx - ACTUALIZACIÓN COMPLETA
+
+// =============================================================================
+// PAYMENT GATEWAY TYPES
+// =============================================================================
+// Supported payment gateways for venue transactions
+export type PaymentGateway = 'stripe' | 'neonet';
+
+// Payment gateway configuration structure
+export interface PaymentGatewayConfig {
+  // Stripe configuration
+  stripe_account_id?: string;
+  stripe_publishable_key?: string;
+  // NeoNet configuration
+  neonet_merchant_id?: string;
+  neonet_terminal_id?: string;
+  neonet_environment?: 'sandbox' | 'production';
+}
+
+// Constants for payment gateways
+export const PAYMENT_GATEWAYS = {
+  STRIPE: 'stripe' as PaymentGateway,
+  NEONET: 'neonet' as PaymentGateway,
+} as const;
+
+// Payment gateway display info for UI
+export const PAYMENT_GATEWAY_INFO: Record<PaymentGateway, { name: string; description: string }> = {
+  stripe: {
+    name: 'Stripe',
+    description: 'International payment processor with card support',
+  },
+  neonet: {
+    name: 'NeoNet',
+    description: 'Local payment processor',
+  },
+};
+
+// =============================================================================
+// VENUE TYPES
+// =============================================================================
 export type VenueInfo = {
   id: string;
   slug: string;
@@ -8,8 +47,14 @@ export type VenueInfo = {
   location: string;
   open_time: string;
   close_time: string;
-  latitude?: string;
-  longitude?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  // Payment gateway configuration
+  payment_gateway?: PaymentGateway;
+  payment_gateway_config?: PaymentGatewayConfig;
+  // VIP List flow - when true, venue uses VIP lists instead of regular ticket purchase
+  use_vip_list_flow?: boolean;
+  whatsapp_number?: string;
 };
 
 type Requirements = {
@@ -40,8 +85,8 @@ export type VenueEventInfo = {
   open_time: string;
   close_time: string;
   long_location: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number | null;
+  longitude?: number | null;
   description: string;
 };
 
@@ -60,7 +105,7 @@ export type EventDetailedInfo = {
   requirements: Requirements[];
   custom_location?: VenueInfo;
   currency: string;
-  min_age?: number;
+  min_age?: number | string;
   dress_code?: string;
   description?: string;
 };
@@ -115,7 +160,6 @@ export type UserInfoTicket = {
   owner_phone_prefix?: string;
   owner_gender?: string;
   owner_birthdate: string;
-  owner_dpi?: string;
 };
 
 export type TicketResponse = {
@@ -169,7 +213,6 @@ export type UsuarioFormData = {
   owner_phone_prefix?: string;
   owner_gender?: string;
   owner_birthdate: string;
-  owner_dpi?: string;
   confirmationMail?: string;
   start_time?: string;
   end_time?: string;
@@ -242,8 +285,6 @@ export type ReservationData = {
 export const GENDER_OPTIONS = [
   { value: "male", label: "Masculino" },
   { value: "female", label: "Femenino" },
-  { value: "other", label: "Otro" },
-  { value: "prefer_not_to_say", label: "Prefiero no decir" },
 ] as const;
 
 export const PHONE_PREFIX_OPTIONS = [
@@ -457,3 +498,77 @@ export interface CreateGroupReservationResponse {
   currency: string;
   error?: string;
 }
+
+// =============================================================================
+// GUEST LIST TYPES (Listas Gratis)
+// =============================================================================
+
+// Guest list type configuration for an event
+export interface GuestListType {
+  id: string;
+  event_id: string;
+  venue_id: string;
+  name: string;
+  description?: string;
+  max_capacity?: number;
+  current_count: number;
+  is_active: boolean;
+  allowed_gender?: 'male' | 'female' | null; // null = todos permitidos
+}
+
+// Request to sign up for a guest list
+export interface GuestListSignupRequest {
+  event_slug: string;
+  guest_list_type_id: string;
+  name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  phone_prefix?: string;
+  gender: 'male' | 'female';
+  guest_count: number; // Número de acompañantes
+}
+
+// Response after successful signup
+export interface GuestListSignupResponse {
+  success: boolean;
+  signup_id: string;
+  verification_code: string;
+  message: string;
+}
+
+// Guest list signup status
+export type GuestListSignupStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+// Full signup info for status check
+export interface GuestListSignup {
+  id: string;
+  guest_list_type_id: string;
+  guest_list_name: string;
+  event_id: string;
+  event_name: string;
+  event_date: string;
+  event_slug: string;
+  venue_name: string;
+  name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  gender: string;
+  guest_count: number;
+  status: GuestListSignupStatus;
+  verification_code: string;
+  created_at: string;
+  processed_at?: string;
+  reject_reason?: string;
+  ticket_id?: string;
+}
+
+// Color scheme for guest list UI
+export const GUEST_LIST_COLORS = {
+  primary: 'rgb(20, 184, 166)',        // Teal
+  primaryLight: 'rgb(94, 234, 212)',   // Light teal
+  background: 'rgba(20, 184, 166, 0.15)',
+  border: 'rgba(20, 184, 166, 0.4)',
+  borderHover: 'rgba(20, 184, 166, 0.6)',
+} as const;

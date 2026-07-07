@@ -7,8 +7,10 @@ import { getEventsByVenue, getVenueInfo } from "../../controller/events-page-con
 import { useParams } from "react-router-dom";
 import type { EventInfo, VenueEventInfo } from "../../types/types";
 import { MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const AllVenueEventsPage = () => {
+  const { t } = useTranslation('events');
   const { venueId } = useParams<{ venueId: string }>();
   const [events, setAllEvents] = useState<EventInfo[]>([]);
   const [venueInfo, setVenueInfo] = useState<VenueEventInfo | null>(null);
@@ -25,7 +27,18 @@ export const AllVenueEventsPage = () => {
       getVenueInfo(venueId)
     ])
       .then(([eventsData, venueData]) => {
-        const sortedEvents = [...eventsData].sort((a, b) => {
+        // Filter out past events
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcomingEvents = eventsData.filter((event: EventInfo) => {
+          const eventDate = new Date(event.event_date);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate >= today;
+        });
+
+        // Sort by date ascending
+        const sortedEvents = [...upcomingEvents].sort((a, b) => {
           const dateA = new Date(a.event_date).getTime();
           const dateB = new Date(b.event_date).getTime();
           return dateA - dateB;
@@ -56,7 +69,7 @@ export const AllVenueEventsPage = () => {
                   <img src={venueInfo?.image} alt={venueInfo?.name} />
                 </div>
                 <div className="all-events-banner__info">
-                  <h1 className="all-events-banner__title">All Events</h1>
+                  <h1 className="all-events-banner__title">{t('allEvents.title')}</h1>
                   <p className="all-events-banner__venue">
                     <MapPin size={16} className="all-events-banner__venue-icon" />
                     {venueInfo?.name}
@@ -74,7 +87,7 @@ export const AllVenueEventsPage = () => {
                 </div>
               ) : (
                 <div className="all-events-empty">
-                  <p>No events available</p>
+                  <p>{t('venue.noEventsAvailable')}</p>
                 </div>
               )}
             </div>

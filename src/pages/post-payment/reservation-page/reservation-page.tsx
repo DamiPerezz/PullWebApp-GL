@@ -1,6 +1,7 @@
 // @ts-nocheck
 // TODO: Fix type mismatches in this file
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { Layout } from "../../../components/layout/layout";
 import "./reservation-page.css";
 import { ReservationHeader } from "../../../components/reservation-header/reservation-header";
@@ -12,10 +13,15 @@ import { formatBookingPostData } from "../../../utils/format-post";
 import { postBookingRequest } from "../../../controller/booking-page-controller";
 
 export const ReservationPage = () => {
-  const { venueId, reservationDate } = useParams<{
+  const { t, i18n } = useTranslation('payment');
+  const { lang, venueId, reservationDate } = useParams<{
+    lang: string;
     venueId: string;
     reservationDate: string;
   }>();
+
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -48,7 +54,7 @@ export const ReservationPage = () => {
         .then((response) => {
           setIsLoading(false);
           if (response.status === 201) {
-            navigate(`/venue/${venueId}/booking/${reservationDate}/confirmed`);
+            navigate(buildUrl(`/venue/${venueId}/booking/${reservationDate}/confirmed`));
           }
         })
         .catch(() => {
@@ -67,7 +73,7 @@ export const ReservationPage = () => {
           date={reservationDate ? reservationDate : ""}
           table={table ? table : ""}
         />
-        <p className="booking-form-title">Booking form</p>
+        <p className="booking-form-title">{t('reservation.bookingForm')}</p>
         <div className="reservation-user-details">
           <div className="form-details">
             <UserDetailsForm
@@ -89,7 +95,7 @@ export const ReservationPage = () => {
                 ticket_description: "Access to the general admission area",
               }}
               url=""
-              buttonText="Book now"
+              buttonText={t('reservation.bookNow')}
               onConfirm={() => formRef.current?.submit(onSubmit)}
               isLoading={isLoading}
             />

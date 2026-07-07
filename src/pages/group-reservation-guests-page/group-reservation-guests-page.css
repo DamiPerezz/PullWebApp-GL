@@ -1,8 +1,7 @@
 .guests-page-wrapper {
   flex: 1;
   position: relative;
-  overflow: hidden;
-  background: #0a0a0f;
+  background: transparent;
 }
 
 .guests-page-bg-blur {
@@ -21,8 +20,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 150px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+  height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
   pointer-events: none;
 }
 
@@ -41,40 +40,13 @@
 .guests-page-container {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 5rem 1.5rem 3rem;
+  padding: 2rem 1.5rem 3rem;
 }
 
 .guests-page-content {
   display: flex;
   flex-direction: column;
   gap: 32px;
-}
-
-/* Header */
-.guests-page-header {
-  margin-bottom: 32px;
-  text-align: center;
-}
-
-.guests-page-event-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.guests-page-event-title {
-  color: white;
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  letter-spacing: -0.02em;
-}
-
-.guests-page-event-subtitle {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1rem;
-  margin: 0;
-  font-weight: 300;
 }
 
 /* Error Box */
@@ -161,15 +133,17 @@
 }
 
 .guests-page-guest-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
   padding: 20px;
   transition: all 0.3s ease;
 }
 
 .guests-page-guest-card:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 15, 21, 0.65);
   border-color: rgba(139, 92, 246, 0.3);
 }
 
@@ -296,6 +270,12 @@
 }
 
 /* Receipt Section - Order Summary Style */
+.guests-page-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .guests-page-receipt-card {
   position: relative;
   padding: 1.5rem;
@@ -379,7 +359,7 @@
 }
 
 .guests-page-receipt-totals {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .guests-page-receipt-subtotal,
@@ -407,8 +387,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
-  margin-bottom: 1.5rem;
+  padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -422,7 +401,7 @@
   font-size: 1.5rem;
   font-weight: 500;
   color: transparent;
-  background: linear-gradient(to right, rgb(167, 139, 250), rgb(232, 121, 249));
+  background: linear-gradient(to right, rgb(167, 139, 250), rgb(168, 85, 255));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -467,12 +446,36 @@
   transform: translateX(0.25rem);
 }
 
+/* Info Box - Blue */
+.guests-page-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.guests-page-info-icon {
+  flex-shrink: 0;
+  color: rgb(96, 165, 250);
+  margin-top: 2px;
+}
+
+.guests-page-info-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgb(191, 219, 254);
+  line-height: 1.5;
+}
+
 /* Notice Messages */
 .guests-page-notices {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 1rem;
 }
 
 .guests-page-notice {
@@ -585,11 +588,7 @@
 /* Responsive */
 @media (max-width: 640px) {
   .guests-page-container {
-    padding: 3rem 1.1rem 2.5rem;
-  }
-
-  .guests-page-event-title {
-    font-size: 24px;
+    padding: 2rem 1.1rem 2.5rem;
   }
 
   .guests-page-forms {

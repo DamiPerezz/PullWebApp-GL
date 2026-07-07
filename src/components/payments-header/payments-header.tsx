@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useParams } from "react-router-dom"
 import { CalendarIcon, ClockIcon, LocationIcon, GoBackIcon } from "../../icons/icons"
 import './payments-header.css'
 import { useEffect, useState } from "react"
@@ -6,6 +6,7 @@ import type { EventDetailedInfo } from "../../types/types"
 import { getEventDetailedInfo } from "../../controller/purchase-pages-controller"
 
 export const PrePaymentHeader = ({ url, slug }: { url: string, slug: string }) => {
+    const { lang } = useParams<{ lang: string }>();
 
     const [eventDetail, setEventDetail] = useState<EventDetailedInfo | null>(null);
 
@@ -20,8 +21,9 @@ export const PrePaymentHeader = ({ url, slug }: { url: string, slug: string }) =
     }, [slug])
 
     const date = new Date(eventDetail?.date || '');
+    const dateLocale = lang === 'es' ? 'es-ES' : 'en-US';
 
-    const formattedDate = date.toLocaleDateString('en-US', {
+    const formattedDate = date.toLocaleDateString(dateLocale, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',

@@ -218,6 +218,13 @@ export const useCookieConsent = () => {
 // ANALYTICS & TRACKING FUNCTIONS
 // ============================================
 
+// SECURITY: Helper to get secure cookie attributes
+const getSecureCookieAttributes = (): string => {
+  const isSecure = window.location.protocol === 'https:';
+  const baseAttrs = 'path=/; max-age=31536000; SameSite=Strict';
+  return isSecure ? `${baseAttrs}; Secure` : baseAttrs;
+};
+
 // Enable Google Analytics (GA4)
 function enableAnalytics() {
   // Check if gtag is available
@@ -228,8 +235,8 @@ function enableAnalytics() {
     });
   }
 
-  // Set cookie to signal analytics consent
-  document.cookie = 'analytics_consent=granted; path=/; max-age=31536000; SameSite=Lax';
+  // SECURITY: Set cookie with Secure attribute on HTTPS
+  document.cookie = `analytics_consent=granted; ${getSecureCookieAttributes()}`;
 }
 
 // Disable Google Analytics
@@ -249,7 +256,8 @@ function disableAnalytics() {
     document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   });
 
-  document.cookie = 'analytics_consent=denied; path=/; max-age=31536000; SameSite=Lax';
+  // SECURITY: Set cookie with Secure attribute on HTTPS
+  document.cookie = `analytics_consent=denied; ${getSecureCookieAttributes()}`;
 }
 
 // Enable Marketing cookies (for future use)
@@ -261,7 +269,8 @@ function enableMarketing() {
       ad_personalization: 'granted',
     });
   }
-  document.cookie = 'marketing_consent=granted; path=/; max-age=31536000; SameSite=Lax';
+  // SECURITY: Set cookie with Secure attribute on HTTPS
+  document.cookie = `marketing_consent=granted; ${getSecureCookieAttributes()}`;
 }
 
 // Disable Marketing cookies
@@ -273,5 +282,6 @@ function disableMarketing() {
       ad_personalization: 'denied',
     });
   }
-  document.cookie = 'marketing_consent=denied; path=/; max-age=31536000; SameSite=Lax';
+  // SECURITY: Set cookie with Secure attribute on HTTPS
+  document.cookie = `marketing_consent=denied; ${getSecureCookieAttributes()}`;
 }

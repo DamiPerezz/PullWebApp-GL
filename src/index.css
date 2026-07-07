@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/* PERFORMANCE: Fonts loaded non-blocking via index.html preload */
 
 :root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
@@ -19,7 +19,7 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
-  --backgroundColor: #151515;
+  --backgroundColor: #0a0a0f;
   --background-color-shadow: rgb(21, 21, 21, .99);
   --light-color-gray: #888;
   --blue-button-color: #007bff;
@@ -108,4 +108,51 @@ a {
 @keyframes protected-route-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   PAGE LOADER STYLES (Code Splitting)
+======================================== */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0f;
+  z-index: 9999;
+}
+
+.page-loader__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-loader__spinner {
+  animation: page-loader-spin 1s linear infinite;
+  color: rgb(167, 139, 250);
+}
+
+@keyframes page-loader-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   PERFORMANCE: GPU Acceleration hints
+======================================== */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ========================================
+   PERFORMANCE: Content visibility
+======================================== */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }

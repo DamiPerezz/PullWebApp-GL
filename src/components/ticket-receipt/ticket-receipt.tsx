@@ -1,10 +1,11 @@
 // ticket-receipt.tsx
+import { useTranslation } from 'react-i18next';
 import './ticket-receipt.css'
 import type { TicketType } from '../../types/types'
 import { ShoppingCart, ChevronLeft } from 'lucide-react'
 
 export const TicketReceipt = (
-    { quantity, ticketDetails, onConfirm, buttonText = "Continue to Data", disabled = false }
+    { quantity, ticketDetails, onConfirm, buttonText, disabled = false }
         :
         {
             quantity: number,
@@ -14,6 +15,8 @@ export const TicketReceipt = (
             disabled?: boolean
         }
 ) => {
+    const { t } = useTranslation('common');
+    const displayButtonText = buttonText || t('receipt.continueToData');
     const currencySymbol = ticketDetails.currency === 'GTQ' ? 'Q' : 
                           ticketDetails.currency === 'USD' ? '$' : 
                           ticketDetails.currency === 'EUR' ? '€' : 
@@ -27,7 +30,7 @@ export const TicketReceipt = (
         <div className="ticket-receipt">
             <div className="ticket-receipt-card">
                 <div className="ticket-receipt-header">
-                    <h3 className="ticket-receipt-title">Order Summary</h3>
+                    <h3 className="ticket-receipt-title">{t('receipt.orderSummary')}</h3>
                     <ShoppingCart className="ticket-receipt-icon" />
                 </div>
 
@@ -38,7 +41,7 @@ export const TicketReceipt = (
                                 {ticketDetails.ticket_name}
                             </div>
                             <div className="ticket-receipt-item-quantity">
-                                {quantity}x {quantity > 1 ? 'tickets' : 'ticket'}
+                                {quantity}x {quantity > 1 ? t('receipt.tickets') : t('receipt.ticket')}
                             </div>
                         </div>
                         <div className="ticket-receipt-item-price">
@@ -46,7 +49,7 @@ export const TicketReceipt = (
                                 {currencySymbol}{ticketDetails.ticket_price?.toFixed(2)}
                             </div>
                             <div className="ticket-receipt-item-label">
-                                per ticket
+                                {t('receipt.perTicket')}
                             </div>
                         </div>
                     </div>
@@ -56,31 +59,31 @@ export const TicketReceipt = (
 
                 <div className="ticket-receipt-totals">
                     <div className="ticket-receipt-subtotal">
-                        <span>Subtotal</span>
+                        <span>{t('receipt.subtotal')}</span>
                         <span>{currencySymbol}{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="ticket-receipt-fee">
-                        <span>Service Fee</span>
+                        <span>{t('receipt.serviceFee')}</span>
                         <span>{currencySymbol}{serviceFee.toFixed(2)}</span>
                     </div>
 
                     <div className="ticket-receipt-total">
-                        <span>Total</span>
+                        <span>{t('receipt.total')}</span>
                         <span className="ticket-receipt-total-amount">
                             {currencySymbol}{total.toFixed(2)}
                         </span>
                     </div>
                 </div>
-
-                <button
-                    onClick={onConfirm}
-                    className="ticket-receipt-button"
-                    disabled={disabled}
-                >
-                    {buttonText}
-                    <ChevronLeft className="ticket-receipt-button-icon" />
-                </button>
             </div>
+
+            <button
+                onClick={onConfirm}
+                className="ticket-receipt-button"
+                disabled={disabled}
+            >
+                {displayButtonText}
+                <ChevronLeft className="ticket-receipt-button-icon" />
+            </button>
         </div>
     );
 }

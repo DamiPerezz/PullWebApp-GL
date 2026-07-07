@@ -1,0 +1,94 @@
+{
+  "page": {
+    "error": "Error",
+    "dismissError": "Dismiss error",
+    "processing": "Processing...",
+    "proceedToPayment": "Proceed to Payment",
+    "cancelledWarning": "Payment was cancelled. Your form data has been preserved. You can try again when ready.",
+    "paymentSuccessTitle": "Payment Successful!",
+    "paymentSuccessDesc": "Your order has been submitted and is pending staff approval. You'll receive an email confirmation shortly.",
+    "redirecting": "Redirecting...",
+    "processingOrder": "Processing your order...",
+    "processingWait": "Please wait while we confirm your payment",
+    "failedToLoad": "Failed to load event information. Please try again.",
+    "invalidFormData": "Invalid form data structure. Expected { usuarios: [...] }",
+    "noTicketInfo": "No ticket information provided",
+    "fillAllFields": "Please fill in all required fields for each ticket",
+    "eventNotLoaded": "Event information not loaded",
+    "couldNotDetermineEventId": "Could not determine event ID",
+    "failedToCreateOrder": "Failed to create pending order",
+    "paymentSimulationFailed": "Payment simulation failed",
+    "unexpectedError": "An unexpected error occurred. Please try again."
+  },
+  "success": {
+    "title": "Payment Authorized!",
+    "description": "Your payment has been successfully authorized and is being held securely.",
+    "pendingApproval": "Pending Staff Approval",
+    "pendingDescription": "Your order is now waiting for staff confirmation. Once approved, your payment will be processed and you'll receive your tickets via email.",
+    "orderReference": "Order Reference",
+    "copyReference": "Copy Reference",
+    "copied": "Copied!",
+    "referenceHint": "Save this reference number. You can use it to track your order status or contact support.",
+    "importantInfo": "Important Information",
+    "returnToVenue": "Return to Venue",
+    "infoList": {
+      "authorized": "Your payment is <strong>authorized but not yet charged</strong>",
+      "staffReview": "Staff will review your order shortly (usually within 24 hours)",
+      "approved": "If approved, payment will be processed and tickets sent to your email",
+      "rejected": "If rejected, the authorization will be cancelled and funds returned",
+      "emailUpdates": "You'll receive email updates about your order status"
+    },
+    "timeline": {
+      "paymentAuthorized": "Payment Authorized",
+      "paymentAuthorizedDesc": "Your payment is securely held",
+      "staffReview": "Staff Review",
+      "staffReviewDesc": "Staff is reviewing your order",
+      "ticketsSent": "Tickets Sent",
+      "ticketsSentDesc": "You'll receive tickets via email"
+    }
+  },
+  "cancel": {
+    "title": "Payment Cancelled",
+    "description": "Your payment was cancelled. No charges were made to your account.",
+    "tryAgain": "Try Again",
+    "returnToHome": "Return to Home",
+    "whatHappensNow": "What happens now?",
+    "orderCancelled": "Your order has been cancelled",
+    "noPaymentProcessed": "No payment was processed",
+    "formDataSaved": "Your form data has been saved",
+    "tryWhenReady": "You can try again when you're ready",
+    "loading": "Loading..."
+  },
+  "postPayment": {
+    "backToHome": "Back to Home",
+    "paymentSuccessful": "Payment Successful!",
+    "ticketsSentEmail": "Your tickets have been sent to your email. You can view and download them below.",
+    "downloadAll": "Download All",
+    "yourTickets": "Your Tickets",
+    "ticket": "ticket",
+    "tickets": "tickets",
+    "noTicketsFound": "No tickets found for this order.",
+    "nextSteps": "Next Steps",
+    "ticketsSentToEmail": "Your tickets have been sent to your email address",
+    "presentQRCode": "Present your QR code at the venue entrance",
+    "singleUseOnly": "Each ticket can only be used once",
+    "arriveEarly": "Arrive early to avoid queues",
+    "loadingTickets": "Loading your tickets",
+    "pleaseWait": "Please wait while we retrieve your order...",
+    "failedToLoad": "Failed to load tickets",
+    "invalidOrderReference": "Invalid order reference",
+    "returnToHome": "Return to Home"
+  },
+  "reservation": {
+    "bookingForm": "Booking form",
+    "bookNow": "Book now"
+  },
+  "error": {
+    "orderNotFound": "Order Not Found",
+    "orderNotFoundDesc": "We couldn't find any order information. The link may be invalid or has expired.",
+    "returnToHome": "Return to Home"
+  },
+  "loading": {
+    "order": "Loading your order..."
+  }
+}

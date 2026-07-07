@@ -1,21 +1,32 @@
 // event-detailed-page.tsx (TU DISEÑO - SOLO CORREGIDO BACKEND)
-import { useEffect, useState } from 'react';
+// SECURITY: Validate URL parameters to prevent injection
+import { useEffect, useState, useMemo } from 'react';
 import { Layout } from '../../components/layout/layout';
 import { TicketTypeCard } from '../../components/ticket-type-card/ticket-type-card';
 import { DivTicketTypeCard } from '../../components/ticket-type-card/div-ticket-type-card';
-import { Calendar, Clock, MapPin, Plus, Shirt, X } from 'lucide-react';
-import type { EventDetailedInfo, TicketType } from '../../types/types';
+import { GuestListCard } from '../../components/guest-list-card/guest-list-card';
+import { Calendar, Clock, MapPin, Plus, Shirt, X, Ticket, Users, ClipboardList, MessageCircle, Crown } from 'lucide-react';
+import type { EventDetailedInfo, TicketType, GuestListType } from '../../types/types';
 import './event-detailed-page.css';
 import { getEventDetailedInfo } from '../../controller/event-controller';
 import { getTicketTypes } from '../../controller/event-controller';
+import { getGuestListsForEvent } from '../../controller/guest-list-controller';
 import { useParams } from 'react-router-dom';
 import { SEO, generateEventStructuredData } from '../../components/seo/seo';
+import { validateSlug } from '../../utils/security';
+import { useTranslation } from 'react-i18next';
 
 export const EventDetailedPage = () => {
-    const { eventId } = useParams<{ eventId: string }>();
+    const { t, i18n } = useTranslation('events');
+    const { eventId: rawEventId, lang } = useParams<{ eventId: string; lang: string }>();
+    const currentLang = lang || i18n.language || 'es';
+
+    // SECURITY: Validate event slug parameter
+    const eventId = useMemo(() => validateSlug(rawEventId), [rawEventId]);
 
     const [eventDetailedInfo, setEventDetailedInfo] = useState<EventDetailedInfo | null>(null);
     const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
+    const [guestLists, setGuestLists] = useState<GuestListType[]>([]);
     const [loading, setIsLoading] = useState<boolean>(true);
     const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
@@ -28,6 +39,11 @@ export const EventDetailedPage = () => {
         getEventDetailedInfo(eventId)
             .then(data => {
                 setEventDetailedInfo(data);
+                // Store venue name for navbar display (use venue name from custom_location, not address)
+                const venueName = data?.custom_location?.name || data?.custom_location?.venue_name;
+                if (venueName) {
+                    sessionStorage.setItem('lastVenueName', venueName);
+                }
             })
             .catch(() => {
                 // Silently handle error
@@ -40,6 +56,15 @@ export const EventDetailedPage = () => {
             })
             .catch(() => {
                 setIsLoading(false);
+            });
+
+        // Fetch guest lists (free lists)
+        getGuestListsForEvent(eventId)
+            .then(data => {
+                setGuestLists(data.filter(gl => gl.is_active));
+            })
+            .catch(() => {
+                // Silently handle - guest lists are optional
             });
     }, [eventId]);
 
@@ -72,7 +97,8 @@ export const EventDetailedPage = () => {
     const close = eventDetailedInfo?.close_time.slice(0, 5);
 
     const date = new Date(eventDetailedInfo?.date || '');
-    const formattedDate = date.toLocaleDateString('en-US', {
+    const dateLocale = currentLang === 'es' ? 'es-GT' : 'en-US';
+    const formattedDate = date.toLocaleDateString(dateLocale, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -129,7 +155,7 @@ export const EventDetailedPage = () => {
 
                                 {eventDetailedInfo?.description && (
                                     <div className="event-detailed-description-card">
-                                        <h3 className="event-detailed-description-title">Event Description</h3>
+                                        <h3 className="event-detailed-description-title">{t('details.eventDescription')}</h3>
                                         <p className="event-detailed-description">
                                             {eventDetailedInfo.description}
                                         </p>
@@ -137,7 +163,7 @@ export const EventDetailedPage = () => {
                                             className="event-detailed-read-more"
                                             onClick={() => setShowDescriptionModal(true)}
                                         >
-                                            Read more
+                                            {t('details.readMore')}
                                         </button>
                                     </div>
                                 )}
@@ -156,7 +182,7 @@ export const EventDetailedPage = () => {
                                         rel="noopener noreferrer"
                                     >
                                         <MapPin size={16} />
-                                        <span>Get Directions</span>
+                                        <span>{t('details.getDirections')}</span>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="9 18 15 12 9 6"></polyline>
                                         </svg>
@@ -209,7 +235,7 @@ export const EventDetailedPage = () => {
                                         rel="noopener noreferrer"
                                     >
                                         <MapPin size={14} />
-                                        <span>Get Directions</span>
+                                        <span>{t('details.getDirections')}</span>
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="9 18 15 12 9 6"></polyline>
                                         </svg>
@@ -225,22 +251,95 @@ export const EventDetailedPage = () => {
                                             className="event-detailed-mobile-read-more"
                                             onClick={() => setShowDescriptionModal(true)}
                                         >
-                                            Read more
+                                            {t('details.readMore')}
                                         </button>
                                     </div>
                                 )}
 
-                                <div className="event-detailed-tickets-section">
-                                    <h2 className="event-detailed-tickets-title">Available Tickets</h2>
-                                    <div className="event-detailed-tickets-grid">
-                                        {ticketTypes.map(ticket => {
-                                            if (ticket.ticket_quantity === 0) {
-                                                return <DivTicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
-                                            }
-                                            return <TicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
-                                        })}
+                                {/* VIP List Flow - Contact venue instead of buying tickets */}
+                                {eventDetailedInfo?.custom_location?.use_vip_list_flow ? (
+                                    <div className="event-detailed-vip-section">
+                                        <div className="event-detailed-vip-card">
+                                            <div className="event-detailed-vip-header">
+                                                <Crown size={24} />
+                                                <h2>{t('details.vipOnly.title')}</h2>
+                                            </div>
+                                            <p className="event-detailed-vip-description">
+                                                {t('details.vipOnly.description')}
+                                            </p>
+                                            {eventDetailedInfo?.custom_location?.whatsapp_number ? (
+                                                <a
+                                                    href={`https://wa.me/${eventDetailedInfo.custom_location.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(t('details.vipOnly.whatsappMessage', { eventName: eventDetailedInfo.event_name }))}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="event-detailed-vip-button"
+                                                >
+                                                    <MessageCircle size={20} />
+                                                    {t('details.vipOnly.contactButton')}
+                                                </a>
+                                            ) : (
+                                                <p className="event-detailed-vip-no-contact">
+                                                    {t('details.vipOnly.noContact')}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <>
+                                        {ticketTypes.filter(t => !t.is_group).length > 0 && (
+                                            <div className="event-detailed-tickets-section">
+                                                <h2 className="event-detailed-tickets-title">
+                                                    <Ticket size={20} style={{ color: 'rgb(168, 85, 255)' }} />
+                                                    {t('details.individualTickets')}
+                                                </h2>
+                                                <div className="event-detailed-tickets-grid">
+                                                    {ticketTypes.filter(ticket => !ticket.is_group).map(ticket => {
+                                                        if (ticket.ticket_quantity === 0) {
+                                                            return <DivTicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
+                                                        }
+                                                        return <TicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {guestLists.length > 0 && (
+                                            <div className="event-detailed-tickets-section">
+                                                <h2 className="event-detailed-tickets-title">
+                                                    <ClipboardList size={20} style={{ color: 'rgb(20, 184, 166)' }} />
+                                                    {t('details.guestLists')}
+                                                </h2>
+                                                <div className="event-detailed-tickets-grid">
+                                                    {guestLists.map(guestList => (
+                                                        <GuestListCard
+                                                            key={guestList.id}
+                                                            guestList={guestList}
+                                                            eventSlug={eventId || ''}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {ticketTypes.filter(t => t.is_group).length > 0 && (
+                                            <div className="event-detailed-tickets-section">
+                                                <h2 className="event-detailed-tickets-title">
+                                                    <Users size={20} style={{ color: 'rgb(59, 130, 246)' }} />
+                                                    {t('details.groupTickets')}
+                                                </h2>
+                                                <div className="event-detailed-tickets-grid">
+                                                    {ticketTypes.filter(ticket => ticket.is_group).map(ticket => {
+                                                        if (ticket.ticket_quantity === 0) {
+                                                            return <DivTicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
+                                                        }
+                                                        return <TicketTypeCard key={ticket.ticket_type_id} ticket={ticket} />;
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -250,7 +349,7 @@ export const EventDetailedPage = () => {
                     <div className="event-detailed-modal-overlay" onClick={() => setShowDescriptionModal(false)}>
                         <div className="event-detailed-modal" onClick={(e) => e.stopPropagation()}>
                             <div className="event-detailed-modal-header">
-                                <h3 className="event-detailed-modal-title">About this event</h3>
+                                <h3 className="event-detailed-modal-title">{t('details.aboutThisEvent')}</h3>
                                 <button
                                     className="event-detailed-modal-close"
                                     onClick={() => setShowDescriptionModal(false)}

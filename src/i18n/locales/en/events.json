@@ -1,0 +1,63 @@
+{
+  "details": {
+    "eventDescription": "Event Description",
+    "readMore": "Read more",
+    "aboutThisEvent": "About this event",
+    "getDirections": "Get Directions",
+    "availableTickets": "Available Tickets",
+    "individualTickets": "Tickets",
+    "groupTickets": "Groups",
+    "guestLists": "Guest Lists",
+    "soldOut": "Sold Out",
+    "minAge": "{{age}}+",
+    "dateFormat": {
+      "weekday": "long",
+      "year": "numeric",
+      "month": "long",
+      "day": "numeric"
+    },
+    "vipOnly": {
+      "title": "VIP Reservation",
+      "description": "This event requires a prior reservation. Contact the venue via WhatsApp to organize your VIP reservation.",
+      "contactButton": "Contact via WhatsApp",
+      "whatsappMessage": "Hi! I would like to make a reservation for the event: {{eventName}}",
+      "noContact": "Contact the venue directly to make your reservation."
+    }
+  },
+  "card": {
+    "buyTickets": "Buy Tickets",
+    "viewEvent": "View Event",
+    "freeEntry": "Free Entry",
+    "from": "From"
+  },
+  "calendar": {
+    "title": "Event Calendar",
+    "noEvents": "No events scheduled",
+    "selectDate": "Select a date to see events"
+  },
+  "venue": {
+    "upcomingEvents": "Upcoming Events",
+    "noUpcomingEvents": "No upcoming events",
+    "noEventsAvailable": "No events available",
+    "checkBackLater": "Check back later for new events",
+    "allEvents": "All Events",
+    "calendar": "Calendar",
+    "information": "Information",
+    "viewEventCalendar": "View Event Calendar"
+  },
+  "ticketType": {
+    "available": "available",
+    "perPerson": "per person",
+    "soldOut": "Sold Out",
+    "getTickets": "Get Tickets",
+    "groupReservation": "Group Reservation",
+    "minGuests": "Min {{min}} guests",
+    "pricePerPerson": "{{price}} / person"
+  },
+  "allEvents": {
+    "title": "All Events",
+    "backToVenue": "Back to venue",
+    "noEvents": "No events found",
+    "showing": "Showing {{count}} events"
+  }
+}

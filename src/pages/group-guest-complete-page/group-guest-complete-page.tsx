@@ -1,22 +1,20 @@
-// group-guest-complete-page.tsx
+﻿// group-guest-complete-page.tsx
 // SECURITY: Using apiClient for consistent cookie-based authentication
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+// SECURITY: Validate URL parameters to prevent injection
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { User, AlertCircle, Loader2, CreditCard, Ticket, ArrowRight, PartyPopper, Gift, Lock, KeyRound } from 'lucide-react';
 import { VenueNavBar } from '../../components/venue-nav-bar/venue-nav-bar';
 import { Footer } from '../../components/footer/footer';
-import { PHONE_PREFIX_OPTIONS } from '../../types/types';
+import { PhonePrefixSelector } from '../../components/phone-prefix-selector/phone-prefix-selector';
+import { BirthDatePicker, parseMinAge } from '../../components/birth-date-picker/birth-date-picker';
 import { apiClient } from '../../utils/axios';
+import { validateUUID } from '../../utils/security';
 import './group-guest-complete-page.css';
 
-// Fun messages to remind guests to pay back the host
-const HOST_PAYBACK_MESSAGES = [
-  "Don't forget to Venmo/Zelle your friend back! Good karma awaits.",
-  "Pro tip: Buy your host a drink at the party. It's only fair!",
-  "Remember: the host covered you. Time to settle up!",
-  "Your ticket is ready! Now go pay back your generous friend.",
-  "Free ticket? Not quite - your host is waiting for that payback!",
-];
+// Fun messages to remind guests to pay back the host - moved to translations
+// The array will be loaded from t('guestComplete.paybackMessages')
 
 interface GuestData {
   id: string;
@@ -36,6 +34,7 @@ interface EventInfo {
   event_date: string;
   start_time: string;
   image: string;
+  min_age?: number | string;
 }
 
 interface PaymentSuccessData {
@@ -51,9 +50,21 @@ interface PaymentSuccessData {
 type NextAction = 'pay' | 'complete_data' | 'complete_data_then_pay' | 'ticket_ready';
 
 export const GroupGuestCompletePage = () => {
+  const { t, i18n } = useTranslation('group');
+
   // Support both guestId (new flow) and verificationCode (legacy)
-  const { guestId, verificationCode } = useParams<{ guestId?: string; verificationCode?: string }>();
+  const { guestId: rawGuestId, verificationCode: rawVerificationCode, lang } = useParams<{ guestId?: string; verificationCode?: string; lang?: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const vcFromQuery = searchParams.get('vc');
+
+  // Language handling
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
+  // SECURITY: Validate URL parameters (both are UUIDs)
+  const guestId = useMemo(() => validateUUID(rawGuestId), [rawGuestId]);
+  const verificationCode = useMemo(() => validateUUID(rawVerificationCode), [rawVerificationCode]);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -79,9 +90,11 @@ export const GroupGuestCompletePage = () => {
   const [accessCode, setAccessCode] = useState('');
   const [accessCodeVerified, setAccessCodeVerified] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
-  const [funMessage] = useState(() =>
-    HOST_PAYBACK_MESSAGES[Math.floor(Math.random() * HOST_PAYBACK_MESSAGES.length)]
-  );
+  const [randomMessageIndex] = useState(() => Math.floor(Math.random() * 5));
+
+  // Get fun message from translations
+  const paybackMessages = t('guestComplete.paybackMessages', { returnObjects: true }) as string[];
+  const funMessage = Array.isArray(paybackMessages) ? paybackMessages[randomMessageIndex] : '';
 
   // Determine which ID to use and which API endpoints
   const useGuestIdFlow = !!guestId;
@@ -94,7 +107,7 @@ export const GroupGuestCompletePage = () => {
       try {
         // Use different endpoint based on flow
         const endpoint = useGuestIdFlow
-          ? `/group-reservations/guest/${identifier}`
+          ? `/group-reservations/guest/${identifier}?verification_code=${vcFromQuery || ''}`
           : `/group-reservations/guest/verify/${identifier}`;
 
         const response = await apiClient.get(endpoint);
@@ -122,7 +135,7 @@ export const GroupGuestCompletePage = () => {
 
         setLoading(false);
       } catch (err: any) {
-        setError(err.response?.data?.error || err.message || 'Error loading guest data');
+        setError(err.response?.data?.error || err.message || t('guestComplete.errors.loadingData'));
         setLoading(false);
       }
     };
@@ -144,7 +157,7 @@ export const GroupGuestCompletePage = () => {
     try {
       // Use different endpoint based on flow
       const endpoint = useGuestIdFlow
-        ? `/group-reservations/guest/${identifier}/pay`
+        ? `/group-reservations/guest/${identifier}/pay?verification_code=${vcFromQuery || ''}`
         : `/group-reservations/guest/pay/${identifier}`;
 
       const response = await apiClient.post(endpoint);
@@ -162,7 +175,7 @@ export const GroupGuestCompletePage = () => {
       });
       setSubmitting(false);
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Error processing payment');
+      setError(err.response?.data?.error || err.message || t('guestComplete.errors.processingPayment'));
       setSubmitting(false);
     }
   };
@@ -175,7 +188,7 @@ export const GroupGuestCompletePage = () => {
 
     try {
       const response = await apiClient.post(
-        `/group-reservations/guest/${guestId}/verify-access-code`,
+        `/group-reservations/guest/${guestId}/verify-access-code?verification_code=${vcFromQuery || ''}`,
         { access_code: accessCode }
       );
       const data = response.data;
@@ -183,10 +196,10 @@ export const GroupGuestCompletePage = () => {
       if (data.valid) {
         setAccessCodeVerified(true);
       } else {
-        setError(data.error || 'Invalid access code');
+        setError(data.error || t('guestComplete.errors.invalidAccessCode'));
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Error verifying access code');
+      setError(err.response?.data?.error || err.message || t('guestComplete.errors.verifyingCode'));
     } finally {
       setVerifyingCode(false);
     }
@@ -199,23 +212,40 @@ export const GroupGuestCompletePage = () => {
 
     // Validation
     if (!formData.email?.trim()) {
-      setError('Email is required');
+      setError(t('guestComplete.errors.emailRequired'));
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Please enter a valid email address');
+      setError(t('guestComplete.errors.invalidEmail'));
       return;
     }
     if (!formData.birth_date?.trim()) {
-      setError('Date of birth is required');
+      setError(t('guestComplete.errors.birthDateRequired'));
+      return;
+    }
+    // Age validation
+    const minAge = parseMinAge(eventInfo?.min_age);
+    const birthDate = new Date(formData.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (birthDate > today) {
+      setError(t('guestComplete.errors.birthDateFuture'));
+      return;
+    }
+    if (age < minAge) {
+      setError(t('guestComplete.errors.minAge', { age: minAge }));
       return;
     }
     if (!formData.phone?.trim()) {
-      setError('Phone number is required');
+      setError(t('guestComplete.errors.phoneRequired'));
       return;
     }
     if (!/^\d{6,15}$/.test(formData.phone)) {
-      setError('Phone must be 6-15 digits');
+      setError(t('guestComplete.errors.invalidPhone'));
       return;
     }
 
@@ -225,7 +255,7 @@ export const GroupGuestCompletePage = () => {
     try {
       // Use different endpoint based on flow
       const endpoint = useGuestIdFlow
-        ? `/group-reservations/guest/${identifier}/complete`
+        ? `/group-reservations/guest/${identifier}/complete?verification_code=${vcFromQuery || ''}`
         : `/group-reservations/guest/complete/${identifier}`;
 
       await apiClient.post(endpoint, {
@@ -244,12 +274,12 @@ export const GroupGuestCompletePage = () => {
         // Redirect back to tracking page after 10 seconds
         if (paymentLinkCode) {
           setTimeout(() => {
-            navigate(`/group/track/${paymentLinkCode}?success=data`);
+            navigate(buildUrl(`/group/track/${paymentLinkCode}?success=data`));
           }, 10000);
         }
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Error completing data');
+      setError(err.response?.data?.error || err.message || t('guestComplete.errors.completingData'));
       setSubmitting(false);
     }
   };
@@ -260,7 +290,7 @@ export const GroupGuestCompletePage = () => {
     try {
       // Use different endpoint based on flow
       const endpoint = useGuestIdFlow
-        ? `/group-reservations/guest/${identifier}/pay`
+        ? `/group-reservations/guest/${identifier}/pay?verification_code=${vcFromQuery || ''}`
         : `/group-reservations/guest/pay/${identifier}`;
 
       const response = await apiClient.post(endpoint);
@@ -278,7 +308,7 @@ export const GroupGuestCompletePage = () => {
       });
       setSubmitting(false);
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Error processing payment');
+      setError(err.response?.data?.error || err.message || t('guestComplete.errors.processingPayment'));
       setSubmitting(false);
     }
   };
@@ -290,7 +320,7 @@ export const GroupGuestCompletePage = () => {
         <div className="guest-complete-wrapper">
           <div className="guest-complete-loading">
             <Loader2 size={48} className="guest-complete-spinner" />
-            <p>Loading...</p>
+            <p>{t('guestComplete.loading')}</p>
           </div>
         </div>
       </>
@@ -304,10 +334,10 @@ export const GroupGuestCompletePage = () => {
         <div className="guest-complete-wrapper">
           <div className="guest-complete-error">
             <AlertCircle size={48} />
-            <h2>Guest Not Found</h2>
+            <h2>{t('guestComplete.notFound')}</h2>
             <p>{error}</p>
-            <button onClick={() => navigate('/venues')} className="guest-complete-btn">
-              Back to home
+            <button onClick={() => navigate(buildUrl('/venues'))} className="guest-complete-btn">
+              {t('guestComplete.backToHome')}
             </button>
           </div>
         </div>
@@ -333,8 +363,8 @@ export const GroupGuestCompletePage = () => {
           <div className="guest-complete-content">
             <div className="guest-complete-success">
               <PartyPopper size={64} className="guest-complete-success-icon" />
-              <h2>Payment Complete!</h2>
-              <p>Your ticket has been generated and sent to your email.</p>
+              <h2>{t('guestComplete.paymentComplete')}</h2>
+              <p>{t('guestComplete.ticketSent')}</p>
               <p className="guest-complete-success-email">{paymentSuccess.guest_email}</p>
 
               <div className="guest-complete-success-details">
@@ -350,10 +380,10 @@ export const GroupGuestCompletePage = () => {
               <div className="guest-complete-success-actions">
                 {paymentSuccess.payment_link_code && (
                   <button
-                    onClick={() => navigate(`/group/track/${paymentSuccess.payment_link_code}?success=payment`)}
+                    onClick={() => navigate(buildUrl(`/group/track/${paymentSuccess.payment_link_code}?success=payment`))}
                     className="guest-complete-submit-btn"
                   >
-                    View Reservation
+                    {t('guestComplete.viewReservation')}
                     <ArrowRight size={18} />
                   </button>
                 )}
@@ -385,25 +415,25 @@ export const GroupGuestCompletePage = () => {
           <div className="guest-complete-content">
             <div className="guest-complete-success">
               <Ticket size={64} className="guest-complete-success-icon" />
-              <h2>You're All Set!</h2>
-              <p>Your ticket has been generated and sent to your email.</p>
+              <h2>{t('guestComplete.allSet')}</h2>
+              <p>{t('guestComplete.ticketSent')}</p>
               <p className="guest-complete-success-email">{formData.email}</p>
 
               {/* Fun reminder for host-paid guests */}
               {isHostPaid && guestData && guestData.amount_due > 0 && (
                 <div className="guest-complete-payback-reminder">
                   <Gift size={20} />
-                  <span>{funMessage}</span>
+                  <span>{t('guestComplete.paybackReminder', { message: funMessage })}</span>
                 </div>
               )}
 
               <div className="guest-complete-success-actions">
                 {paymentLinkCode && (
                   <button
-                    onClick={() => navigate(`/group/track/${paymentLinkCode}?success=data`)}
+                    onClick={() => navigate(buildUrl(`/group/track/${paymentLinkCode}?success=data`))}
                     className="guest-complete-submit-btn"
                   >
-                    View Reservation
+                    {t('guestComplete.viewReservation')}
                     <ArrowRight size={18} />
                   </button>
                 )}
@@ -436,18 +466,18 @@ export const GroupGuestCompletePage = () => {
           <div className="guest-complete-content">
             <div className="guest-complete-success">
               <Ticket size={64} className="guest-complete-success-icon" />
-              <h2>You Already Have Your Ticket!</h2>
-              <p>Your ticket was already sent to your email.</p>
+              <h2>{t('guestComplete.alreadyHaveTicket')}</h2>
+              <p>{t('guestComplete.ticketAlreadySent')}</p>
               {guestData?.email && (
                 <p className="guest-complete-success-email">{guestData.email}</p>
               )}
               <div className="guest-complete-success-actions">
                 {paymentLinkCode && (
                   <button
-                    onClick={() => navigate(`/group/track/${paymentLinkCode}`)}
+                    onClick={() => navigate(buildUrl(`/group/track/${paymentLinkCode}`))}
                     className="guest-complete-submit-btn"
                   >
-                    View Reservation
+                    {t('guestComplete.viewReservation')}
                     <ArrowRight size={18} />
                   </button>
                 )}
@@ -480,17 +510,17 @@ export const GroupGuestCompletePage = () => {
           <div className="guest-complete-container">
             <div className="guest-complete-header">
               <h1>
-                {nextAction === 'pay' ? 'Pay for Ticket' : 'Complete Your Info'}
+                {nextAction === 'pay' ? t('guestComplete.titlePay') : t('guestComplete.title')}
               </h1>
               {eventInfo && (
                 <p className="guest-complete-event-name">{eventInfo.name}</p>
               )}
               <p className="guest-complete-subtitle">
                 {nextAction === 'pay'
-                  ? 'Complete your payment to receive your ticket'
+                  ? t('guestComplete.completeInfoDesc')
                   : nextAction === 'complete_data_then_pay'
-                  ? 'Enter your information, then proceed to payment'
-                  : 'Enter your information to receive your ticket'
+                  ? t('guestComplete.completeAndPayDesc')
+                  : t('guestComplete.completeDataDesc')
                 }
               </p>
             </div>
@@ -522,7 +552,7 @@ export const GroupGuestCompletePage = () => {
               <div className="guest-complete-payment">
                 <div className="guest-complete-payment-info">
                   <CreditCard size={32} />
-                  <p>Pay securely with your credit or debit card.</p>
+                  <p>{t('guestComplete.paySecurely')}</p>
                 </div>
                 <button
                   onClick={handlePayment}
@@ -532,12 +562,12 @@ export const GroupGuestCompletePage = () => {
                   {submitting ? (
                     <>
                       <Loader2 size={20} className="guest-complete-spinner" />
-                      Processing...
+                      {t('guestComplete.processing')}
                     </>
                   ) : (
                     <>
                       <CreditCard size={20} />
-                      Pay Q{guestData?.amount_due.toFixed(2)}
+                      {t('guestComplete.pay', { price: `Q${guestData?.amount_due.toFixed(2)}` })}
                     </>
                   )}
                 </button>
@@ -551,21 +581,21 @@ export const GroupGuestCompletePage = () => {
                   <div className="guest-complete-access-code-icon">
                     <Lock size={48} />
                   </div>
-                  <h2 className="guest-complete-access-code-title">Access Code Required</h2>
+                  <h2 className="guest-complete-access-code-title">{t('guestComplete.accessCodeRequired')}</h2>
                   <p className="guest-complete-access-code-desc">
-                    This ticket was paid for by the organizer. Enter the access code they shared with you to continue.
+                    {t('guestComplete.accessCodeDesc')}
                   </p>
 
                   <div className="guest-complete-form-group">
                     <label>
                       <KeyRound size={14} style={{ marginRight: '0.25rem' }} />
-                      Access Code <span className="form-field-required">*</span>
+                      {t('guestComplete.accessCode')} <span className="form-field-required">*</span>
                     </label>
                     <input
                       type="text"
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                      placeholder="Enter 6-character code"
+                      placeholder={t('guestComplete.enterCode')}
                       maxLength={6}
                       className="guest-complete-access-code-input"
                       autoComplete="off"
@@ -581,18 +611,18 @@ export const GroupGuestCompletePage = () => {
                     {verifyingCode ? (
                       <>
                         <Loader2 size={18} className="animate-spin" />
-                        Verifying...
+                        {t('guestComplete.verifying')}
                       </>
                     ) : (
                       <>
                         <Lock size={18} />
-                        Verify Code
+                        {t('guestComplete.verifyCode')}
                       </>
                     )}
                   </button>
 
                   <p className="guest-complete-access-code-hint">
-                    Don't have the code? Ask your group organizer for it.
+                    {t('guestComplete.noCode')}
                   </p>
                 </div>
               </div>
@@ -604,7 +634,7 @@ export const GroupGuestCompletePage = () => {
                 <div className="guest-complete-form-row">
                   <div className="guest-complete-form-group">
                     <label>
-                      Name <span className="form-field-required">*</span>
+                      {t('guestComplete.name')} <span className="form-field-required">*</span>
                     </label>
                     <input
                       type="text"
@@ -618,7 +648,7 @@ export const GroupGuestCompletePage = () => {
 
                   <div className="guest-complete-form-group">
                     <label>
-                      Last Name <span className="form-field-required">*</span>
+                      {t('guestComplete.lastName')} <span className="form-field-required">*</span>
                     </label>
                     <input
                       type="text"
@@ -633,7 +663,7 @@ export const GroupGuestCompletePage = () => {
 
                 <div className="guest-complete-form-group">
                   <label>
-                    Email <span className="form-field-required">*</span>
+                    {t('guestComplete.email')} <span className="form-field-required">*</span>
                   </label>
                   <input
                     type="email"
@@ -648,22 +678,20 @@ export const GroupGuestCompletePage = () => {
                 <div className="guest-complete-form-row">
                   <div className="guest-complete-form-group">
                     <label>
-                      Date of Birth <span className="form-field-required">*</span>
+                      {t('guestComplete.dateOfBirth')} <span className="form-field-required">*</span>
                     </label>
-                    <input
-                      type="date"
-                      name="birth_date"
+                    <BirthDatePicker
                       value={formData.birth_date}
-                      onChange={handleInputChange}
-                      max={new Date().toISOString().split('T')[0]}
-                      required
+                      onChange={(value) => setFormData(prev => ({ ...prev, birth_date: value }))}
+                      minAge={eventInfo?.min_age}
+                      placeholder="DD/MM/YYYY"
                     />
                   </div>
 
                   <div className="guest-complete-form-group">
                     <label>
                       <User size={14} style={{ marginRight: '0.25rem' }} />
-                      Gender <span className="form-field-required">*</span>
+                      {t('guestComplete.gender')} <span className="form-field-required">*</span>
                     </label>
                     <div className="gender-selection gender-selection-single">
                       {formData.gender === 'male' && (
@@ -676,7 +704,7 @@ export const GroupGuestCompletePage = () => {
                             checked
                             disabled
                           />
-                          <label htmlFor="gender-male" className="gender-label">Male</label>
+                          <label htmlFor="gender-male" className="gender-label">{t('guestComplete.male')}</label>
                         </div>
                       )}
                       {formData.gender === 'female' && (
@@ -689,7 +717,7 @@ export const GroupGuestCompletePage = () => {
                             checked
                             disabled
                           />
-                          <label htmlFor="gender-female" className="gender-label">Female</label>
+                          <label htmlFor="gender-female" className="gender-label">{t('guestComplete.female')}</label>
                         </div>
                       )}
                       {formData.gender === 'other' && (
@@ -702,7 +730,7 @@ export const GroupGuestCompletePage = () => {
                             checked
                             disabled
                           />
-                          <label htmlFor="gender-other" className="gender-label">Other</label>
+                          <label htmlFor="gender-other" className="gender-label">{t('guestComplete.other')}</label>
                         </div>
                       )}
                     </div>
@@ -711,22 +739,13 @@ export const GroupGuestCompletePage = () => {
 
                 <div className="guest-complete-form-group">
                   <label>
-                    Phone <span className="form-field-required">*</span>
+                    {t('guestComplete.phone')} <span className="form-field-required">*</span>
                   </label>
                   <div className="phone-input-container">
-                    <div className="phone-prefix-select">
-                      <select
-                        name="phone_prefix"
-                        value={formData.phone_prefix}
-                        onChange={handleInputChange}
-                      >
-                        {PHONE_PREFIX_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.flag} {option.value}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <PhonePrefixSelector
+                      value={formData.phone_prefix}
+                      onChange={(value) => setFormData(prev => ({ ...prev, phone_prefix: value }))}
+                    />
                     <div className="phone-number-input">
                       <input
                         type="tel"
@@ -748,16 +767,16 @@ export const GroupGuestCompletePage = () => {
                   {submitting ? (
                     <>
                       <Loader2 size={20} className="guest-complete-spinner" />
-                      {nextAction === 'complete_data_then_pay' ? 'Processing...' : 'Generating ticket...'}
+                      {nextAction === 'complete_data_then_pay' ? t('guestComplete.processing') : t('guestComplete.generatingTicket')}
                     </>
                   ) : nextAction === 'complete_data_then_pay' ? (
                     <>
-                      Continue to Pay Q{guestData?.amount_due.toFixed(2)}
+                      {t('guestComplete.continueToPay', { price: `Q${guestData?.amount_due.toFixed(2)}` })}
                       <ArrowRight size={18} />
                     </>
                   ) : (
                     <>
-                      Complete & Get Ticket
+                      {t('guestComplete.completeAndGetTicket')}
                       <ArrowRight size={18} />
                     </>
                   )}

@@ -1,6 +1,7 @@
 // ticket-type-card.tsx - ACTUALIZADO PROFESIONAL
-import { NavLink } from 'react-router-dom';
-import { ShoppingCart, User, Users, Wine, CheckCircle } from 'lucide-react';
+import { NavLink, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ArrowRight, ShoppingCart, User, Users, Wine, CheckCircle } from 'lucide-react';
 import './ticket-type-card.css';
 import type { TicketType } from '../../types/types';
 
@@ -16,20 +17,20 @@ const getCurrencySymbol = (currency: string): string => {
 };
 
 export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
+    const { t } = useTranslation('common');
+    const { lang } = useParams<{ lang: string }>();
+    const currentLang = lang || 'es';
+
     const getTicketIcon = () => {
-        const name = ticket.ticket_name.toLowerCase();
-        if (name.includes('women')) return <User className="ticket-icon-women" />;
-        if (name.includes('men')) return <User className="ticket-icon-men" />;
-        if (name.includes('group')) return <Users className="ticket-icon-group" />;
-        return null;
+        const isGroup = ticket.is_group || ticket.ticket_name.toLowerCase().includes('group');
+        if (isGroup) return <Wine className="ticket-icon-blue" />;
+        return <User className="ticket-icon-purple" />;
     };
 
     const getTicketClass = () => {
-        const name = ticket.ticket_name.toLowerCase();
-        if (name.includes('women')) return 'ticket-type-card ticket-women';
-        if (name.includes('men')) return 'ticket-type-card ticket-men';
-        if (name.includes('group')) return 'ticket-type-card ticket-group';
-        return 'ticket-type-card';
+        const isGroup = ticket.is_group || ticket.ticket_name.toLowerCase().includes('group');
+        if (isGroup) return 'ticket-type-card ticket-group-blue';
+        return 'ticket-type-card ticket-individual-purple';
     };
 
     const isGroupTicket = ticket.is_group || ticket.ticket_name.toLowerCase().includes('group');
@@ -38,7 +39,7 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
     if (isGroupTicket) {
         return (
             <NavLink
-                to={`/event/${ticket.slug}/group/setup`}
+                to={`/${currentLang}/event/${ticket.slug}/group/setup`}
                 className={getTicketClass()}
             >
                 <div className="ticket-type-card-header">
@@ -48,7 +49,7 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
                     </div>
                     {ticket.ticket_quantity < 15 && (
                         <p className="ticket-type-card-availability">
-                            Only {ticket.ticket_quantity} left
+                            {t('ticketCard.onlyLeft', { count: ticket.ticket_quantity })}
                         </p>
                     )}
                 </div>
@@ -58,26 +59,27 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
                 <div className="ticket-group-features">
                     <div className="ticket-group-feature">
                         <CheckCircle />
-                        <span>Premium bottle service available</span>
+                        <span>{t('ticketCard.premiumBottle')}</span>
                     </div>
                     <div className="ticket-group-feature">
                         <CheckCircle />
-                        <span>Dedicated group area</span>
+                        <span>{t('ticketCard.dedicatedArea')}</span>
                     </div>
                     <div className="ticket-group-feature">
                         <CheckCircle />
-                        <span>Easy payment split</span>
+                        <span>{t('ticketCard.easyPayment')}</span>
                     </div>
                 </div>
                 
                 <div className="ticket-type-card-footer">
                     <div className="ticket-group-capacity">
                         <Users size={16} />
-                        <span>{ticket.min_quantity || 4}-{ticket.max_quantity || 12} guests</span>
+                        <span>{t('ticketCard.guests', { min: ticket.min_quantity || 4, max: ticket.max_quantity || 12 })}</span>
                     </div>
                     <div className="ticket-type-card-button">
                         <Wine />
-                        Reserve Now
+                        {t('ticketCard.reserveNow')}
+                        <ArrowRight />
                     </div>
                 </div>
             </NavLink>
@@ -86,7 +88,7 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
 
     return (
         <NavLink 
-            to={`/event/${ticket.slug}/tickets/${ticket.ticket_type_id}`} 
+            to={`/${currentLang}/event/${ticket.slug}/tickets/${ticket.ticket_type_id}`} 
             className={getTicketClass()}
         >
             <div className="ticket-type-card-header">
@@ -96,7 +98,7 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
                 </div>
                 {ticket.ticket_quantity < 15 && (
                     <p className="ticket-type-card-availability">
-                        Only {ticket.ticket_quantity} left
+                        {t('ticketCard.onlyLeft', { count: ticket.ticket_quantity })}
                     </p>
                 )}
             </div>
@@ -107,7 +109,8 @@ export const TicketTypeCard = ({ ticket }: { ticket: TicketType }) => {
                 <p className="ticket-type-card-price">{currencySymbol}{ticket.ticket_price.toFixed(2)}</p>
                 <div className="ticket-type-card-button">
                     <ShoppingCart />
-                    Buy
+                    {t('ticketCard.buy')}
+                    <ArrowRight />
                 </div>
             </div>
         </NavLink>

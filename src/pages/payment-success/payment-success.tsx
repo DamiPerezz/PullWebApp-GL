@@ -1,27 +1,63 @@
 // pages/payment-success-page.tsx
-// SECURITY: Using apiClient for consistent cookie-based authentication
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+// SECURITY: Strict UUID validation and sanitization to prevent XSS/IDOR attacks
+import { useEffect, useState, useMemo } from 'react';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '../../components/layout/layout';
-import { CheckCircle, Clock, ArrowRight, Copy, Check } from 'lucide-react';
+import { CheckCircle, Clock, ArrowRight, Copy, Check, AlertCircle, Home } from 'lucide-react';
 import { apiClient } from '../../utils/axios';
 import './payment-success.css';
 
+// SECURITY: Strict UUID v4 validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * SECURITY: Validates and sanitizes an order ID parameter
+ * - Only accepts valid UUID v4 format
+ * - Returns null for any invalid input (prevents XSS/injection)
+ * - UUIDs have 122 bits of entropy (prevents IDOR enumeration)
+ */
+const validateOrderId = (rawInput: string | null): string | null => {
+  if (!rawInput) return null;
+
+  // Trim and lowercase for consistent validation
+  const sanitized = rawInput.trim().toLowerCase();
+
+  // Strict UUID v4 format check
+  if (!UUID_REGEX.test(sanitized)) {
+    console.warn('SECURITY: Invalid order_id format rejected');
+    return null;
+  }
+
+  return sanitized;
+};
+
 export const PaymentSuccessPage = () => {
+  const { t, i18n } = useTranslation('payment');
+  const { lang } = useParams<{ lang: string }>();
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('order_id');
   const navigate = useNavigate();
+
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
+  // SECURITY: Validate and sanitize order_id immediately
+  const orderId = useMemo(() => {
+    return validateOrderId(searchParams.get('order_id'));
+  }, [searchParams]);
 
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    // SECURITY: Only make API call with validated UUID
     if (!orderId) {
       setLoading(false);
       return;
     }
 
+    // SECURITY: orderId is already validated as UUID, safe to use in URL
     apiClient.get(`/orders/details/${orderId}`)
       .then(response => {
         setOrderData(response.data);
@@ -33,10 +69,13 @@ export const PaymentSuccessPage = () => {
   }, [orderId]);
 
   const handleCopyReference = () => {
-    const reference = orderData?.order?.order_number || orderId;
-    navigator.clipboard.writeText(reference);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    // SECURITY: Prefer server-provided order_number, fallback to validated UUID prefix
+    const reference = orderData?.order?.order_number || (orderId ? orderId.slice(0, 8).toUpperCase() : '');
+    if (reference) {
+      navigator.clipboard.writeText(reference);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   if (loading) {
@@ -45,25 +84,34 @@ export const PaymentSuccessPage = () => {
         <div className="payment-success-wrapper">
           <div className="payment-success-loading">
             <div className="payment-success-spinner"></div>
-            <p>Loading your order...</p>
+            <p>{t('loading.order')}</p>
           </div>
         </div>
       </Layout>
     );
   }
 
+  // SECURITY: Show error for missing or invalid order_id
   if (!orderId) {
     return (
       <Layout>
         <div className="payment-success-wrapper">
-          <div className="payment-success-container">
-            <div className="payment-success-card payment-error-card">
-              <div className="payment-error-icon">⚠️</div>
-              <h1>Order Not Found</h1>
-              <p>Unable to find your order information</p>
-              <button onClick={() => navigate('/')} className="payment-success-button payment-success-button-primary">
-                Return to Home
-              </button>
+          <div className="payment-error-bg-overlay" />
+          <div className="payment-success-content">
+            <div className="payment-success-container">
+              <div className="payment-error-card">
+                <div className="payment-error-icon-wrapper">
+                  <AlertCircle className="payment-error-icon" />
+                </div>
+                <h1 className="payment-error-title">{t('error.orderNotFound')}</h1>
+                <p className="payment-error-description">
+                  {t('error.orderNotFoundDesc')}
+                </p>
+                <button onClick={() => navigate(buildUrl('/'))} className="payment-success-button payment-success-button-primary">
+                  <Home />
+                  {t('error.returnToHome')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -71,9 +119,13 @@ export const PaymentSuccessPage = () => {
     );
   }
 
+  // SECURITY: Use only server-provided data for display, with validated orderId as fallback
   const orderNumber = orderData?.order?.order_number;
   const eventImage = orderData?.event?.image;
   const venueSlug = orderData?.event?.venue_slug || orderData?.venue?.slug;
+
+  // SECURITY: Display reference - prefer server data, fallback to validated UUID prefix
+  const displayReference = orderNumber || orderId.slice(0, 8).toUpperCase();
 
   return (
     <Layout>
@@ -96,111 +148,106 @@ export const PaymentSuccessPage = () => {
               <div className="payment-success-icon-wrapper">
                 <CheckCircle className="payment-success-icon" />
               </div>
-              <h1 className="payment-success-title">Payment Authorized!</h1>
+              <h1 className="payment-success-title">{t('success.title')}</h1>
               <div className="payment-success-description">
-                <p>Your payment has been successfully authorized and is being held securely.</p>
+                <p>{t('success.description')}</p>
               </div>
             </div>
 
-            {/* Main Content Card */}
-            <div className="payment-success-main-card">
-              <h2 className="payment-success-section-title">Order Information</h2>
-
-              {/* Two Column Grid */}
-              <div className="payment-success-grid">
-                {/* Left Column - Pending Staff Approval */}
-                <div className="payment-success-grid-left">
-                  <div className="payment-status-card">
-                    <div className="payment-status-header">
-                      <Clock />
-                      <span>Pending Staff Approval</span>
-                    </div>
-                    <div className="payment-status-body">
-                      <p>
-                        Your order is now waiting for staff confirmation. Once approved, your payment will be processed and you'll receive your tickets via email.
-                      </p>
-                      <div className="payment-status-timeline">
-                        <div className="timeline-step timeline-step-completed">
-                          <div className="timeline-dot"></div>
-                          <div className="timeline-content">
-                            <h4>Payment Authorized</h4>
-                            <p>Your payment is securely held</p>
-                          </div>
+            {/* Two Column Grid */}
+            <div className="payment-success-grid">
+              {/* Left Column - Pending Staff Approval */}
+              <div className="payment-success-grid-left">
+                <div className="payment-status-card">
+                  <div className="payment-status-header">
+                    <Clock />
+                    <span>{t('success.pendingApproval')}</span>
+                  </div>
+                  <div className="payment-status-body">
+                    <p>
+                      {t('success.pendingDescription')}
+                    </p>
+                    <div className="payment-status-timeline">
+                      <div className="timeline-step timeline-step-completed">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                          <h4>{t('success.timeline.paymentAuthorized')}</h4>
+                          <p>{t('success.timeline.paymentAuthorizedDesc')}</p>
                         </div>
-                        <div className="timeline-step timeline-step-current">
-                          <div className="timeline-dot"></div>
-                          <div className="timeline-content">
-                            <h4>Staff Review</h4>
-                            <p>Staff is reviewing your order</p>
-                          </div>
+                      </div>
+                      <div className="timeline-step timeline-step-current">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                          <h4>{t('success.timeline.staffReview')}</h4>
+                          <p>{t('success.timeline.staffReviewDesc')}</p>
                         </div>
-                        <div className="timeline-step timeline-step-pending">
-                          <div className="timeline-dot"></div>
-                          <div className="timeline-content">
-                            <h4>Tickets Sent</h4>
-                            <p>You'll receive tickets via email</p>
-                          </div>
+                      </div>
+                      <div className="timeline-step timeline-step-pending">
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                          <h4>{t('success.timeline.ticketsSent')}</h4>
+                          <p>{t('success.timeline.ticketsSentDesc')}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Right Column - Order Reference & Important Info */}
-                <div className="payment-success-grid-right">
-                  {/* Order Reference Card */}
-                  <div className="payment-order-reference">
-                    <p className="payment-order-reference-label">Order Reference</p>
-                    <div className="payment-order-reference-content">
-                      <p className="payment-order-reference-number">
-                        {orderNumber || orderId.slice(0, 8).toUpperCase()}
-                      </p>
-                      <button
-                        onClick={handleCopyReference}
-                        className={`payment-order-reference-copy ${copied ? 'copied' : ''}`}
-                      >
-                        {copied ? (
-                          <>
-                            <Check />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Copy />
-                            Copy Reference
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <p className="payment-order-reference-hint">
-                      Save this reference number. You can use it to track your order status or contact support.
+              {/* Right Column - Order Reference & Important Info */}
+              <div className="payment-success-grid-right">
+                {/* Order Reference Card */}
+                <div className="payment-order-reference">
+                  <p className="payment-order-reference-label">{t('success.orderReference')}</p>
+                  <div className="payment-order-reference-content">
+                    <p className="payment-order-reference-number">
+                      {displayReference}
                     </p>
+                    <button
+                      onClick={handleCopyReference}
+                      className={`payment-order-reference-copy ${copied ? 'copied' : ''}`}
+                    >
+                      {copied ? (
+                        <>
+                          <Check />
+                          {t('success.copied')}
+                        </>
+                      ) : (
+                        <>
+                          <Copy />
+                          {t('success.copyReference')}
+                        </>
+                      )}
+                    </button>
                   </div>
+                  <p className="payment-order-reference-hint">
+                    {t('success.referenceHint')}
+                  </p>
+                </div>
 
-                  {/* Important Information */}
-                  <div className="payment-info-box payment-info-box-blue">
-                    <h3>Important Information</h3>
-                    <ul>
-                      <li>Your payment is <strong>authorized but not yet charged</strong></li>
-                      <li>Staff will review your order shortly (usually within 24 hours)</li>
-                      <li>If approved, payment will be processed and tickets sent to your email</li>
-                      <li>If rejected, the authorization will be cancelled and funds returned</li>
-                      <li>You'll receive email updates about your order status</li>
-                    </ul>
-                  </div>
+                {/* Important Information */}
+                <div className="payment-info-box payment-info-box-blue">
+                  <h3>{t('success.importantInfo')}</h3>
+                  <ul>
+                    <li dangerouslySetInnerHTML={{ __html: t('success.infoList.authorized') }} />
+                    <li>{t('success.infoList.staffReview')}</li>
+                    <li>{t('success.infoList.approved')}</li>
+                    <li>{t('success.infoList.rejected')}</li>
+                    <li>{t('success.infoList.emailUpdates')}</li>
+                  </ul>
                 </div>
               </div>
+            </div>
 
-              {/* Action Button */}
-              <div className="payment-success-actions">
-                <button
-                  onClick={() => navigate(venueSlug ? `/venues/${venueSlug}` : '/')}
-                  className="payment-success-button payment-success-button-primary"
-                >
-                  Return to Venue
-                  <ArrowRight />
-                </button>
-              </div>
+            {/* Action Button */}
+            <div className="payment-success-actions">
+              <button
+                onClick={() => navigate(buildUrl(venueSlug ? `/venues/${venueSlug}/events` : '/'))}
+                className="payment-success-button payment-success-button-primary"
+              >
+                {t('success.returnToVenue')}
+                <ArrowRight />
+              </button>
             </div>
           </div>
         </div>

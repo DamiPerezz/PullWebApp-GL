@@ -1,4 +1,5 @@
 import QRCode from "react-qr-code";
+import { useTranslation } from "react-i18next";
 import "./qr-card.css";
 import type { PurchasedTicketInfo } from "../../types/types";
 import { Ticket, Download, CheckCircle } from "lucide-react";
@@ -9,11 +10,14 @@ interface QrCardProps {
 }
 
 export const QrCard = ({ info, onDownload }: QrCardProps) => {
-  // Formatear fecha
+  const { t, i18n } = useTranslation('common');
+
+  // Format date based on current locale
   const formatDate = (dateStr: string) => {
-    if (!dateStr) return "Date TBD";
+    if (!dateStr) return t('qr.dateTbd');
     try {
-      return new Date(dateStr).toLocaleDateString("en-US", {
+      const locale = i18n.language === 'es' ? 'es-GT' : 'en-US';
+      return new Date(dateStr).toLocaleDateString(locale, {
         weekday: "long",
         month: "long",
         day: "numeric",
@@ -34,20 +38,20 @@ export const QrCard = ({ info, onDownload }: QrCardProps) => {
             <span>Ticket #{info.qr_token.slice(0, 8)}</span>
           </div>
           <h3 className="qr-card-modern-title">
-            {info.ticket_type || "General Admission"}
+            {info.ticket_type || t('qr.generalAdmission')}
           </h3>
         </div>
         <div className="qr-card-modern-badge">
           <CheckCircle size={12} />
-          <span>Valid</span>
+          <span>{t('qr.valid')}</span>
         </div>
       </div>
 
       {/* QR Code */}
       <div className="qr-card-modern-qr">
         <div className="qr-card-modern-qr-wrapper">
-          <QRCode 
-            value={info.qr_token} 
+          <QRCode
+            value={info.qr_token}
             size={192}
             bgColor="#000000"
             fgColor="#FFFFFF"
@@ -59,23 +63,23 @@ export const QrCard = ({ info, onDownload }: QrCardProps) => {
       {/* Info Grid */}
       <div className="qr-card-modern-info">
         <div className="qr-card-modern-info-item">
-          <span className="qr-card-modern-info-label">Name</span>
+          <span className="qr-card-modern-info-label">{t('qr.name')}</span>
           <span className="qr-card-modern-info-value">{info.owner_full_name}</span>
         </div>
-        
+
         <div className="qr-card-modern-info-item">
-          <span className="qr-card-modern-info-label">Event</span>
+          <span className="qr-card-modern-info-label">{t('qr.event')}</span>
           <span className="qr-card-modern-info-value">{info.event_name}</span>
         </div>
-        
+
         <div className="qr-card-modern-info-item">
-          <span className="qr-card-modern-info-label">Date</span>
+          <span className="qr-card-modern-info-label">{t('qr.date')}</span>
           <span className="qr-card-modern-info-value">{formatDate(info.event_date)}</span>
         </div>
-        
+
         {info.location && (
           <div className="qr-card-modern-info-item">
-            <span className="qr-card-modern-info-label">Location</span>
+            <span className="qr-card-modern-info-label">{t('qr.location')}</span>
             <span className="qr-card-modern-info-value">{info.location}</span>
           </div>
         )}
@@ -83,12 +87,12 @@ export const QrCard = ({ info, onDownload }: QrCardProps) => {
 
       {/* Download Button */}
       {onDownload && (
-        <button 
+        <button
           onClick={onDownload}
           className="qr-card-modern-download"
         >
           <Download size={16} />
-          <span>Download PDF</span>
+          <span>{t('qr.downloadPdf')}</span>
         </button>
       )}
     </div>

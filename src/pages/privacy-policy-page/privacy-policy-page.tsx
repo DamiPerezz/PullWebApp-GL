@@ -1,18 +1,31 @@
 import { Footer } from '../../components/footer/footer';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Shield, Lock, Eye, Database, Users, Globe, Mail, Building2, ChevronRight, FileText, Smartphone, Server } from 'lucide-react';
 import fondoImage from '../../assets/fondo.png';
 import '../cookie-policy-page/cookie-policy-page.css';
 import { SEO } from '../../components/seo/seo';
 
 export const PrivacyPolicyPage = () => {
+  const { t, i18n } = useTranslation('legal');
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
+
+  // Helper function to build language-prefixed URLs
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
   return (
     <div className="cookie-policy-page">
       <SEO
-        title="Política de Privacidad"
-        description="Política de privacidad de Pull Events. Conoce cómo protegemos y manejamos tus datos personales en nuestra plataforma de eventos en Guatemala."
-        keywords="privacidad, política de privacidad, protección de datos, pull events, guatemala, GDPR"
-        canonicalUrl="https://web.pullevents.com/privacy"
+        title={t('privacyPolicy.title')}
+        description={currentLang === 'es'
+          ? "Política de privacidad de Pull Events. Conoce cómo protegemos y manejamos tus datos personales en nuestra plataforma de eventos en Guatemala."
+          : "Pull Events Privacy Policy. Learn how we protect and handle your personal data on our event platform in Guatemala."
+        }
+        keywords={currentLang === 'es'
+          ? "privacidad, política de privacidad, protección de datos, pull events, guatemala, GDPR"
+          : "privacy, privacy policy, data protection, pull events, guatemala, GDPR"
+        }
         noIndex={false}
       />
       {/* Background with blur */}
@@ -180,7 +193,7 @@ export const PrivacyPolicyPage = () => {
                 </li>
                 <li>
                   <strong>Cookies and similar technologies:</strong> See our{' '}
-                  <Link to="/cookie-policy">Cookie Policy</Link> for more information.
+                  <Link to={buildUrl("/cookie-policy")}>Cookie Policy</Link> for more information.
                 </li>
               </ul>
 
@@ -504,8 +517,8 @@ export const PrivacyPolicyPage = () => {
               We reserve the right to modify it to adapt to legislative changes or
               new features. We will notify you of any relevant changes.
             </p>
-            <Link to="/" className="back-home-link">
-              Back to home page
+            <Link to={buildUrl("/venues/aurora-hall/events")} className="back-home-link">
+              {currentLang === 'es' ? 'Volver a la página principal' : 'Back to home page'}
             </Link>
           </div>
         </main>

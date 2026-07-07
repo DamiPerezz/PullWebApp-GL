@@ -1,8 +1,10 @@
+/* wallet-page.css - Redesigned Professional Layout */
+
 .wallet-page {
   flex: 1;
-  background: #0a0a0f;
+  background: transparent;
   position: relative;
-  padding-top: 64px !important; /* Navbar height */
+  padding-top: 64px !important;
 }
 
 .wallet-page-bg-blur {
@@ -11,8 +13,16 @@
   background-image: url('../../assets/fondo-2.png');
   background-size: cover;
   background-position: center;
-  filter: blur(24px) brightness(0.25);
+  filter: blur(40px) brightness(0.4);
+  transform: scale(1.1);
   z-index: 0;
+}
+
+.wallet-page-bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
 }
 
 .wallet-page-bg-blur::after {
@@ -21,20 +31,20 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 150px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+  height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
   pointer-events: none;
 }
 
 .wallet-page__container {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 1rem 1.5rem 3rem;
+  padding: 2rem 1.5rem 3rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .wallet-page__header {
@@ -42,7 +52,6 @@
   align-items: center;
   gap: 0.75rem;
   color: rgb(167, 139, 250);
-  margin-top: 2.5rem;
 }
 
 .wallet-page__title {
@@ -53,9 +62,12 @@
   letter-spacing: -0.02em;
 }
 
+/* ========================================
+   LOADING STATE
+   ======================================== */
 .wallet-page__loading {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,7 +81,6 @@
   font-weight: 300;
   color: rgba(255, 255, 255, 0.8);
   margin: 0;
-  letter-spacing: -0.01em;
 }
 
 .wallet-page__spinner {
@@ -82,27 +93,39 @@
   to { transform: rotate(360deg); }
 }
 
-.wallet-page__profile {
+/* ========================================
+   UNIFIED CARD (Profile + Tickets + Spending)
+   ======================================== */
+.wallet-page__unified-card {
   background: rgba(15, 15, 21, 0.4);
   backdrop-filter: blur(48px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1rem;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wallet-page__profile-section {
+  padding-bottom: 1.5rem;
 }
 
 .wallet-page__profile-header {
   display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  align-items: center;
+  gap: 1rem;
+}
+
+.wallet-page__profile-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .wallet-page__profile-avatar {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, rgb(139, 92, 246), rgb(79, 70, 229));
   display: flex;
@@ -110,7 +133,12 @@
   justify-content: center;
   color: white;
   overflow: hidden;
-  flex-shrink: 0;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.wallet-page__profile-avatar svg {
+  width: 36px;
+  height: 36px;
 }
 
 .wallet-page__profile-avatar img {
@@ -119,116 +147,268 @@
   object-fit: cover;
 }
 
+.wallet-page__profile-vip-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, rgb(251, 191, 36), rgb(245, 158, 11));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 2px solid rgba(15, 15, 21, 0.8);
+}
+
 .wallet-page__profile-info {
   flex: 1;
+  min-width: 0;
+}
+
+.wallet-page__profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.125rem;
 }
 
 .wallet-page__profile-name {
-  font-size: 1.75rem;
-  font-weight: 400;
+  font-size: 1.375rem;
+  font-weight: 600;
   color: white;
-  margin: 0 0 0.5rem 0;
-  letter-spacing: -0.02em;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wallet-page__profile-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.wallet-page__profile-tier-badge--regular {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: rgb(196, 181, 253);
+}
+
+.wallet-page__profile-tier-badge--vip {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: rgb(251, 191, 36);
 }
 
 .wallet-page__profile-email {
   font-size: 0.9375rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 0.75rem 0;
-}
-
-.wallet-page__profile-tier {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.875rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 0.375rem 0;
 }
 
-.wallet-page__profile-tier--regular {
-  background: linear-gradient(to right, rgba(52, 211, 153, 0.15), rgba(16, 185, 129, 0.15));
-  border: 1px solid rgba(52, 211, 153, 0.3);
-  color: rgb(52, 211, 153);
-}
-
-.wallet-page__profile-tier--vip {
-  background: linear-gradient(to right, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  color: rgb(251, 191, 36);
-}
-
-.wallet-page__stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.wallet-page__stat {
+.wallet-page__profile-member-since {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
 }
 
-.wallet-page__stat:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(139, 92, 246, 0.3);
+.wallet-page__profile-member-since svg {
+  color: rgb(139, 92, 246);
 }
 
-.wallet-page__stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 0.75rem;
+.wallet-page__profile-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 0.5rem;
+  color: rgb(196, 181, 253);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.wallet-page__profile-edit-btn:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+  color: white;
+}
+
+/* ========================================
+   QUICK STATS
+   ======================================== */
+.wallet-page__quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 1.75rem 0;
+  margin-top: 0.75rem;
+}
+
+.wallet-page__quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wallet-page__quick-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.wallet-page__stat-icon--purple {
+.wallet-page__quick-stat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wallet-page__quick-stat-icon--purple {
   background: rgba(139, 92, 246, 0.2);
   color: rgb(167, 139, 250);
 }
 
-.wallet-page__stat-icon--green {
+.wallet-page__quick-stat-icon--green {
   background: rgba(16, 185, 129, 0.2);
   color: rgb(52, 211, 153);
 }
 
-.wallet-page__stat-icon--blue {
+.wallet-page__quick-stat-icon--blue {
   background: rgba(59, 130, 246, 0.2);
   color: rgb(96, 165, 250);
 }
 
-.wallet-page__stat-icon--orange {
+.wallet-page__quick-stat-icon--orange {
   background: rgba(245, 158, 11, 0.2);
   color: rgb(251, 191, 36);
 }
 
-.wallet-page__stat-content {
-  flex: 1;
+.wallet-page__quick-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
-.wallet-page__stat-label {
-  font-size: 0.8125rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 0.25rem 0;
+.wallet-page__quick-stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1;
 }
 
-.wallet-page__stat-value {
-  font-size: 1.5rem;
+.wallet-page__quick-stat-label {
+  font-size: 0.75rem;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* ========================================
+   PROFILE DETAILS (inside unified card)
+   ======================================== */
+.wallet-page__profile-details {
+  padding-top: 1rem;
+}
+
+.wallet-page__section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: rgb(167, 139, 250);
+}
+
+.wallet-page__section-title {
+  font-size: 1.125rem;
+  font-weight: 500;
   color: white;
   margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wallet-page__details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.wallet-page__detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.625rem;
+}
+
+.wallet-page__detail-item .wallet-page__detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wallet-page__detail-icon {
+  color: rgb(139, 92, 246);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.wallet-page__detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.wallet-page__detail-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.wallet-page__detail-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  word-break: break-word;
+}
+
+.wallet-page__tags-section {
+  margin-top: 1.25rem;
+}
+
+.wallet-page__tags-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.75rem;
 }
 
 .wallet-page__tags {
@@ -248,30 +428,44 @@
   text-transform: capitalize;
 }
 
-/* Venue Spending Section */
-.wallet-page__venue-spending {
-  background: rgba(15, 15, 21, 0.4);
-  backdrop-filter: blur(48px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+/* ========================================
+   TICKETS SECTION (inside unified card)
+   ======================================== */
+.wallet-page__tickets-section {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.wallet-page__section-header {
+.wallet-page__tickets-section .wallet-page__tickets-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  color: rgb(167, 139, 250);
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.wallet-page__section-title {
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: white;
-  margin: 0;
-  letter-spacing: -0.01em;
+.wallet-page__empty--compact {
+  padding: 2.5rem 1.5rem;
+}
+
+.wallet-page__empty--compact svg {
+  margin-bottom: 1rem;
+}
+
+.wallet-page__tickets-section .wallet-page__section-header {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   SPENDING SECTION (inside unified card)
+   ======================================== */
+.wallet-page__spending-section {
+  padding-top: 1.5rem;
+}
+
+.wallet-page__spending-section .wallet-page__section-header {
+  margin-bottom: 1rem;
 }
 
 .wallet-page__spending-grid {
@@ -365,32 +559,9 @@
   color: white;
 }
 
-/* Tickets Section */
-.wallet-page__tickets {
-  background: rgba(15, 15, 21, 0.4);
-  backdrop-filter: blur(48px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-}
-
-.wallet-page__tickets-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.wallet-page__tickets-title {
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: white;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
+/* ========================================
+   TICKETS HEADER & TABS
+   ======================================== */
 
 .wallet-page__tabs {
   display: flex;
@@ -401,12 +572,12 @@
 }
 
 .wallet-page__tab {
-  padding: 0.625rem 1.25rem;
+  padding: 0.5rem 1rem;
   background: transparent;
   border: none;
   border-radius: 0.5rem;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -466,56 +637,35 @@
 }
 
 .wallet-page__tickets-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-/* Pagination */
-.wallet-page__pagination {
   display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
 }
 
-.wallet-page__pagination-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.625rem;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  transition: all 0.3s ease;
+.wallet-page__tickets-grid::-webkit-scrollbar {
+  height: 6px;
 }
 
-.wallet-page__pagination-btn:hover:not(:disabled) {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
-  color: rgb(167, 139, 250);
+.wallet-page__tickets-grid::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.wallet-page__pagination-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.wallet-page__tickets-grid::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
 }
 
-.wallet-page__pagination-info {
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  min-width: 60px;
-  text-align: center;
+.wallet-page__tickets-grid .wallet-page__ticket-card {
+  flex: 0 0 280px;
+  min-width: 280px;
 }
 
-/* Professional Ticket Card - Compact Design */
+/* ========================================
+   TICKET CARD
+   ======================================== */
 .wallet-page__ticket-card {
   background: linear-gradient(135deg, rgba(20, 20, 28, 0.95), rgba(15, 15, 21, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -524,7 +674,6 @@
   transition: all 0.3s ease;
   position: relative;
 }
-
 
 .wallet-page__ticket-card:hover {
   border-color: rgba(139, 92, 246, 0.4);
@@ -682,17 +831,6 @@
   height: 14px;
 }
 
-.wallet-page__ticket-action--view {
-  background: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  color: rgb(96, 165, 250);
-}
-
-.wallet-page__ticket-action--view:hover {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
 .wallet-page__ticket-action--download {
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.25);
@@ -704,23 +842,306 @@
   border-color: rgba(139, 92, 246, 0.4);
 }
 
+/* ========================================
+   PAGINATION
+   ======================================== */
+.wallet-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.wallet-page__pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wallet-page__pagination-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: rgb(167, 139, 250);
+}
+
+.wallet-page__pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.wallet-page__pagination-info {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* ========================================
+   EDIT PROFILE MODAL
+   ======================================== */
+.wallet-page__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.wallet-page__modal {
+  background: rgba(15, 15, 21, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet-page__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-page__modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.wallet-page__modal-close {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wallet-page__modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.wallet-page__modal-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wallet-page__form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.wallet-page__form-row--names {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.wallet-page__form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Phone Input Container - Grid Layout */
+.wallet-page__phone-input-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.wallet-page__phone-input-container .wallet-page__form-input {
+  width: 100%;
+}
+
+/* Gender Selection - Horizontal Pills */
+.wallet-page__gender-selection {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.wallet-page__gender-option {
+  position: relative;
+  flex: 1;
+}
+
+.wallet-page__gender-option > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wallet-page__gender-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.wallet-page__gender-option > input[type="radio"]:checked + .wallet-page__gender-label {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: white;
+}
+
+.wallet-page__gender-label:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.wallet-page__form-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wallet-page__form-input,
+.wallet-page__form-select {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.wallet-page__form-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.wallet-page__form-input:focus,
+.wallet-page__form-select:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.wallet-page__form-select {
+  cursor: pointer;
+}
+
+.wallet-page__form-select option {
+  background: #1a1a24;
+  color: white;
+}
+
+.wallet-page__modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-page__modal-cancel,
+.wallet-page__modal-save {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wallet-page__modal-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wallet-page__modal-cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.wallet-page__modal-save {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: rgb(196, 181, 253);
+}
+
+.wallet-page__modal-save:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  color: white;
+}
+
+.wallet-page__modal-cancel:disabled,
+.wallet-page__modal-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
 @media (max-width: 1024px) {
-  .wallet-page__tickets-grid {
+  .wallet-page__quick-stats {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 }
 
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
 @media (max-width: 768px) {
   .wallet-page__container {
-    padding: 0.5rem 1.5rem 2.5rem;
+    padding: 1.5rem 1.5rem 2.5rem;
   }
 
   .wallet-page__title {
     font-size: 1.75rem;
-  }
-
-  .wallet-page__header {
-    margin-top: 2rem;
   }
 
   .wallet-page__header svg {
@@ -728,91 +1149,177 @@
     height: 24px;
   }
 
-  .wallet-page__profile,
-  .wallet-page__tickets,
-  .wallet-page__venue-spending {
-    padding: 1.5rem;
-  }
-
   .wallet-page__profile-header {
     flex-direction: column;
-    align-items: center;
     text-align: center;
+    gap: 0.75rem;
   }
 
-  .wallet-page__stats {
+  .wallet-page__profile-name-row {
+    justify-content: center;
+  }
+
+  .wallet-page__profile-member-since {
+    justify-content: center;
+  }
+
+  .wallet-page__profile-edit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wallet-page__quick-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wallet-page__details-grid {
+    grid-template-columns: 1fr;
   }
 
   .wallet-page__spending-grid {
     grid-template-columns: 1fr;
   }
 
-  .wallet-page__tickets-header {
+  .wallet-page__tickets-section .wallet-page__tickets-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .wallet-page__tickets-grid {
-    grid-template-columns: 1fr;
+  .wallet-page__tickets-grid .wallet-page__ticket-card {
+    flex: 0 0 260px;
+    min-width: 260px;
   }
 
   .wallet-page__ticket-preview {
     height: 160px;
   }
 
-  .wallet-page__pagination {
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
+  .wallet-page__form-row {
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .wallet-page__pagination-btn {
-    width: 36px;
-    height: 36px;
+  .wallet-page__form-row--names {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
   }
 
-  .wallet-page__pagination-info {
+  .wallet-page__phone-input-container {
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+  }
+
+  .wallet-page__gender-selection {
+    gap: 0.5rem;
+  }
+
+  .wallet-page__gender-label {
+    padding: 0.75rem 0.875rem;
     font-size: 0.875rem;
   }
 }
 
 @media (max-width: 640px) {
   .wallet-page {
-    padding-top: 56px !important; /* Mobile navbar height */
+    padding-top: 56px !important;
   }
 
   .wallet-page__container {
-    padding: 0.5rem 1.1rem 2.5rem;
+    padding: 1.5rem 1.1rem 2.5rem;
   }
 
   .wallet-page__title {
     font-size: 1.5rem;
   }
 
-  .wallet-page__header {
-    margin-top: 1.5rem;
-  }
-
   .wallet-page__header svg {
     width: 22px;
     height: 22px;
+  }
+
+  .wallet-page__unified-card {
+    padding: 1rem;
+  }
+
+  .wallet-page__profile-section {
+    padding-bottom: 1rem;
+  }
+
+  .wallet-page__tickets-section {
+    padding: 1rem 0;
+  }
+
+  .wallet-page__spending-section {
+    padding-top: 1rem;
+  }
+
+  .wallet-page__profile-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .wallet-page__profile-name {
+    font-size: 1rem;
+  }
+
+  .wallet-page__quick-stat-value {
+    font-size: 0.9375rem;
+  }
+
+  .wallet-page__modal {
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  .wallet-page__modal-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .wallet-page__modal-content {
+    padding: 1.25rem;
+  }
+
+  .wallet-page__modal-actions {
+    padding: 1rem 1.25rem;
+    flex-direction: column-reverse;
+  }
+
+  .wallet-page__form-row--names {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .wallet-page__gender-label {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
   }
 }
 
 @media (min-width: 1280px) {
   .wallet-page__container {
-    padding: 1rem 2rem 3rem;
+    padding: 2rem 2rem 3rem;
   }
 }
 
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
 @media (prefers-reduced-motion: reduce) {
   .wallet-page__ticket-card,
   .wallet-page__ticket-action,
-  .wallet-page__stat,
   .wallet-page__tab,
   .wallet-page__spending-card,
-  .wallet-page__pagination-btn {
+  .wallet-page__pagination-btn,
+  .wallet-page__profile-edit-btn,
+  .wallet-page__modal-cancel,
+  .wallet-page__modal-save,
+  .wallet-page__form-input,
+  .wallet-page__form-select,
+  .wallet-page__gender-label {
     transition: none !important;
+  }
+
+  .wallet-page__spinner {
+    animation: none;
   }
 }

@@ -12,8 +12,7 @@ export const formatBookingPostData = ({ id, data, date, isTable }:
         user: {
             name: data.usuarios[0].owner_name,
             surname: data.usuarios[0].owner_last_name,
-            email: data.usuarios[0].owner_email,
-            dpi: data.usuarios[0].owner_dpi
+            email: data.usuarios[0].owner_email
         },
         reservation: {
             venueId: id,

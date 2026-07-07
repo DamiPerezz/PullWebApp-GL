@@ -1,0 +1,80 @@
+{
+  "cookiePolicy": {
+    "title": "Política de Cookies",
+    "lastUpdated": "Última actualización: {{date}}",
+    "intro": "Esta Política de Cookies explica cómo Pull Events utiliza cookies y tecnologías similares.",
+    "whatAreCookies": {
+      "title": "¿Qué son las Cookies?",
+      "description": "Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas nuestro sitio web."
+    },
+    "typesOfCookies": {
+      "title": "Tipos de Cookies que Usamos",
+      "necessary": {
+        "title": "Cookies Necesarias",
+        "description": "Requeridas para que el sitio web funcione correctamente. No se pueden desactivar."
+      },
+      "analytics": {
+        "title": "Cookies Analíticas",
+        "description": "Nos ayudan a entender cómo los visitantes interactúan con nuestro sitio web."
+      },
+      "marketing": {
+        "title": "Cookies de Marketing",
+        "description": "Se utilizan para rastrear visitantes en sitios web con fines publicitarios."
+      }
+    },
+    "manageCookies": {
+      "title": "Cómo Gestionar las Cookies",
+      "description": "Puedes gestionar tus preferencias de cookies a través de nuestra configuración de cookies o la configuración de tu navegador."
+    }
+  },
+  "privacyPolicy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: {{date}}",
+    "intro": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información personal.",
+    "dataCollection": {
+      "title": "Datos que Recopilamos",
+      "description": "Recopilamos información que proporcionas directamente, como tu nombre, correo electrónico y número de teléfono al comprar entradas."
+    },
+    "dataUsage": {
+      "title": "Cómo Usamos tus Datos",
+      "description": "Usamos tus datos para procesar compras, enviar entradas y mejorar nuestros servicios."
+    },
+    "dataProtection": {
+      "title": "Protección de Datos",
+      "description": "Implementamos medidas de seguridad para proteger tu información personal."
+    },
+    "yourRights": {
+      "title": "Tus Derechos",
+      "description": "Tienes derecho a acceder, corregir o eliminar tus datos personales."
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "description": "Si tienes preguntas sobre esta política, contáctanos."
+    }
+  },
+  "termsOfService": {
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última actualización: {{date}}",
+    "intro": "Al usar Pull Events, aceptas estos términos y condiciones.",
+    "acceptance": {
+      "title": "Aceptación de Términos",
+      "description": "Al acceder a nuestra plataforma, aceptas estar sujeto a estos términos."
+    },
+    "userResponsibilities": {
+      "title": "Responsabilidades del Usuario",
+      "description": "Eres responsable de mantener la confidencialidad de tu cuenta."
+    },
+    "purchases": {
+      "title": "Compra de Entradas",
+      "description": "Todas las compras de entradas están sujetas a disponibilidad y aprobación del organizador."
+    },
+    "refunds": {
+      "title": "Política de Reembolsos",
+      "description": "Los reembolsos se manejan según la política de cada organizador de eventos."
+    },
+    "liability": {
+      "title": "Limitación de Responsabilidad",
+      "description": "Pull Events no es responsable por cancelaciones o cambios realizados por los organizadores."
+    }
+  }
+}

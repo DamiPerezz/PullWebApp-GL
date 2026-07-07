@@ -15,6 +15,7 @@ interface User {
   profile_image?: string;
   birth_date?: string;
   gender?: string;
+  created_at?: string;
   total_spent: number;
   average_spend: number;
   tags: string[];
@@ -39,6 +40,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, code: string) => Promise<void>;
   loginWithToken: (token: string) => Promise<void>;
+  loginWithGoogle: (credential: string, nonce?: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -120,6 +122,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Login with Google OAuth credential
+   * SECURITY: The credential (ID token) is verified server-side with Google
+   */
+  const loginWithGoogle = async (credential: string, nonce?: string): Promise<void> => {
+    try {
+      setIsLoading(true);
+
+      const result = await authService.loginWithGoogle(credential, nonce);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Google login failed');
+      }
+
+      if (!result.user) {
+        throw new Error('No user data received');
+      }
+
+      setUser(result.user);
+
+    } catch (error: any) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const register = async (data: RegisterData): Promise<void> => {
     try {
       setIsLoading(true);
@@ -175,6 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         login,
         loginWithToken,
+        loginWithGoogle,
         register,
         logout,
         refreshProfile,

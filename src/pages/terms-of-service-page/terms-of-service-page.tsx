@@ -1,18 +1,31 @@
 import { Footer } from '../../components/footer/footer';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FileText, CreditCard, AlertTriangle, Scale, Ban, RefreshCw, Mail, Building2, ChevronRight, Users, Ticket, Clock, CheckCircle } from 'lucide-react';
 import fondoImage from '../../assets/fondo.png';
 import '../cookie-policy-page/cookie-policy-page.css';
 import { SEO } from '../../components/seo/seo';
 
 export const TermsOfServicePage = () => {
+  const { t, i18n } = useTranslation('legal');
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
+
+  // Helper function to build language-prefixed URLs
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
   return (
     <div className="cookie-policy-page">
       <SEO
-        title="Términos y Condiciones"
-        description="Términos y condiciones de uso de Pull Events. Lee las condiciones para comprar entradas y reservar en eventos en Guatemala."
-        keywords="términos y condiciones, términos de servicio, condiciones de uso, pull events, guatemala, entradas"
-        canonicalUrl="https://web.pullevents.com/terms"
+        title={t('termsOfService.title')}
+        description={currentLang === 'es'
+          ? "Términos y condiciones de uso de Pull Events. Lee las condiciones para comprar entradas y reservar en eventos en Guatemala."
+          : "Pull Events Terms and Conditions. Read the conditions for purchasing tickets and booking events in Guatemala."
+        }
+        keywords={currentLang === 'es'
+          ? "términos y condiciones, términos de servicio, condiciones de uso, pull events, guatemala, entradas"
+          : "terms and conditions, terms of service, conditions of use, pull events, guatemala, tickets"
+        }
         noIndex={false}
       />
       {/* Background with blur */}
@@ -86,8 +99,8 @@ export const TermsOfServicePage = () => {
               <div className="info-box">
                 <strong>Related documents:</strong>
                 <ul>
-                  <li><Link to="/privacy">Privacy Policy</Link> - How we handle your data</li>
-                  <li><Link to="/cookie-policy">Cookie Policy</Link> - Use of cookies and similar technologies</li>
+                  <li><Link to={buildUrl("/privacy")}>Privacy Policy</Link> - How we handle your data</li>
+                  <li><Link to={buildUrl("/cookie-policy")}>Cookie Policy</Link> - Use of cookies and similar technologies</li>
                 </ul>
               </div>
             </div>
@@ -500,8 +513,8 @@ export const TermsOfServicePage = () => {
               These Terms and Conditions were last updated in <strong>December 2024</strong>.
               By using Pull, you confirm that you have read, understood, and accepted these Terms.
             </p>
-            <Link to="/" className="back-home-link">
-              Back to home page
+            <Link to={buildUrl("/venues/aurora-hall/events")} className="back-home-link">
+              {currentLang === 'es' ? 'Volver a la página principal' : 'Back to home page'}
             </Link>
           </div>
         </main>

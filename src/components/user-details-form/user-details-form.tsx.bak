@@ -1,0 +1,278 @@
+// user-details-form.tsx
+// SECURITY: Input validation and sanitization for user data
+import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+import "./user-details-form.css";
+import { GENDER_OPTIONS } from "../../types/types";
+import { PhonePrefixSelector } from "../phone-prefix-selector/phone-prefix-selector";
+import { BirthDatePicker, parseMinAge } from "../birth-date-picker/birth-date-picker";
+import { User } from "lucide-react";
+import {
+  sanitizeName,
+  validateEmail,
+  validatePhone,
+  validateBirthdate,
+  SECURITY_CONSTANTS
+} from "../../utils/security";
+
+type UserDetailsFormProps = {
+  quantity: number;
+  initialData?: any;
+  ticketGender?: 'male' | 'female' | null;
+  minAge?: number | string;
+  customTitle?: string;
+  sectionNumber?: number;
+  onGenderChange?: (gender: string) => void;
+};
+
+export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => void) => void }, UserDetailsFormProps>(
+  ({ quantity, initialData, ticketGender, minAge, customTitle, sectionNumber, onGenderChange }, ref) => {
+    // Parse minAge once - handles "+21", "18+", "21 years", etc.
+    const parsedMinAge = parseMinAge(minAge);
+    const [formData, setFormData] = useState<any[]>([]);
+    const [errors, setErrors] = useState<Record<number, Record<string, string>>>({});
+
+    const getAvailableGenderOptions = () => {
+      if (!ticketGender) return GENDER_OPTIONS;
+      return GENDER_OPTIONS.filter(option => option.value === ticketGender);
+    };
+
+    useEffect(() => {
+      const initialFormData = Array.from({ length: quantity }, (_, i) => {
+        const existingData = initialData?.usuarios?.[i] || initialData?.[i] || {};
+        return {
+          owner_name: existingData.owner_name || "",
+          owner_last_name: existingData.owner_last_name || "",
+          owner_email: existingData.owner_email || "",
+          owner_phone: existingData.owner_phone || "",
+          owner_phone_prefix: existingData.owner_phone_prefix || "+502",
+          owner_dpi: existingData.owner_dpi || "",
+          owner_birthdate: existingData.owner_birthdate || "",
+          owner_gender: existingData.owner_gender || ticketGender || "",
+        };
+      });
+
+      setFormData(initialFormData);
+    }, [quantity, initialData, ticketGender]);
+
+    const handleInputChange = (index: number, field: string, value: string) => {
+      // SECURITY: Sanitize input based on field type
+      let sanitizedValue = value;
+
+      if (field === "owner_name" || field === "owner_last_name") {
+        // Sanitize names - only allow letters, spaces, hyphens, apostrophes
+        sanitizedValue = sanitizeName(value);
+      } else if (field === "owner_phone") {
+        // Only allow digits for phone
+        sanitizedValue = value.replace(/\D/g, '').slice(0, SECURITY_CONSTANTS.MAX_PHONE_LENGTH);
+      } else if (field === "owner_email") {
+        // Trim and lowercase email, limit length
+        sanitizedValue = value.trim().toLowerCase().slice(0, SECURITY_CONSTANTS.MAX_EMAIL_LENGTH);
+      }
+
+      setFormData((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], [field]: sanitizedValue };
+        return updated;
+      });
+
+      setErrors((prev) => {
+        const updated = { ...prev };
+        if (updated[index]?.[field]) {
+          delete updated[index][field];
+          if (Object.keys(updated[index]).length === 0) {
+            delete updated[index];
+          }
+        }
+        return updated;
+      });
+
+      // Notify parent when gender changes
+      if (field === "owner_gender" && onGenderChange) {
+        onGenderChange(value);
+      }
+    };
+
+    const validate = (): boolean => {
+      const newErrors: Record<number, Record<string, string>> = {};
+
+      formData.forEach((data, index) => {
+        const ticketErrors: Record<string, string> = {};
+
+        // SECURITY: Validate name using sanitized check
+        if (!data.owner_name?.trim()) {
+          ticketErrors.owner_name = "Name is required";
+        } else if (data.owner_name.trim().length < 2) {
+          ticketErrors.owner_name = "Name must be at least 2 characters";
+        }
+
+        // SECURITY: Validate last name
+        if (!data.owner_last_name?.trim()) {
+          ticketErrors.owner_last_name = "Last name is required";
+        } else if (data.owner_last_name.trim().length < 2) {
+          ticketErrors.owner_last_name = "Last name must be at least 2 characters";
+        }
+
+        // SECURITY: Validate email using security utility
+        if (!data.owner_email?.trim()) {
+          ticketErrors.owner_email = "Email is required";
+        } else if (!validateEmail(data.owner_email)) {
+          ticketErrors.owner_email = "Invalid email format";
+        }
+
+        // SECURITY: Validate phone using security utility
+        if (!data.owner_phone?.trim()) {
+          ticketErrors.owner_phone = "Phone number is required";
+        } else if (!validatePhone(data.owner_phone)) {
+          ticketErrors.owner_phone = "Phone must be 6-15 digits";
+        }
+
+        // SECURITY: Validate birthdate using security utility
+        if (!data.owner_birthdate?.trim()) {
+          ticketErrors.owner_birthdate = "Date of birth is required";
+        } else {
+          const birthdateValidation = validateBirthdate(data.owner_birthdate, parsedMinAge);
+          if (!birthdateValidation.isValid && birthdateValidation.error) {
+            ticketErrors.owner_birthdate = birthdateValidation.error;
+          }
+        }
+
+        if (Object.keys(ticketErrors).length > 0) {
+          newErrors[index] = ticketErrors;
+        }
+      });
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+
+    useImperativeHandle(ref, () => ({
+      submit: (onSubmit) => {
+        if (validate()) {
+          onSubmit({ usuarios: formData });
+        }
+      },
+    }));
+
+    const availableGenderOptions = getAvailableGenderOptions();
+
+    return (
+      <div className="user-details-form-container">
+        {formData.map((data, index) => (
+          <div key={index} className="user-details-form">
+            <h4>
+              <span className="user-details-form-number">{sectionNumber ?? index + 1}</span>
+              {customTitle || `Attendee ${index + 1} Details`}
+            </h4>
+
+            <div className="sep"></div>
+
+            <div className="form-content-container">
+              <div className="form-field">
+                <label>
+                  Name <span className="form-field-required">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  value={data.owner_name}
+                  onChange={(e) => handleInputChange(index, "owner_name", e.target.value)}
+                  maxLength={50}
+                />
+                {errors[index]?.owner_name && <p className="user-form-error">{errors[index].owner_name}</p>}
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Last Name <span className="form-field-required">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter last name"
+                  value={data.owner_last_name}
+                  onChange={(e) => handleInputChange(index, "owner_last_name", e.target.value)}
+                  maxLength={50}
+                />
+                {errors[index]?.owner_last_name && <p className="user-form-error">{errors[index].owner_last_name}</p>}
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Email <span className="form-field-required">*</span>
+                </label>
+                <input
+                  type="email"
+                  placeholder="email@example.com"
+                  value={data.owner_email}
+                  onChange={(e) => handleInputChange(index, "owner_email", e.target.value)}
+                  maxLength={100}
+                />
+                {errors[index]?.owner_email && <p className="user-form-error">{errors[index].owner_email}</p>}
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Phone <span className="form-field-required">*</span>
+                </label>
+                <div className="phone-input-container">
+                  <PhonePrefixSelector
+                    value={data.owner_phone_prefix}
+                    onChange={(value) => handleInputChange(index, "owner_phone_prefix", value)}
+                  />
+                  <div className="phone-number-input">
+                    <input
+                      type="tel"
+                      placeholder="612345678"
+                      value={data.owner_phone}
+                      onChange={(e) => handleInputChange(index, "owner_phone", e.target.value)}
+                      maxLength={15}
+                    />
+                  </div>
+                </div>
+                {errors[index]?.owner_phone && <p className="user-form-error">{errors[index].owner_phone}</p>}
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Date of Birth <span className="form-field-required">*</span>
+                </label>
+                <BirthDatePicker
+                  value={data.owner_birthdate}
+                  onChange={(value) => handleInputChange(index, "owner_birthdate", value)}
+                  minAge={minAge}
+                  placeholder="DD/MM/YYYY"
+                  error={errors[index]?.owner_birthdate}
+                />
+                {errors[index]?.owner_birthdate && <p className="user-form-error">{errors[index].owner_birthdate}</p>}
+              </div>
+
+              <div className="form-field">
+                <label>
+                  <User size={14} style={{ marginRight: '0.25rem' }} />
+                  Gender {ticketGender && <span style={{ fontSize: '0.75rem', color: 'rgba(167, 139, 250, 0.8)' }}>(Required by ticket type)</span>}
+                </label>
+                <div className="gender-selection">
+                  {availableGenderOptions.map((option) => (
+                    <div key={option.value} className="gender-option">
+                      <input
+                        type="radio"
+                        id={`gender-${index}-${option.value}`}
+                        name={`gender-${index}`}
+                        value={option.value}
+                        checked={data.owner_gender === option.value}
+                        onChange={(e) => handleInputChange(index, "owner_gender", e.target.value)}
+                        disabled={!!ticketGender}
+                      />
+                      <label htmlFor={`gender-${index}-${option.value}`} className="gender-label">
+                        {option.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+);

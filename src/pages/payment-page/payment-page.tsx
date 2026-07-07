@@ -1,6 +1,7 @@
 // payment-page.tsx
 // SECURITY: Using apiClient for consistent cookie-based authentication
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { Layout } from "../../components/layout/layout";
 import "./payment-page.css";
 import { TicketReceipt } from "../../components/ticket-receipt/ticket-receipt";
@@ -14,16 +15,21 @@ import {
   getOrderDataAfterCancel,
 } from "../../controller/purchase-pages-controller";
 import type { TicketType, EventDetailedInfo } from "../../types/types";
-import { AlertCircle, CheckCircle, Check } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 import { EventInfoCard } from "../../components/event-info-card/event-info-card";
 import { apiClient } from "../../utils/axios";
 
 export const PaymentPage = () => {
-  const { eventId, ticketTypeId, quantity } = useParams<{
+  const { t, i18n } = useTranslation('payment');
+  const { lang, eventId, ticketTypeId, quantity } = useParams<{
+    lang: string;
     eventId: string;
     ticketTypeId: string;
     quantity: string;
   }>();
+
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   const [searchParams] = useSearchParams();
   const orderIdParam = searchParams.get("order_id");
@@ -85,10 +91,10 @@ export const PaymentPage = () => {
         setIsLoading(false);
       })
       .catch(() => {
-        setError("Failed to load event information. Please try again.");
+        setError(t('page.failedToLoad'));
         setIsLoading(false);
       });
-  }, [eventId, ticketTypeId, orderIdParam, cancelledParam]);
+  }, [eventId, ticketTypeId, orderIdParam, cancelledParam, t]);
 
   const onSubmit = async (formData: any) => {
     if (processing) return;
@@ -98,11 +104,11 @@ export const PaymentPage = () => {
 
     try {
       if (!formData || !formData.usuarios || !Array.isArray(formData.usuarios)) {
-        throw new Error("Invalid form data structure. Expected { usuarios: [...] }");
+        throw new Error(t('page.invalidFormData'));
       }
 
       if (formData.usuarios.length === 0) {
-        throw new Error("No ticket information provided");
+        throw new Error(t('page.noTicketInfo'));
       }
 
       const missingFields = formData.usuarios.some((ticket: any) =>
@@ -111,12 +117,12 @@ export const PaymentPage = () => {
       );
 
       if (missingFields) {
-        throw new Error("Please fill in all required fields for each ticket");
+        throw new Error(t('page.fillAllFields'));
       }
 
       // Verificar que tenemos eventInfo con el ID real
       if (!eventInfo) {
-        throw new Error("Event information not loaded");
+        throw new Error(t('page.eventNotLoaded'));
       }
 
       // ✅ Necesitamos obtener el event_id real del backend
@@ -131,7 +137,7 @@ export const PaymentPage = () => {
       }
 
       if (!realEventID) {
-        throw new Error("Could not determine event ID");
+        throw new Error(t('page.couldNotDetermineEventId'));
       }
 
       // Crear orden pendiente
@@ -145,7 +151,7 @@ export const PaymentPage = () => {
       );
 
       if (!orderResponse.success) {
-        throw new Error(orderResponse.error || "Failed to create pending order");
+        throw new Error(orderResponse.error || t('page.failedToCreateOrder'));
       }
 
       const orderId = orderResponse.order_id;
@@ -154,7 +160,7 @@ export const PaymentPage = () => {
       const paymentResponse = await simulateStripePayment(orderId);
 
       if (!paymentResponse.success) {
-        throw new Error(paymentResponse.error || "Payment simulation failed");
+        throw new Error(paymentResponse.error || t('page.paymentSimulationFailed'));
       }
 
       setPaymentSuccess(true);
@@ -162,11 +168,11 @@ export const PaymentPage = () => {
 
       // Redirigir después de 3 segundos
       setTimeout(() => {
-        navigate(`/order/payment-success?order_id=${orderId}`);
+        navigate(buildUrl(`/order/payment-success?order_id=${orderId}`));
       }, 3000);
 
     } catch (error: any) {
-      let errorMessage = "An unexpected error occurred. Please try again.";
+      let errorMessage = t('page.unexpectedError');
 
       if (error.message) {
         errorMessage = error.message;
@@ -211,13 +217,13 @@ export const PaymentPage = () => {
                 <div className="payment-page-error-content">
                   <AlertCircle className="payment-page-error-icon" />
                   <div className="payment-page-error-text">
-                    <h4 className="payment-page-error-title">Error</h4>
+                    <h4 className="payment-page-error-title">{t('page.error')}</h4>
                     <p className="payment-page-error-message">{error}</p>
                   </div>
                   <button
                     onClick={handleDismissError}
                     className="payment-page-error-close"
-                    aria-label="Dismiss error"
+                    aria-label={t('page.dismissError')}
                   >
                     ×
                   </button>
@@ -238,29 +244,12 @@ export const PaymentPage = () => {
                 color: "rgb(252, 211, 77)",
               }}>
                 <AlertCircle size={20} />
-                <span>Payment was cancelled. Your form data has been preserved. You can try again when ready.</span>
+                <span>{t('page.cancelledWarning')}</span>
               </div>
             )}
 
             {!paymentSuccess ? (
               <>
-                <div className="payment-page-steps">
-                  <div className="payment-page-step payment-page-step-completed">
-                    <div className="payment-page-step-number"><Check size={14} strokeWidth={3} /></div>
-                    <div className="payment-page-step-label">Select Tickets</div>
-                  </div>
-                  <div className="payment-page-step-line payment-page-step-line-completed"></div>
-                  <div className="payment-page-step payment-page-step-active">
-                    <div className="payment-page-step-number">2</div>
-                    <div className="payment-page-step-label">Enter Details</div>
-                  </div>
-                  <div className="payment-page-step-line"></div>
-                  <div className="payment-page-step">
-                    <div className="payment-page-step-number">3</div>
-                    <div className="payment-page-step-label">Payment</div>
-                  </div>
-                </div>
-
                 <EventInfoCard eventInfo={eventInfo} />
 
                 <div className="payment-page-grid">
@@ -270,6 +259,7 @@ export const PaymentPage = () => {
                       ref={formRef}
                       initialData={cancelledOrderData}
                       ticketGender={ticketGender}
+                      minAge={eventInfo?.min_age}
                     />
                   </div>
 
@@ -277,7 +267,7 @@ export const PaymentPage = () => {
                     <TicketReceipt
                       quantity={Number(quantity!)}
                       ticketDetails={ticketDetails}
-                      buttonText={processing ? "Processing..." : "Proceed to Payment"}
+                      buttonText={processing ? t('page.processing') : t('page.proceedToPayment')}
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
                       disabled={processing}
                     />
@@ -308,14 +298,14 @@ export const PaymentPage = () => {
                   <CheckCircle size={60} color="rgb(52, 211, 153)" />
                 </div>
                 <h2 style={{ color: "white", fontSize: "2rem", marginBottom: "1rem" }}>
-                  Payment Successful!
+                  {t('page.paymentSuccessTitle')}
                 </h2>
                 <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "1.125rem", marginBottom: "2rem", maxWidth: "600px" }}>
-                  Your order has been submitted and is pending staff approval. You'll receive an email confirmation shortly.
+                  {t('page.paymentSuccessDesc')}
                 </p>
                 <div className="payment-page-loading-spinner" style={{ margin: "0 auto" }}></div>
                 <p style={{ color: "rgba(255, 255, 255, 0.6)", marginTop: "1rem" }}>
-                  Redirecting...
+                  {t('page.redirecting')}
                 </p>
               </div>
             )}
@@ -339,9 +329,9 @@ export const PaymentPage = () => {
                   textAlign: "center",
                 }}>
                   <div className="payment-page-loading-spinner" style={{ margin: "0 auto 1rem" }}></div>
-                  <p style={{ color: "white", margin: 0 }}>Processing your order...</p>
+                  <p style={{ color: "white", margin: 0 }}>{t('page.processingOrder')}</p>
                   <p style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.875rem", margin: "0.5rem 0 0" }}>
-                    Please wait while we confirm your payment
+                    {t('page.processingWait')}
                   </p>
                 </div>
               </div>

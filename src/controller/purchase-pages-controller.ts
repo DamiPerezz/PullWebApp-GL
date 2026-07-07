@@ -34,9 +34,10 @@ export const createPendingOrder = async (
     owner_last_name: usuario.owner_last_name,
     owner_email: usuario.owner_email,
     owner_phone: usuario.owner_phone,
-    owner_phone_prefix: usuario.owner_phone_prefix || '+34',
+    owner_phone_prefix: usuario.owner_phone_prefix || '+502',
     owner_gender: usuario.owner_gender,
     owner_birthdate: usuario.owner_birthdate,
+    owner_instagram: usuario.owner_instagram,
   }));
 
   // Calculate total with 11.2% service fee

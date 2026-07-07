@@ -33,7 +33,7 @@
 .cookie-policy-container {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 60px 1.5rem 80px;
+  padding: 2rem 1.5rem 80px;
 }
 
 /* Header */
@@ -644,13 +644,13 @@
 /* Responsive */
 @media (min-width: 1280px) {
   .cookie-policy-container {
-    padding: 60px 2rem 80px;
+    padding: 2rem 2rem 80px;
   }
 }
 
 @media (max-width: 768px) {
   .cookie-policy-container {
-    padding: 40px 1.1rem 60px;
+    padding: 2rem 1.1rem 60px;
   }
 
   .cookie-policy-header h1 {

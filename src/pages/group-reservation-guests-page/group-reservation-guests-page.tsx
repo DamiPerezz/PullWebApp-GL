@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Ticket, CheckCircle, AlertCircle, Loader, Users, ShoppingCart, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Ticket, CheckCircle, AlertCircle, Loader, Users, ShoppingCart, ChevronRight, Info } from 'lucide-react';
 import { Layout } from '../../components/layout/layout';
+import { EventInfoCard } from '../../components/event-info-card/event-info-card';
 import type { EventDetailedInfo, VIPBottle } from '../../types/types';
 import { createGroupReservation } from '../../controller/group-reservation-controller';
 import './group-reservation-guests-page.css';
@@ -25,6 +27,7 @@ interface OrganizerData {
 interface GuestFormData {
   name: string;
   last_name: string;
+  instagram?: string;
   gender: 'male' | 'female';
   host_pays: boolean;
   amount_due: number;
@@ -40,13 +43,18 @@ interface LocationState {
   selectedBottles: BottleSelection[];
   totalBottlesCost: number;
   organizerData: OrganizerData;
+  reservationName?: string;
+  reservationDescription?: string;
 }
 
 export const GroupReservationGuestsPage = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId, lang } = useParams<{ eventId: string; lang: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState;
+  const { t, i18n } = useTranslation('group');
+  const currentLang = lang || i18n.language || 'es';
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
 
   const [menGuests, setMenGuests] = useState<GuestFormData[]>([]);
   const [womenGuests, setWomenGuests] = useState<GuestFormData[]>([]);
@@ -55,7 +63,7 @@ export const GroupReservationGuestsPage = () => {
 
   useEffect(() => {
     if (!state || !state.eventInfo) {
-      navigate(`/event/${eventId}`);
+      navigate(buildUrl(`/event/${eventId}`));
       return;
     }
 
@@ -167,7 +175,7 @@ export const GroupReservationGuestsPage = () => {
     // Check minimum host pays (at least 4 including organizer)
     const hostPaysCount = getHostPaysCount();
     if (hostPaysCount < 4) {
-      setError('You must pay for at least 4 people (including yourself)');
+      setError(t('guests.minGuestsRequired', { count: 4 }));
       return false;
     }
 
@@ -176,7 +184,7 @@ export const GroupReservationGuestsPage = () => {
     for (let i = menStartIndex; i < menGuests.length; i++) {
       const guest = menGuests[i];
       if (!guest.name || !guest.last_name) {
-        setError(`Please complete the details for Man ${i + 1}`);
+        setError(t('guests.completeAllDetails'));
         return false;
       }
     }
@@ -186,7 +194,7 @@ export const GroupReservationGuestsPage = () => {
     for (let i = womenStartIndex; i < womenGuests.length; i++) {
       const guest = womenGuests[i];
       if (!guest.name || !guest.last_name) {
-        setError(`Please complete the details for Woman ${i + 1}`);
+        setError(t('guests.completeAllDetails'));
         return false;
       }
     }
@@ -201,10 +209,12 @@ export const GroupReservationGuestsPage = () => {
     setError(null);
 
     try {
-      // Combine all guests with amount_due
+      // Combine all guests with amount_due (Instagram passes through as
+      // optional metadata).
       const allGuests = [...menGuests, ...womenGuests].map((guest) => ({
         name: guest.name,
         last_name: guest.last_name,
+        instagram: (guest.instagram || '').trim() || undefined,
         gender: guest.gender,
         host_pays: guest.host_pays,
         amount_due: guest.amount_due
@@ -236,13 +246,15 @@ export const GroupReservationGuestsPage = () => {
         guests: allGuests,
         bottles: bottles.length > 0 ? bottles : undefined,
         mixers: mixers.length > 0 ? mixers : undefined,
-        total_amount: calculateReservationTotal() // Total for entire reservation with all fees
+        total_amount: calculateReservationTotal(), // Total for entire reservation with all fees
+        reservation_name: state.reservationName,
+        reservation_description: state.reservationDescription,
       };
 
       const result = await createGroupReservation(requestData);
 
       // Navigate to confirmation page
-      navigate('/group/confirmation', {
+      navigate(buildUrl('/group/confirmation'), {
         state: {
           success: result.success,
           reservation_id: result.reservation_id,
@@ -281,15 +293,8 @@ export const GroupReservationGuestsPage = () => {
 
         <div className="guests-page-content-wrapper">
           <div className="guests-page-container">
-            {/* Header */}
-            <div className="guests-page-header">
-              <div className="guests-page-event-info">
-                <h1 className="guests-page-event-title">{state?.eventInfo?.event_name}</h1>
-                <p className="guests-page-event-subtitle">
-                  Guest Information
-                </p>
-              </div>
-            </div>
+            {/* Event Info Card */}
+            <EventInfoCard eventInfo={state?.eventInfo} />
 
             <div className="guests-page-content">
               {/* Error Message */}
@@ -303,12 +308,10 @@ export const GroupReservationGuestsPage = () => {
               {/* Host Pays Counter */}
               <div className="guests-page-counter-box">
                 <Users size={20} />
-                <span>
-                  You will pay for <strong>{hostPaysCount}</strong> of {state.guestCount} people
-                </span>
+                <span dangerouslySetInnerHTML={{ __html: t('guests.youWillPay', { count: hostPaysCount, total: state.guestCount }) }} />
                 {hostPaysCount < 4 && (
                   <span className="guests-page-counter-warning">
-                    (Minimum 4)
+                    {t('guests.minimum', { count: 4 })}
                   </span>
                 )}
                 {hostPaysCount >= 4 && (
@@ -323,10 +326,10 @@ export const GroupReservationGuestsPage = () => {
                     <Ticket size={24} className="guests-page-section-icon" />
                     <div>
                       <h2 className="guests-page-section-title">
-                        Men ({menGuests.length})
+                        {t('setup.men')} ({menGuests.length})
                       </h2>
                       <p className="guests-page-section-subtitle">
-                        Q{state.menPrice} per person
+                        Q{state.menPrice} {t('setup.perPerson')}
                       </p>
                     </div>
                   </div>
@@ -340,7 +343,7 @@ export const GroupReservationGuestsPage = () => {
                             <div className="guests-page-guest-title-group">
                               <Ticket size={18} className="guests-page-ticket-icon guests-page-ticket-icon-men" />
                               <h3 className="guests-page-guest-title">
-                                {isOrganizer ? 'Organizer (You)' : `Man ${index + 1}`}
+                                {isOrganizer ? t('guests.organizer') : t('guests.man', { number: index + 1 })}
                               </h3>
                             </div>
                             <label className="guests-page-host-pays-checkbox">
@@ -350,51 +353,62 @@ export const GroupReservationGuestsPage = () => {
                                 onChange={() => handleMenGuestChange(index, 'host_pays', !guest.host_pays)}
                                 disabled={isOrganizer}
                               />
-                              <span>I pay</span>
+                              <span>{t('guests.iPay')}</span>
                             </label>
                           </div>
 
                           <div className="guests-page-guest-form">
                             <div className="guests-page-form-row">
                               <div className="guests-page-form-field">
-                                <label>First Name <span className="guests-page-required">*</span></label>
+                                <label>{t('guests.firstName')} <span className="guests-page-required">*</span></label>
                                 <input
                                   type="text"
                                   value={guest.name}
                                   onChange={(e) => handleMenGuestChange(index, 'name', e.target.value)}
-                                  placeholder="First name"
+                                  placeholder={t('guests.firstName')}
                                   disabled={isOrganizer}
                                   required
                                 />
                               </div>
                               <div className="guests-page-form-field">
-                                <label>Last Name <span className="guests-page-required">*</span></label>
+                                <label>{t('guests.lastName')} <span className="guests-page-required">*</span></label>
                                 <input
                                   type="text"
                                   value={guest.last_name}
                                   onChange={(e) => handleMenGuestChange(index, 'last_name', e.target.value)}
-                                  placeholder="Last name"
+                                  placeholder={t('guests.lastName')}
                                   disabled={isOrganizer}
                                   required
+                                />
+                              </div>
+                            </div>
+                            <div className="guests-page-form-row">
+                              <div className="guests-page-form-field" style={{ flex: 1 }}>
+                                <label>Instagram <span style={{ color: '#6b6b7b', fontWeight: 400 }}>(opcional)</span></label>
+                                <input
+                                  type="text"
+                                  value={guest.instagram || ''}
+                                  onChange={(e) => handleMenGuestChange(index, 'instagram', e.target.value)}
+                                  placeholder="@usuario"
                                 />
                               </div>
                             </div>
 
                             {isOrganizer && (
                               <p className="guests-page-organizer-note">
-                                You'll receive your entry upon meeting the minimum payment
+                                {t('guests.organizerNote')}
                               </p>
                             )}
 
                             {guest.host_pays && !isOrganizer && (
                               <p className="guests-page-organizer-note">
-                                This guest only needs to fill in their details to receive their entry
+                                {t('guests.guestPaidNote')}
                               </p>
                             )}
 
                             {!guest.host_pays && !isOrganizer && (
                               <p className="guests-page-payment-note">
-                                You'll receive a link to share with this guest to pay their entry (Q{state.menPrice.toFixed(2)})
+                                {t('guests.guestPaymentNote', { price: `Q${state.menPrice.toFixed(2)}` })}
                               </p>
                             )}
                           </div>
@@ -412,10 +426,10 @@ export const GroupReservationGuestsPage = () => {
                     <Ticket size={24} className="guests-page-section-icon" />
                     <div>
                       <h2 className="guests-page-section-title">
-                        Women ({womenGuests.length})
+                        {t('setup.women')} ({womenGuests.length})
                       </h2>
                       <p className="guests-page-section-subtitle">
-                        Q{state.womenPrice} per person
+                        Q{state.womenPrice} {t('setup.perPerson')}
                       </p>
                     </div>
                   </div>
@@ -429,7 +443,7 @@ export const GroupReservationGuestsPage = () => {
                             <div className="guests-page-guest-title-group">
                               <Ticket size={18} className="guests-page-ticket-icon guests-page-ticket-icon-women" />
                               <h3 className="guests-page-guest-title">
-                                {isOrganizer ? 'Organizer (You)' : `Woman ${index + 1}`}
+                                {isOrganizer ? t('guests.organizer') : t('guests.woman', { number: index + 1 })}
                               </h3>
                             </div>
                             <label className="guests-page-host-pays-checkbox">
@@ -439,51 +453,62 @@ export const GroupReservationGuestsPage = () => {
                                 onChange={() => handleWomenGuestChange(index, 'host_pays', !guest.host_pays)}
                                 disabled={isOrganizer}
                               />
-                              <span>I pay</span>
+                              <span>{t('guests.iPay')}</span>
                             </label>
                           </div>
 
                           <div className="guests-page-guest-form">
                             <div className="guests-page-form-row">
                               <div className="guests-page-form-field">
-                                <label>First Name <span className="guests-page-required">*</span></label>
+                                <label>{t('guests.firstName')} <span className="guests-page-required">*</span></label>
                                 <input
                                   type="text"
                                   value={guest.name}
                                   onChange={(e) => handleWomenGuestChange(index, 'name', e.target.value)}
-                                  placeholder="First name"
+                                  placeholder={t('guests.firstName')}
                                   disabled={isOrganizer}
                                   required
                                 />
                               </div>
                               <div className="guests-page-form-field">
-                                <label>Last Name <span className="guests-page-required">*</span></label>
+                                <label>{t('guests.lastName')} <span className="guests-page-required">*</span></label>
                                 <input
                                   type="text"
                                   value={guest.last_name}
                                   onChange={(e) => handleWomenGuestChange(index, 'last_name', e.target.value)}
-                                  placeholder="Last name"
+                                  placeholder={t('guests.lastName')}
                                   disabled={isOrganizer}
                                   required
+                                />
+                              </div>
+                            </div>
+                            <div className="guests-page-form-row">
+                              <div className="guests-page-form-field" style={{ flex: 1 }}>
+                                <label>Instagram <span style={{ color: '#6b6b7b', fontWeight: 400 }}>(opcional)</span></label>
+                                <input
+                                  type="text"
+                                  value={guest.instagram || ''}
+                                  onChange={(e) => handleWomenGuestChange(index, 'instagram', e.target.value)}
+                                  placeholder="@usuario"
                                 />
                               </div>
                             </div>
 
                             {isOrganizer && (
                               <p className="guests-page-organizer-note">
-                                You'll receive your entry upon meeting the minimum payment
+                                {t('guests.organizerNote')}
                               </p>
                             )}
 
                             {guest.host_pays && !isOrganizer && (
                               <p className="guests-page-organizer-note">
-                                This guest only needs to fill in their details to receive their entry
+                                {t('guests.guestPaidNote')}
                               </p>
                             )}
 
                             {!guest.host_pays && !isOrganizer && (
                               <p className="guests-page-payment-note">
-                                You'll receive a link to share with this guest to pay their entry (Q{state.womenPrice.toFixed(2)})
+                                {t('guests.guestPaymentNote', { price: `Q${state.womenPrice.toFixed(2)}` })}
                               </p>
                             )}
                           </div>
@@ -496,10 +521,16 @@ export const GroupReservationGuestsPage = () => {
 
               {/* Summary Section - Order Summary Style */}
               <div className="guests-page-receipt">
+                {/* Info Message - Above the card */}
+                <div className="guests-page-info-box">
+                  <Info size={18} className="guests-page-info-icon" />
+                  <p>{t('guests.infoMessage')}</p>
+                </div>
+
                 <div className="guests-page-receipt-card">
                   {/* Header */}
                   <div className="guests-page-receipt-header">
-                    <h3 className="guests-page-receipt-title">Payment Summary</h3>
+                    <h3 className="guests-page-receipt-title">{t('guests.paymentSummary')}</h3>
                     <ShoppingCart size={20} className="guests-page-receipt-icon" />
                   </div>
 
@@ -508,8 +539,8 @@ export const GroupReservationGuestsPage = () => {
                     {menGuests.filter(g => g.host_pays).length > 0 && (
                       <div className="guests-page-receipt-item">
                         <div className="guests-page-receipt-item-info">
-                          <div className="guests-page-receipt-item-name">Men Entries</div>
-                          <div className="guests-page-receipt-item-quantity">{menGuests.filter(g => g.host_pays).length}x entry</div>
+                          <div className="guests-page-receipt-item-name">{t('guests.menEntries')}</div>
+                          <div className="guests-page-receipt-item-quantity">{menGuests.filter(g => g.host_pays).length}x {t('guests.entry')}</div>
                         </div>
                         <div className="guests-page-receipt-item-price">
                           <div className="guests-page-receipt-item-amount">Q{(menGuests.filter(g => g.host_pays).length * state.menPrice).toFixed(2)}</div>
@@ -520,8 +551,8 @@ export const GroupReservationGuestsPage = () => {
                     {womenGuests.filter(g => g.host_pays).length > 0 && (
                       <div className="guests-page-receipt-item">
                         <div className="guests-page-receipt-item-info">
-                          <div className="guests-page-receipt-item-name">Women Entries</div>
-                          <div className="guests-page-receipt-item-quantity">{womenGuests.filter(g => g.host_pays).length}x entry</div>
+                          <div className="guests-page-receipt-item-name">{t('guests.womenEntries')}</div>
+                          <div className="guests-page-receipt-item-quantity">{womenGuests.filter(g => g.host_pays).length}x {t('guests.entry')}</div>
                         </div>
                         <div className="guests-page-receipt-item-price">
                           <div className="guests-page-receipt-item-amount">Q{(womenGuests.filter(g => g.host_pays).length * state.womenPrice).toFixed(2)}</div>
@@ -532,8 +563,8 @@ export const GroupReservationGuestsPage = () => {
                     {state.totalBottlesCost > 0 && (
                       <div className="guests-page-receipt-item">
                         <div className="guests-page-receipt-item-info">
-                          <div className="guests-page-receipt-item-name">Bottles & Mixers</div>
-                          <div className="guests-page-receipt-item-quantity">VIP service</div>
+                          <div className="guests-page-receipt-item-name">{t('guests.bottlesAndMixers')}</div>
+                          <div className="guests-page-receipt-item-quantity">{t('guests.vipService')}</div>
                         </div>
                         <div className="guests-page-receipt-item-price">
                           <div className="guests-page-receipt-item-amount">Q{state.totalBottlesCost.toFixed(2)}</div>
@@ -547,56 +578,41 @@ export const GroupReservationGuestsPage = () => {
                   {/* Totals */}
                   <div className="guests-page-receipt-totals">
                     <div className="guests-page-receipt-subtotal">
-                      <span>Subtotal</span>
+                      <span>{t('summary.subtotal')}</span>
                       <span>Q{calculateHostPayment().toFixed(2)}</span>
                     </div>
                     <div className="guests-page-receipt-fee">
-                      <span>Service Fee</span>
+                      <span>{t('summary.serviceFee')}</span>
                       <span>Q{calculateServiceFee().toFixed(2)}</span>
                     </div>
+
+                    <div className="guests-page-receipt-total">
+                      <span>{t('guests.totalToPayNow')}</span>
+                      <span className="guests-page-receipt-total-amount">
+                        Q{calculateGrandTotal().toFixed(2)}
+                      </span>
+                    </div>
                   </div>
-
-                  <div className="guests-page-receipt-total">
-                    <span>Total to pay now</span>
-                    <span className="guests-page-receipt-total-amount">
-                      Q{calculateGrandTotal().toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Warning Messages */}
-                  <div className="guests-page-notices">
-                    {state.guestCount > hostPaysCount && (
-                      <p className="guests-page-notice guests-page-notice-warning">
-                        <AlertCircle size={16} />
-                        <span>You'll receive a link to share with the remaining {state.guestCount - hostPaysCount} guests so they can pay their entry after staff approval</span>
-                      </p>
-                    )}
-
-                    <p className="guests-page-notice guests-page-notice-success">
-                      <CheckCircle size={16} />
-                      <span>Your reservation will be sent to staff for approval. You'll receive a confirmation email.</span>
-                    </p>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    onClick={handleSubmit}
-                    className="guests-page-receipt-button"
-                    disabled={submitting || hostPaysCount < 4}
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader size={18} className="guests-page-btn-spinner" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        Submit Reservation
-                        <ChevronRight size={18} className="guests-page-receipt-button-icon" />
-                      </>
-                    )}
-                  </button>
                 </div>
+
+                {/* Submit Button - Outside the card */}
+                <button
+                  onClick={handleSubmit}
+                  className="guests-page-receipt-button"
+                  disabled={submitting || hostPaysCount < 4}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader size={18} className="guests-page-btn-spinner" />
+                      {t('guests.processing')}
+                    </>
+                  ) : (
+                    <>
+                      {t('guests.submitReservation')}
+                      <ChevronRight size={18} className="guests-page-receipt-button-icon" />
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

@@ -1,24 +1,31 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { InstagramIcon, TikTokIcon, LinkedInIcon } from '../../icons/icons'
 import './footer.css'
 
 export const Footer = () => {
+    const { t } = useTranslation();
+    const { lang } = useParams<{ lang: string }>();
+    const currentLang = lang || 'es';
     const currentYear = new Date().getFullYear();
+
+    // Helper function to build language-prefixed URLs
+    const buildUrl = (path: string) => `/${currentLang}${path}`;
 
     return (
         <footer>
             <div className="footer-content">
                 <div className="footer-left">
                     <p className="footer-copyright">
-                        © {currentYear} Pull
+                        {t('footer.copyright', { year: currentYear })}
                     </p>
                     <div className="important-documents">
                         <span>•</span>
-                        <Link to="/privacy">Privacy</Link>
+                        <Link to={buildUrl("/privacy")}>{t('footer.privacy')}</Link>
                         <span>•</span>
-                        <Link to="/terms">Terms</Link>
+                        <Link to={buildUrl("/terms")}>{t('footer.terms')}</Link>
                         <span>•</span>
-                        <Link to="/cookie-policy">Cookies</Link>
+                        <Link to={buildUrl("/cookie-policy")}>{t('footer.cookies')}</Link>
                     </div>
                 </div>
 

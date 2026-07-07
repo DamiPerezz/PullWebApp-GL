@@ -2,8 +2,7 @@
   flex: 1;
   color: #fff;
   position: relative;
-  overflow: hidden;
-  background-color: #0b0915;
+  background: transparent;
 }
 
 /* Fondo con blur oscuro elegante */
@@ -37,7 +36,7 @@
   z-index: 10;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .venues-title-section {
@@ -151,7 +150,7 @@
 /* Responsivo */
 @media (max-width: 768px) {
   .venues-page-content {
-    padding: 2.25rem 1.25rem;
+    padding: 2rem 1.25rem;
   }
   .venues-main-title {
     font-size: 1.9rem;

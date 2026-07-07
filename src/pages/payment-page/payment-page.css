@@ -2,7 +2,7 @@
 .payment-page-wrapper {
     flex: 1;
     position: relative;
-    overflow: clip;
+    background: transparent;
 }
 
 .payment-page-bg-blur {
@@ -21,8 +21,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 150px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+    height: 100vh;
+    background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
     pointer-events: none;
 }
 
@@ -41,7 +41,7 @@
 .payment-page-container {
     max-width: 1120px;
     margin: 0 auto;
-    padding: 5rem 1.5rem 3rem;
+    padding: 2rem 1.5rem 3rem;
 }
 
 .payment-page-error {
@@ -238,7 +238,7 @@
 
 @media (min-width: 1280px) {
     .payment-page-container {
-        padding: 5rem 2rem 3rem;
+        padding: 2rem 2rem 3rem;
     }
 }
 
@@ -251,7 +251,7 @@
 
 @media (max-width: 768px) {
     .payment-page-container {
-        padding: 4rem 1.5rem 2.5rem;
+        padding: 2rem 1.5rem 2.5rem;
     }
 
     .payment-page-error-content {
@@ -271,7 +271,7 @@
 
 @media (max-width: 640px) {
     .payment-page-container {
-        padding: 3rem 1.1rem 2rem;
+        padding: 2rem 1.1rem 2rem;
     }
 
     .payment-page-right {
@@ -316,7 +316,7 @@
 
 @media (max-width: 400px) {
     .payment-page-container {
-        padding: 3rem 1.1rem 2rem;
+        padding: 2rem 1.1rem 2rem;
     }
 }
 

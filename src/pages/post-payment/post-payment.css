@@ -2,8 +2,7 @@
 .post-payment-wrapper {
     flex: 1;
     position: relative;
-    overflow: hidden;
-    background: #0a0a0f;
+    background: transparent;
 }
 
 /* Background Blur Effect */
@@ -15,6 +14,17 @@
     filter: blur(40px) brightness(0.4);
     transform: scale(1.1);
     z-index: 0;
+}
+
+.post-payment-bg-blur::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
+    pointer-events: none;
 }
 
 .post-payment-bg-overlay {
@@ -40,7 +50,7 @@
 .post-payment-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2.5rem 1.5rem 3rem;
+    padding: 2rem 1.5rem 3rem;
 }
 
 /* Back Button */
@@ -565,7 +575,7 @@
 
 @media (max-width: 640px) {
     .post-payment-container {
-        padding: 1.75rem 1.25rem 2rem;
+        padding: 2rem 1.25rem 2rem;
     }
 
     .post-payment-loading {
@@ -630,7 +640,7 @@
 
 @media (max-width: 400px) {
     .post-payment-container {
-        padding: 1.5rem 1rem 2rem;
+        padding: 2rem 1rem 2rem;
     }
 
     .post-payment-loading-card {

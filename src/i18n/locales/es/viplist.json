@@ -1,0 +1,273 @@
+{
+  "tracking": {
+    "errors": {
+      "loadFailed": "No se pudo cargar la lista VIP",
+      "notFound": "Lista VIP no encontrada",
+      "rsvpFailed": "Error al confirmar asistencia",
+      "emailAlreadyRegistered": "Ya existe un invitado registrado con este email"
+    },
+    "backToHome": "Volver al inicio",
+    "organizedBy": "Organizado por",
+    "type": {
+      "table": "Mesa",
+      "bar": "Barra"
+    },
+    "defaultTitle": {
+      "table": "Reserva Mesa de {{host}}",
+      "bar": "Reserva Barra de {{host}}"
+    },
+    "defaultDescription": "Únete a nuestra lista VIP y disfruta de una experiencia exclusiva con consumibles incluidos.",
+    "pricePerPerson": "Precio por persona",
+    "includesFee": "Incluye costes de gestión",
+    "orderSummary": {
+      "title": "Resumen del Pedido",
+      "menPrice": "Hombres",
+      "womenPrice": "Mujeres",
+      "consumables": "Consumibles",
+      "managementFee": "Gestión",
+      "consumablesIncluded": "Consumibles Incluidos",
+      "feeNote": "Incluye {{percentage}}% de costes de gestión",
+      "basePrice": "Precio base",
+      "serviceFee": "Costes de gestión",
+      "total": "Total"
+    },
+    "successBanner": {
+      "allDone": "¡Listo!",
+      "rsvpComplete": "Tu asistencia ha sido confirmada",
+      "paymentComplete": "Tu pago ha sido procesado correctamente"
+    },
+    "statusBanner": {
+      "open": "Lista Abierta",
+      "openDesc": "¡Únete a la lista! Confirma tu asistencia ahora.",
+      "closed": "Lista Cerrada - Hora de Pagar",
+      "closedDesc": "La lista se ha cerrado. Paga antes del {{deadline}}",
+      "completed": "Reserva Finalizada",
+      "completedDesc": "Esta reserva ha sido finalizada."
+    },
+    "deadline": {
+      "expired": "Tiempo expirado",
+      "daysRemaining": "{{days}} días restantes",
+      "hoursRemaining": "{{hours}}h {{minutes}}m restantes"
+    },
+    "rsvp": {
+      "joinButton": "Confirmar Asistencia",
+      "title": "Confirma tu asistencia",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "lastName": "Apellidos",
+      "lastNamePlaceholder": "Tus apellidos",
+      "email": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "phone": "Teléfono",
+      "phonePlaceholder": "Número de teléfono",
+      "birthDate": "Fecha de nacimiento",
+      "birthDatePlaceholder": "DD / MM / AAAA",
+      "gender": "Género",
+      "male": "Hombre",
+      "female": "Mujer",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "doneTitle": "¡Estás en la lista!",
+      "doneMessage": "Te avisaremos cuando se abra el pago.",
+      "quotaFull": "Lleno",
+      "listFull": "Lista Completa",
+      "listFullDesc": "Todos los cupos han sido ocupados para este evento.",
+      "menQuotaFull": "Ya no hay cupos disponibles para hombres. Solo puedes registrarte como mujer.",
+      "womenQuotaFull": "Ya no hay cupos disponibles para mujeres. Solo puedes registrarte como hombre.",
+      "allQuotasFull": "Todos los cupos han sido ocupados. No se pueden añadir más invitados."
+    },
+    "rsvpSuccess": {
+      "title": "¡Confirmado!",
+      "message": "Estás en la lista. Te notificaremos cuando sea hora de pagar."
+    },
+    "celebration": {
+      "thanks": "¡Gracias {{name}}!",
+      "guest": "amigo",
+      "youAdded": "Has aportado al bote",
+      "nowHave": "Ahora llevan",
+      "inConsumables": "en consumibles",
+      "bottlesUnlocked": "{{count}} botellas desbloqueadas",
+      "awesome": "¡Genial!"
+    },
+    "consumables": {
+      "title": "Consumibles",
+      "perPerson": "Por persona",
+      "goal": "Meta",
+      "joinCta": "Únete y desbloquea más botellas"
+    },
+    "paymentProgress": {
+      "title": "Bote de Consumibles",
+      "subtitle": "Aportaciones del grupo",
+      "expected": "Meta",
+      "collected": "Bote",
+      "paidOf": "{{paid}} de {{total}} han pagado",
+      "percentage": "{{percent}}% completado",
+      "transferring": "Transfiriendo..."
+    },
+    "confirmed": "Confirmados",
+    "guestsConfirmed": "{{confirmed}} de {{total}} confirmados",
+    "paidTitle": "Pagados",
+    "guestsPaid": "{{paid}} de {{total}} han pagado",
+    "men": "Hombres",
+    "women": "Mujeres",
+    "guestList": "Lista de invitados",
+    "hostBadge": "Host",
+    "peopleConfirmed": "{{count}} personas confirmadas",
+    "peoplePaid": "{{count}} personas han pagado",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "findPayment": {
+      "title": "¿Listo para pagar?",
+      "description": "Ingresa tu email para acceder a tu enlace de pago personal.",
+      "emailPlaceholder": "Ingresa tu email",
+      "button": "Ir a Pagar",
+      "notFound": "No encontramos un invitado confirmado con este email",
+      "alreadyPaid": "Ya has pagado por este evento"
+    }
+  },
+  "payment": {
+    "errors": {
+      "loadFailed": "No se pudo cargar los datos de pago",
+      "notFound": "Invitado no encontrado",
+      "paymentFailed": "Error al procesar el pago"
+    },
+    "backToHome": "Volver al inicio",
+    "hero": {
+      "joiningList": "Vas a unirte a la lista de",
+      "tableReservation": "Reserva de Mesa VIP",
+      "barReservation": "Reserva de Barra VIP",
+      "guestGreeting": "{{name}}, es hora de confirmar tu aporte a la reserva de {{host}} 🎉"
+    },
+    "greeting": "Hola {{name}}!",
+    "subtitle": "Es hora de pagar tu entrada",
+    "type": {
+      "table": "Mesa",
+      "bar": "Barra"
+    },
+    "deadline": {
+      "title": "Fecha límite",
+      "daysRemaining": "{{days}} días restantes",
+      "hoursRemaining": "{{hours}}h {{minutes}}m restantes"
+    },
+    "priceBreakdown": "Desglose del precio",
+    "entry": "Entrada",
+    "managementFee": "Costes de gestión (15%)",
+    "total": "Total",
+    "payNow": "Pagar {{amount}}",
+    "secureNote": "Pago seguro procesado por Stripe",
+    "success": {
+      "title": "¡Pago Confirmado!",
+      "message": "Tu entrada está lista. ¡Nos vemos en el evento!",
+      "emailSent": "Hemos enviado tu entrada por email",
+      "viewList": "Ver la lista"
+    },
+    "alreadyPaid": {
+      "title": "¡Ya has pagado!",
+      "message": "Tu entrada ya está confirmada.",
+      "viewList": "Ver la lista"
+    },
+    "expired": {
+      "title": "Tiempo expirado",
+      "message": "El plazo para pagar ha terminado."
+    }
+  },
+  "bottleSelection": {
+    "title": "Selecciona tus Botellas",
+    "subtitle": "Elige las botellas para tu reserva",
+    "hostGreeting": "¡Hola {{name}}! Selecciona tus botellas",
+    "budget": "Tu Presupuesto",
+    "available": "Disponible",
+    "selected": "Seleccionado",
+    "remaining": "Restante",
+    "availableBottles": "Botellas Disponibles",
+    "filterByType": "Filtrar por tipo",
+    "allTypes": "Todos",
+    "add": "Añadir",
+    "yourSelection": "Tu Selección",
+    "total": "Total",
+    "consumableSpent": "Crédito consumible gastado",
+    "remainingCredit": "Crédito restante",
+    "remainingCreditNote": "Este crédito estará disponible para consumir en el venue el día del evento",
+    "confirm": "Confirmar Selección",
+    "confirmNote": "Solo puedes seleccionar una vez. ¡Elige bien!",
+    "success": {
+      "title": "¡Botellas Confirmadas!",
+      "message": "Tu selección ha sido guardada. ¡Tendremos tus botellas listas!",
+      "yourSelection": "Tu Selección",
+      "emailSent": "Email de confirmación enviado"
+    },
+    "errors": {
+      "invalidToken": "Enlace de selección inválido",
+      "loadFailed": "Error al cargar datos de selección",
+      "notFound": "Enlace de selección no encontrado o expirado",
+      "saveFailed": "Error al guardar tu selección"
+    }
+  },
+  "edit": {
+    "hostMode": "Modo Anfitrión",
+    "title": "Gestionar Lista VIP",
+    "subtitle": "Administra tu lista de invitados",
+    "notFound": "Lista no encontrada",
+    "checkCode": "Verifica que tu código de edición sea correcto",
+    "listClosed": "Esta lista está cerrada. No se pueden hacer cambios.",
+    "reservationInfo": "Información de la reserva",
+    "edit": "Editar",
+    "listName": "Nombre de la lista",
+    "listNamePlaceholder": "Nombre para tu lista",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Descripción de la reserva",
+    "type": "Tipo",
+    "table": "Mesa",
+    "bar": "Barra",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "guestList": "Lista de invitados",
+    "addGuest": "Añadir",
+    "addNewGuest": "Añadir nuevo invitado",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Nombre del invitado",
+    "lastName": "Apellidos",
+    "lastNamePlaceholder": "Apellidos del invitado",
+    "email": "Email",
+    "emailPlaceholder": "email@ejemplo.com",
+    "gender": "Género",
+    "male": "Hombre",
+    "female": "Mujer",
+    "add": "Añadir",
+    "adding": "Añadiendo...",
+    "addGuestError": "Error al añadir invitado",
+    "guestAlreadyExists": "Ya existe un invitado con este email",
+    "noGuests": "No hay invitados confirmados",
+    "addedByHost": "Host",
+    "shareTrackingLink": "Comparte este enlace con tus invitados:",
+    "viewTrackingPage": "Ver página de seguimiento",
+    "expectedGuests": "Invitados Esperados",
+    "men": "Hombres",
+    "women": "Mujeres",
+    "hostBadge": "Host",
+    "paid": "Pagado",
+    "markNotComing": "Marcar como no viene",
+    "markNotComingError": "Error al marcar invitado",
+    "notComing": "No vienen",
+    "notComingBadge": "No viene"
+  },
+  "roulette": {
+    "title": "¿A qué botella puedes aspirar?",
+    "subtitle": "Descubre qué botella premium podrías conseguir",
+    "currentBudget": "Consumibles actuales",
+    "potential": "Potencial",
+    "spinning": "Girando...",
+    "spin": "¡GIRAR!",
+    "youCouldWin": "¡Puedes conseguir!",
+    "unlockNext": "¡Desbloquea algo mejor!",
+    "addMore": "Añade más amigos para alcanzar",
+    "needMore": "Solo necesitas",
+    "more": "más",
+    "spinAgain": "Girar de nuevo",
+    "noBottles": "No hay botellas disponibles en este momento",
+    "notEnough": "¡Añade más amigos!",
+    "notEnoughDesc": "Necesitas más consumibles para desbloquear tu primera botella",
+    "firstBottle": "Primera botella disponible"
+  }
+}

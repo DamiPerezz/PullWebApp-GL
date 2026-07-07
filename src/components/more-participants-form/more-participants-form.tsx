@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { CloseXIcon } from "../../icons/icons";
 import "./more-participants-form.css";
 
@@ -9,6 +10,7 @@ export const MoreParticipantsForm = ({
   handleClose: () => void;
   onAddGuests: (guestNames: string[]) => void;
 }) => {
+  const { t } = useTranslation('common');
   const [guestNames, setGuestNames] = useState<string[]>([""]);
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -41,9 +43,9 @@ export const MoreParticipantsForm = ({
     guestNames.forEach((name, index) => {
       const trimmedName = name.trim();
       if (trimmedName === "") {
-        newErrors[index] = "Name is required";
+        newErrors[index] = t('validation.nameRequired');
       } else if (trimmedName.length < 2) {
-        newErrors[index] = "Name must be at least 2 characters";
+        newErrors[index] = t('validation.nameMinLength');
       } else {
         newErrors[index] = "";
         validNames.push(trimmedName);
@@ -58,20 +60,22 @@ export const MoreParticipantsForm = ({
     }
   };
 
+  const guestCount = guestNames.filter((name) => name.trim()).length;
+
   return (
     <div className="more-participants-form">
       <form onSubmit={validateAndSubmit}>
-        <p>Add More Participants</p>
+        <p>{t('participants.addMore')}</p>
 
         {/* Contenedor scrolleable para múltiples inputs */}
         <div className="guests-container">
           {guestNames.map((name, index) => (
             <div key={index} className="guest-input-group">
-              <label>Guest {index + 1} Name:</label>
+              <label>{t('participants.guestName', { number: index + 1 })}:</label>
               <div className="input-with-remove">
                 <input
                   type="text"
-                  placeholder="Enter guest name"
+                  placeholder={t('participants.enterGuestName')}
                   value={name}
                   onChange={(e) => updateGuestName(index, e.target.value)}
                   required
@@ -98,7 +102,7 @@ export const MoreParticipantsForm = ({
               className="add-guest-btn"
               onClick={addGuestField}
             >
-              + Add Another Guest
+              {t('participants.addAnother')}
             </button>
           )}
         </div>
@@ -107,8 +111,7 @@ export const MoreParticipantsForm = ({
           type="submit"
           disabled={guestNames.every((name) => !name.trim())}
         >
-          Add {guestNames.filter((name) => name.trim()).length} Guest
-          {guestNames.filter((name) => name.trim()).length !== 1 ? "s" : ""}
+          {guestCount === 1 ? t('participants.addGuest', { count: guestCount }) : t('participants.addGuests', { count: guestCount })}
         </button>
 
         <button type="button" className="close-button" onClick={handleClose}>

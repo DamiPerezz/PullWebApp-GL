@@ -1,0 +1,265 @@
+﻿{
+    "nav":  {
+                "events":  "Eventos",
+                "help":  "Ayuda",
+                "wallet":  "Cartera",
+                "logout":  "Cerrar Sesión",
+                "back":  "Volver"
+            },
+    "buttons":  {
+                    "back":  "Volver",
+                    "next":  "Siguiente",
+                    "cancel":  "Cancelar",
+                    "save":  "Guardar",
+                    "continue":  "Continuar",
+                    "confirm":  "Confirmar",
+                    "goBack":  "Regresar",
+                    "tryAgain":  "Intentar de Nuevo",
+                    "viewDetails":  "Ver Detalles",
+                    "buyNow":  "Comprar Ahora",
+                    "reserveNow":  "Reservar Ahora",
+                    "download":  "Descargar",
+                    "edit":  "Editar",
+                    "saveChanges":  "Guardar Cambios",
+                    "acceptAll":  "Aceptar todas",
+                    "customize":  "Personalizar",
+                    "necessaryOnly":  "Solo necesarias",
+                    "returnHome":  "Volver al Inicio",
+                    "returnToVenue":  "Volver al Local",
+                    "copyReference":  "Copiar Referencia"
+                },
+    "loading":  {
+                    "default":  "Cargando...",
+                    "wallet":  "Cargando tu cartera...",
+                    "order":  "Cargando tu orden...",
+                    "tickets":  "Cargando entradas...",
+                    "account":  "Cargando tu cuenta..."
+                },
+    "errors":  {
+                   "default":  "Algo salió mal",
+                   "loadFailed":  "Error al cargar datos",
+                   "tryAgainLater":  "Por favor intenta de nuevo más tarde",
+                   "invalidLink":  "Enlace inválido o expirado",
+                   "orderNotFound":  "Orden no encontrada",
+                   "pageNotFound":  "Página no encontrada"
+               },
+    "form":  {
+                 "email":  "Correo Electrónico",
+                 "phone":  "Teléfono",
+                 "firstName":  "Nombre",
+                 "lastName":  "Apellido",
+                 "birthDate":  "Fecha de Nacimiento",
+                 "gender":  "Género",
+                 "male":  "Masculino",
+                 "female":  "Femenino",
+                 "other":  "Otro",
+                 "preferNotToSay":  "Prefiero no decir",
+                 "required":  "Requerido",
+                 "optional":  "Opcional",
+                 "notSet":  "No establecido"
+             },
+    "footer":  {
+                   "copyright":  "© {{year}} Pull",
+                   "privacy":  "Privacidad",
+                   "terms":  "Términos",
+                   "cookies":  "Cookies"
+               },
+    "support":  {
+                    "needHelp":  "¿Necesitas Ayuda?",
+                    "sendMessage":  "Envíanos un mensaje y te responderemos lo antes posible.",
+                    "yourEmail":  "Tu Correo",
+                    "subject":  "Asunto",
+                    "message":  "Mensaje",
+                    "placeholder":  {
+                                        "email":  "tucorreo@ejemplo.com",
+                                        "subject":  "¿En qué necesitas ayuda?",
+                                        "message":  "Describe tu problema o pregunta..."
+                                    },
+                    "sendButton":  "Enviar Mensaje",
+                    "sending":  "Enviando...",
+                    "messageSent":  "¡Mensaje Enviado!",
+                    "responseTime":  "Te responderemos en 24-48 horas.",
+                    "estimatedTime":  "Tiempo estimado de respuesta: 24-48 horas"
+                },
+    "cookies":  {
+                    "banner":  {
+                                   "message":  "Utilizamos cookies para mejorar tu experiencia. Al continuar navegando, aceptas nuestra",
+                                   "policy":  "política de cookies"
+                               },
+                    "modal":  {
+                                  "title":  "Configuración de Cookies",
+                                  "description":  "Utilizamos cookies y tecnologías similares para mejorar tu experiencia. Puedes elegir qué categorías permitir. Las cookies necesarias son esenciales y no se pueden desactivar.",
+                                  "viewPolicy":  "Ver política completa de cookies",
+                                  "necessary":  {
+                                                    "title":  "Cookies Necesarias",
+                                                    "badge":  "Siempre activas",
+                                                    "description":  "Esenciales para el funcionamiento del sitio. Incluyen autenticación, seguridad y preferencias básicas."
+                                                },
+                                  "analytics":  {
+                                                    "title":  "Cookies Analíticas",
+                                                    "badge":  "Opcional",
+                                                    "description":  "Nos ayudan a entender cómo interactúas con el sitio. Usamos Google Analytics 4 con datos anonimizados."
+                                                },
+                                  "marketing":  {
+                                                    "title":  "Cookies de Marketing",
+                                                    "badge":  "Opcional",
+                                                    "description":  "Permiten anuncios personalizados y medir efectividad. Actualmente no están en uso."
+                                                },
+                                  "rejectOptional":  "Rechazar opcionales",
+                                  "savePreferences":  "Guardar preferencias",
+                                  "footerNote":  "Puedes cambiar tus preferencias en cualquier momento desde \"Configuración de cookies\" en el pie de página."
+                              }
+                },
+    "notFound":  {
+                     "title":  "404",
+                     "heading":  "Página No Encontrada",
+                     "description":  "La página que buscas no existe o ha sido movida."
+                 },
+    "validation":  {
+                       "nameRequired":  "El nombre es requerido",
+                       "nameMinLength":  "El nombre debe tener al menos 2 caracteres",
+                       "lastNameRequired":  "El apellido es requerido",
+                       "lastNameMinLength":  "El apellido debe tener al menos 2 caracteres",
+                       "emailRequired":  "El correo es requerido",
+                       "emailInvalid":  "Formato de correo inválido",
+                       "phoneRequired":  "El teléfono es requerido",
+                       "phoneInvalid":  "El teléfono debe tener 6-15 dígitos",
+                       "birthDateRequired":  "La fecha de nacimiento es requerida",
+                       "genderRequired":  "El género es requerido"
+                   },
+    "booking":  {
+                    "assistants":  "Asistentes",
+                    "loginAsAdmin":  "Iniciar como Admin",
+                    "requestMoreParticipants":  "Solicitar más participantes",
+                    "saveChanges":  "Guardar Cambios",
+                    "saving":  "Guardando...",
+                    "cancel":  "Cancelar",
+                    "information":  "Información",
+                    "cancelFreeEnds":  "Cancelación gratis hasta: 48h antes",
+                    "totalPaid":  "Total pagado",
+                    "total":  "Total",
+                    "pending":  "Pendiente",
+                    "guestsAdded":  "¡{{count}} invitado agregado exitosamente!",
+                    "guestsAdded_plural":  "¡{{count}} invitados agregados exitosamente!",
+                    "changesSaved":  "¡Cambios guardados exitosamente! Esperando aprobación del local.",
+                    "changesCancelled":  "Cambios cancelados exitosamente.",
+                    "errorSaving":  "Error al guardar cambios. Por favor intenta de nuevo.",
+                    "bookingIdRequired":  "ID de reserva es requerido",
+                    "failedToLoad":  "Error al cargar detalles de la reserva"
+                },
+    "venues":  {
+                   "title":  "Locales",
+                   "discoverTitle":  "Descubre",
+                   "discoverHighlight":  "increíbles",
+                   "discoverTitleEnd":  "locales",
+                   "subtitle":  "Explora los mejores locales de tu ciudad",
+                   "loading":  "Cargando locales...",
+                   "empty":  "No hay locales disponibles en este momento",
+                   "seo":  {
+                               "title":  "Discotecas y Venues",
+                               "description":  "Descubre las mejores discotecas, bares y venues de Guatemala. Reserva mesas VIP, compra entradas y vive la mejor vida nocturna guatemalteca.",
+                               "keywords":  "discotecas guatemala, venues guatemala, bares guatemala, antros guatemala, vida nocturna guatemala, clubs nocturnos, reservar mesa vip",
+                               "ogTitle":  "Mejores Discotecas y Venues en Guatemala",
+                               "ogDescription":  "Explora las discotecas más exclusivas de Guatemala. Reserva tu mesa VIP y vive noches inolvidables."
+                           }
+               },
+    "assistant":  {
+                      "pendingAdd":  "Por Agregar",
+                      "pendingRemove":  "Por Eliminar",
+                      "toPay":  "Por Pagar",
+                      "cancelAddition":  "Cancelar adición",
+                      "markForRemoval":  "Marcar para eliminar",
+                      "cancelRemoval":  "Cancelar eliminación"
+                  },
+    "login":  {
+                  "title":  "Inicia sesión para gestionar tu reserva",
+                  "dpi":  "DPI",
+                  "password":  "Contraseña",
+                  "dpiPlaceholder":  "Ingresa tu DPI (13 dígitos)",
+                  "passwordPlaceholder":  "Ingresa tu contraseña",
+                  "loginButton":  "Iniciar Sesión",
+                  "loggingIn":  "Iniciando sesión...",
+                  "dpiRequired":  "El DPI es requerido",
+                  "dpiFormat":  "El DPI debe tener exactamente 13 dígitos",
+                  "passwordRequired":  "La contraseña es requerida",
+                  "passwordMinLength":  "La contraseña debe tener al menos 6 caracteres",
+                  "reservationNotFound":  "ID de reserva no encontrado",
+                  "authFailed":  "Autenticación fallida",
+                  "wrongCredentials":  "DPI o contraseña incorrectos",
+                  "notFound":  "Reserva no encontrada",
+                  "connectionError":  "Error de conexión. Por favor intenta de nuevo."
+              },
+    "participants":  {
+                         "addMore":  "Agregar Más Participantes",
+                         "guestName":  "Nombre del Invitado {{number}}",
+                         "enterGuestName":  "Ingresa el nombre del invitado",
+                         "addAnother":  "+ Agregar Otro Invitado",
+                         "addGuest":  "Agregar {{count}} Invitado",
+                         "addGuests":  "Agregar {{count}} Invitados"
+                     },
+    "ticketCard":  {
+                       "onlyLeft":  "Solo quedan {{count}}",
+                       "guests":  "{{min}}-{{max}} invitados",
+                       "buy":  "Comprar",
+                       "reserveNow":  "Reservar Ahora",
+                       "premiumBottle":  "Servicio de botella premium disponible",
+                       "dedicatedArea":  "Área dedicada para grupos",
+                       "easyPayment":  "División de pago fácil"
+                   },
+    "userForm":  {
+                     "attendeeDetails":  "Datos del Asistente {{number}}",
+                     "name":  "Nombre",
+                     "lastName":  "Apellido",
+                     "email":  "Correo Electrónico",
+                     "phone":  "Teléfono",
+                     "dateOfBirth":  "Fecha de Nacimiento",
+                     "gender":  "Género",
+                     "enterName":  "Ingresa el nombre",
+                     "enterLastName":  "Ingresa el apellido",
+                     "requiredByTicket":  "(Requerido por tipo de entrada)"
+                 },
+    "receipt":  {
+                    "orderSummary":  "Resumen del Pedido",
+                    "ticket":  "entrada",
+                    "tickets":  "entradas",
+                    "perTicket":  "por entrada",
+                    "subtotal":  "Subtotal",
+                    "serviceFee":  "Tarifa de Servicio",
+                    "total":  "Total",
+                    "continueToData":  "Continuar a Datos"
+                },
+    "qr": {
+      "validated": "Validado",
+      "date": "Fecha",
+      "downloadPdf": "Descargar PDF",
+      "dateTbd": "Fecha por confirmar",
+      "event": "Evento",
+      "name": "Nombre",
+      "location": "Ubicación",
+      "valid": "Válido",
+      "presentCode": "Presenta este código en la entrada",
+      "generalAdmission": "Entrada General"
+    },
+    "venue": {
+      "bookingFor": "reserva para",
+      "table": "Mesa",
+      "bar": "Barra",
+      "viewEvents": "Ver eventos",
+      "viewUpcoming": "Ver próximos eventos"
+    },
+    "zones": {
+      "standard": "Estándar",
+      "vip": "VIP",
+      "vipPremium": "VIP Premium",
+      "selectTable": "Seleccionar Mesa"
+    },
+    "event": {
+      "readMore": "Leer más",
+      "noDressCode": "Sin código de vestimenta especificado",
+      "reservationNotFound": "Reservación no encontrada",
+      "aboutEvent": "Sobre este evento",
+      "backToHome": "Volver al inicio",
+      "getDirections": "Cómo llegar",
+      "description": "Descripción"
+    }
+}

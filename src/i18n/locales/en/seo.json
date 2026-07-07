@@ -1,0 +1,46 @@
+{
+  "home": {
+    "title": "Pull Events - Buy Tickets for Events in Guatemala",
+    "description": "Discover and buy tickets for the best events, parties, and concerts in Guatemala. Fast, secure, and easy.",
+    "keywords": "events guatemala, tickets guatemala, parties guatemala, concerts guatemala, nightlife guatemala"
+  },
+  "venue": {
+    "title": "{{venueName}} - Events and Tickets | Pull Events",
+    "description": "Buy tickets for events at {{venueName}}. See upcoming events, parties, and concerts.",
+    "keywords": "{{venueName}}, events {{venueName}}, tickets {{venueName}}, parties {{location}}"
+  },
+  "event": {
+    "title": "{{eventName}} | Pull Events",
+    "description": "Buy tickets for {{eventName}}. {{date}} at {{location}}.",
+    "keywords": "{{eventName}}, tickets {{eventName}}, events {{location}}"
+  },
+  "wallet": {
+    "title": "My Wallet - My Tickets | Pull Events",
+    "description": "Manage your tickets and view your purchase history on Pull Events."
+  },
+  "login": {
+    "title": "Sign In | Pull Events",
+    "description": "Sign in to your Pull Events account to manage your tickets and purchases."
+  },
+  "privacy": {
+    "title": "Privacy Policy | Pull Events",
+    "description": "Learn how Pull Events protects your personal information and privacy."
+  },
+  "terms": {
+    "title": "Terms of Service | Pull Events",
+    "description": "Read the terms and conditions for using Pull Events platform."
+  },
+  "cookies": {
+    "title": "Cookie Policy | Pull Events",
+    "description": "Learn how Pull Events uses cookies to improve your experience."
+  },
+  "notFound": {
+    "title": "Page Not Found | Pull Events",
+    "description": "The page you're looking for doesn't exist or has been moved."
+  },
+  "common": {
+    "siteName": "Pull Events",
+    "defaultDescription": "The best platform for buying event tickets in Guatemala",
+    "locale": "en_US"
+  }
+}

@@ -1,0 +1,764 @@
+/* guest-list-signup-page.css - Matches payment-page design */
+
+/* Purple color: rgb(139, 92, 246) / rgb(167, 139, 250) */
+
+.guest-list-signup-wrapper {
+    flex: 1;
+    position: relative;
+    background: transparent;
+}
+
+.guest-list-signup-bg-blur {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(24px) brightness(0.4);
+    transform: scale(1.1);
+    z-index: 0;
+}
+
+.guest-list-signup-bg-blur::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
+    pointer-events: none;
+}
+
+.guest-list-signup-bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.guest-list-signup-content {
+    position: relative;
+    z-index: 2;
+}
+
+.guest-list-signup-container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+}
+
+/* Error Banner */
+.guest-list-signup-error-banner {
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-1rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.guest-list-signup-error-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1.5px solid rgba(239, 68, 68, 0.3);
+    border-radius: 0.75rem;
+    backdrop-filter: blur(24px);
+}
+
+.guest-list-signup-error-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: rgb(248, 113, 113);
+    flex-shrink: 0;
+}
+
+.guest-list-signup-error-text {
+    flex: 1;
+}
+
+.guest-list-signup-error-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(248, 113, 113);
+    margin: 0 0 0.25rem 0;
+}
+
+.guest-list-signup-error-message {
+    font-size: 0.875rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.guest-list-signup-error-close {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.guest-list-signup-error-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Grid Layout - same as payment-page */
+.guest-list-signup-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.guest-list-signup-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.guest-list-signup-right {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+
+/* Ticket Card - same as pre-purchase-ticket-card */
+.guest-list-signup-ticket-card {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    background: rgba(139, 92, 246, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.guest-list-signup-ticket-content {
+    margin-bottom: 1.5rem;
+}
+
+.guest-list-signup-ticket-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.guest-list-signup-ticket-icon {
+    color: rgb(167, 139, 250);
+    flex-shrink: 0;
+}
+
+.guest-list-signup-ticket-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.guest-list-signup-ticket-description {
+    font-size: 0.9375rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.guest-list-signup-ticket-price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.guest-list-signup-price-amount {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: rgb(167, 139, 250);
+    text-transform: uppercase;
+}
+
+/* Info Widget - same as pre-purchase-info-widget */
+.guest-list-signup-info-widget {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.guest-list-signup-info-widget svg {
+    flex-shrink: 0;
+    color: rgb(59, 130, 246);
+    margin-top: 0.125rem;
+}
+
+.guest-list-signup-info-widget p {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Quantity Card - same as pre-purchase-quantity-card */
+.guest-list-signup-quantity-card {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(64px);
+    -webkit-backdrop-filter: blur(64px);
+    overflow: hidden;
+}
+
+.guest-list-signup-quantity-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.01em;
+    text-align: center;
+}
+
+.guest-list-signup-quantity-help {
+    font-size: 0.875rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+}
+
+.guest-list-signup-quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.guest-list-signup-quantity-button {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guest-list-signup-quantity-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.guest-list-signup-quantity-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.guest-list-signup-quantity-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.guest-list-signup-quantity-button-plus {
+    background: rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: white;
+}
+
+.guest-list-signup-quantity-button-plus:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.guest-list-signup-quantity-display {
+    text-align: center;
+}
+
+.guest-list-signup-quantity-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.375rem;
+}
+
+.guest-list-signup-spots-warning {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: rgb(251, 191, 36);
+}
+
+/* Receipt - matches ticket-receipt exactly */
+.guest-list-signup-receipt {
+    position: sticky;
+    top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.guest-list-signup-receipt-card {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(64px);
+    -webkit-backdrop-filter: blur(64px);
+    overflow: hidden;
+}
+
+.guest-list-signup-receipt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.guest-list-signup-receipt-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.guest-list-signup-receipt-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgb(167, 139, 250);
+}
+
+.guest-list-signup-receipt-items {
+    margin-bottom: 1.5rem;
+}
+
+.guest-list-signup-receipt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.guest-list-signup-receipt-item-info {
+    flex: 1;
+}
+
+.guest-list-signup-receipt-item-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 0.25rem;
+}
+
+.guest-list-signup-receipt-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.guest-list-signup-receipt-item-quantity svg {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.guest-list-signup-receipt-item-price {
+    text-align: right;
+}
+
+.guest-list-signup-receipt-free {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: rgb(167, 139, 250);
+    text-transform: uppercase;
+}
+
+.guest-list-signup-receipt-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin-bottom: 1.5rem;
+}
+
+.guest-list-signup-receipt-totals {
+    margin-bottom: 0;
+}
+
+.guest-list-signup-receipt-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.guest-list-signup-receipt-total-row span:first-child {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.guest-list-signup-receipt-total-row span:last-child {
+    font-weight: 500;
+    color: white;
+}
+
+.guest-list-signup-receipt-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.guest-list-signup-receipt-total span:first-child {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+}
+
+.guest-list-signup-receipt-total-amount {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: transparent;
+    background: linear-gradient(to right, rgb(167, 139, 250), rgb(168, 85, 255));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+/* Button - matches ticket-receipt-button */
+.guest-list-signup-receipt-button {
+    width: 100%;
+    padding: 1rem 1.75rem;
+    border-radius: 0.75rem;
+    background: rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.guest-list-signup-receipt-button:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.guest-list-signup-receipt-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.guest-list-signup-button-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.guest-list-signup-receipt-button:hover .guest-list-signup-button-icon {
+    transform: translateX(0.25rem);
+}
+
+.guest-list-signup-button-loading {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* Loading */
+.guest-list-signup-loading {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guest-list-signup-loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(167, 139, 250, 0.2);
+    border-top-color: rgb(167, 139, 250);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (min-width: 1280px) {
+    .guest-list-signup-container {
+        padding: 2rem 2rem 3rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .guest-list-signup-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .guest-list-signup-receipt {
+        position: static;
+    }
+
+    .guest-list-signup-ticket-title {
+        font-size: 1.375rem;
+    }
+
+    .guest-list-signup-price-amount {
+        font-size: 2.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .guest-list-signup-container {
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .guest-list-signup-ticket-card {
+        padding: 1.25rem;
+    }
+
+    .guest-list-signup-ticket-title {
+        font-size: 1.25rem;
+    }
+
+    .guest-list-signup-price-amount {
+        font-size: 2rem;
+    }
+
+    .guest-list-signup-receipt-card {
+        padding: 1.25rem;
+    }
+
+    .guest-list-signup-receipt-title {
+        font-size: 1.125rem;
+    }
+
+    .guest-list-signup-receipt-item-name {
+        font-size: 0.8125rem;
+    }
+
+    .guest-list-signup-receipt-free {
+        font-size: 1rem;
+    }
+
+    .guest-list-signup-receipt-total-amount {
+        font-size: 1.375rem;
+    }
+
+    .guest-list-signup-receipt-button {
+        font-size: 0.9375rem;
+        padding: 0.9375rem 1.5rem;
+    }
+
+    .guest-list-signup-error-content {
+        padding: 0.875rem 1rem;
+    }
+
+    .guest-list-signup-error-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .guest-list-signup-container {
+        padding: 2rem 1.1rem 2rem;
+    }
+
+    .guest-list-signup-info-widget {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .guest-list-signup-info-widget svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .guest-list-signup-info-widget p {
+        font-size: 0.75rem;
+    }
+
+    .guest-list-signup-quantity-card {
+        padding: 1.25rem;
+    }
+
+    .guest-list-signup-quantity-title {
+        font-size: 1.125rem;
+    }
+
+    .guest-list-signup-quantity-help {
+        font-size: 0.8125rem;
+    }
+
+    .guest-list-signup-receipt-card {
+        padding: 1rem;
+    }
+
+    .guest-list-signup-receipt-title {
+        font-size: 1rem;
+    }
+
+    .guest-list-signup-receipt-item {
+        padding: 0.875rem;
+    }
+
+    .guest-list-signup-receipt-item-name {
+        font-size: 0.75rem;
+    }
+
+    .guest-list-signup-receipt-free {
+        font-size: 0.9375rem;
+    }
+
+    .guest-list-signup-receipt-total-row {
+        font-size: 0.8125rem;
+    }
+
+    .guest-list-signup-receipt-total span:first-child {
+        font-size: 1rem;
+    }
+
+    .guest-list-signup-receipt-total-amount {
+        font-size: 1.25rem;
+    }
+
+    .guest-list-signup-receipt-button {
+        font-size: 0.875rem;
+        padding: 0.875rem 1.25rem;
+    }
+
+    .guest-list-signup-error-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem 0.875rem;
+    }
+
+    .guest-list-signup-error-close {
+        align-self: flex-end;
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .guest-list-signup-container {
+        padding: 2rem 1.1rem 2rem;
+    }
+
+    .guest-list-signup-ticket-title {
+        font-size: 1.125rem;
+    }
+
+    .guest-list-signup-price-amount {
+        font-size: 1.75rem;
+    }
+
+    .guest-list-signup-quantity-number {
+        font-size: 2rem;
+    }
+
+    .guest-list-signup-receipt-card {
+        padding: 0.875rem;
+    }
+
+    .guest-list-signup-receipt-title {
+        font-size: 0.9375rem;
+    }
+
+    .guest-list-signup-receipt-item {
+        padding: 0.75rem;
+    }
+
+    .guest-list-signup-receipt-item-name {
+        font-size: 0.6875rem;
+    }
+
+    .guest-list-signup-receipt-free {
+        font-size: 0.875rem;
+    }
+
+    .guest-list-signup-receipt-total-amount {
+        font-size: 1.125rem;
+    }
+
+    .guest-list-signup-receipt-button {
+        font-size: 0.8125rem;
+        padding: 0.8125rem 1.125rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guest-list-signup-quantity-button,
+    .guest-list-signup-loading-spinner,
+    .guest-list-signup-button-loading,
+    .guest-list-signup-error-banner,
+    .guest-list-signup-receipt-button,
+    .guest-list-signup-button-icon {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .guest-list-signup-quantity-button:hover {
+        transform: none !important;
+    }
+
+    .guest-list-signup-receipt-button:hover .guest-list-signup-button-icon {
+        transform: none !important;
+    }
+}

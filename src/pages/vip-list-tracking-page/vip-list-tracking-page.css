@@ -1,0 +1,2553 @@
+/* VIP List Tracking Page Styles */
+
+/* Ensure all elements use border-box */
+.viptrack-wrapper *,
+.viptrack-wrapper *::before,
+.viptrack-wrapper *::after {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.viptrack-wrapper {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  flex: 1;
+  position: relative;
+  background: transparent;
+}
+
+.viptrack-bg-blur {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(24px) brightness(0.3);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.viptrack-bg-blur::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
+  pointer-events: none;
+}
+
+.viptrack-bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.viptrack-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.viptrack-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+/* Loading */
+.viptrack-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.viptrack-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: viptrack-spin 1s linear infinite;
+}
+
+@keyframes viptrack-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error */
+.viptrack-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 60vh;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.viptrack-error svg {
+  color: #a78bfa;
+  margin-bottom: 16px;
+}
+
+.viptrack-error h2 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  font-family: inherit;
+}
+
+.viptrack-error-btn {
+  padding: 0.875rem 1.5rem;
+  background: rgba(139, 92, 246, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  border-radius: 0.625rem;
+  color: #a78bfa;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.viptrack-error-btn:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+/* Header */
+.viptrack-header {
+  margin-bottom: 32px;
+}
+
+.viptrack-header-content {
+  display: flex;
+  align-items: stretch;
+  gap: 1.5rem;
+}
+
+.viptrack-event-image {
+  flex-shrink: 0;
+  width: 160px;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.viptrack-event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.viptrack-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.viptrack-header-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.viptrack-type-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 480px) {
+  .viptrack-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .viptrack-event-image {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 1;
+  }
+
+  .viptrack-header-top {
+    justify-content: center;
+  }
+
+  .viptrack-event-details {
+    justify-content: center;
+  }
+}
+
+.viptrack-vip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(167, 139, 250, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.viptrack-vip-badge svg {
+  color: #c4b5fd;
+}
+
+.viptrack-vip-badge span {
+  color: #c4b5fd;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  font-family: inherit;
+}
+
+.viptrack-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 6px;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.viptrack-event-name {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  font-family: inherit;
+  margin: 0 0 1rem 0;
+}
+
+.viptrack-event-description {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-family: inherit;
+  margin: 0 auto 16px auto;
+  max-width: 600px;
+}
+
+.viptrack-event-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  row-gap: 8px;
+}
+
+.viptrack-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.viptrack-detail-item svg {
+  color: #a78bfa;
+}
+
+@media (max-width: 640px) {
+  .viptrack-title {
+    font-size: 1.375rem;
+  }
+
+  .viptrack-event-name {
+    font-size: 0.9375rem;
+  }
+
+  .viptrack-event-details {
+    gap: 8px;
+  }
+
+  .viptrack-detail-item {
+    font-size: 0.8125rem;
+    padding: 4px 8px;
+  }
+}
+
+/* Tablet/Small desktop */
+@media (min-width: 641px) and (max-width: 900px) {
+  .viptrack-event-image {
+    width: 130px;
+  }
+
+  .viptrack-title {
+    font-size: 1.625rem;
+  }
+}
+
+/* Banners */
+.viptrack-banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 0.75rem;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.viptrack-banner > svg {
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.viptrack-banner h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+  font-family: inherit;
+}
+
+.viptrack-banner p {
+  font-size: 0.8125rem;
+  opacity: 0.85;
+  margin: 2px 0 0 0;
+  line-height: 1.3;
+  font-family: inherit;
+}
+
+.viptrack-banner-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.viptrack-banner-close:hover {
+  opacity: 1;
+}
+
+.viptrack-banner-success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.viptrack-banner-open {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.viptrack-banner-closed {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.1));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+}
+
+.viptrack-banner-completed {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(75, 85, 99, 0.1));
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  color: #9ca3af;
+}
+
+.viptrack-deadline-remaining {
+  display: inline-block;
+  margin-top: 8px;
+  background: rgba(139, 92, 246, 0.2);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* Two Columns */
+.viptrack-two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .viptrack-two-columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+}
+
+/* Left Column */
+.viptrack-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Info Card */
+.viptrack-info-card {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.viptrack-info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+.viptrack-info-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+  font-family: inherit;
+}
+
+/* Guests Card (Left Column) */
+.viptrack-guests-card {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.viptrack-guests-card .viptrack-guests-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: none;
+  padding-top: 0;
+}
+
+.viptrack-guests-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #c4b5fd;
+  margin-left: auto;
+}
+
+/* Type Badge */
+.viptrack-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(167, 139, 250, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  padding: 12px 20px;
+  border-radius: 0.625rem;
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+/* Price Card */
+.viptrack-price-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.05));
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-radius: 1.25rem;
+  padding: 28px;
+  text-align: center;
+}
+
+.viptrack-price-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-family: inherit;
+}
+
+.viptrack-price-header svg {
+  color: #a78bfa;
+}
+
+.viptrack-price-amount {
+  font-size: 2.625rem;
+  font-weight: 800;
+  color: #10b981;
+  margin-bottom: 8px;
+  font-family: inherit;
+}
+
+.viptrack-price-note {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+  font-family: inherit;
+}
+
+.viptrack-price-fee {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-family: inherit;
+}
+
+/* RSVP Section */
+.viptrack-rsvp-section {
+  margin-top: 8px;
+}
+
+.viptrack-rsvp-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(139, 92, 246, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  color: #a78bfa;
+  padding: 1rem 2rem;
+  border-radius: 0.625rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.viptrack-rsvp-btn:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+/* RSVP Form - Matching user-details-form */
+.viptrack-rsvp-form {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.viptrack-rsvp-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+}
+
+.viptrack-rsvp-header svg {
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.viptrack-rsvp-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.01em;
+  font-family: inherit;
+}
+
+.viptrack-rsvp-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: rgb(248, 113, 113);
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.viptrack-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .viptrack-form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.viptrack-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.viptrack-form-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.viptrack-required {
+  color: rgb(248, 113, 113);
+  font-size: 0.75rem;
+}
+
+.viptrack-form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.viptrack-form-group input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.viptrack-form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: inherit;
+}
+
+/* Phone Input - Matching user-details-form */
+.viptrack-phone-input {
+  display: grid;
+  grid-template-columns: 125px 1fr;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.viptrack-phone-input input {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.viptrack-phone-input input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.viptrack-phone-input input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: inherit;
+}
+
+/* BirthDatePicker Overrides - Flat style matching other inputs */
+.viptrack-form-group .birth-date-picker-container {
+  width: 100%;
+}
+
+.viptrack-form-group .birth-date-trigger {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  min-height: auto;
+  gap: 0;
+}
+
+.viptrack-form-group .birth-date-trigger:hover {
+  border-color: transparent;
+  background: transparent;
+}
+
+.viptrack-form-group .birth-date-trigger:focus-within {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.viptrack-form-group .birth-date-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.625rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: white;
+  letter-spacing: normal;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.viptrack-form-group .birth-date-input:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.viptrack-form-group .birth-date-input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.viptrack-form-group .birth-date-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: inherit;
+}
+
+.viptrack-form-group .birth-date-input--placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: normal;
+  font-weight: 400;
+}
+
+.viptrack-form-group .birth-date-calendar-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.viptrack-form-group .birth-date-calendar-btn:hover {
+  color: rgb(167, 139, 250);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.viptrack-form-group .birth-date-trigger {
+  position: relative;
+}
+
+/* Gender Options - Matching user-details-form pills */
+.viptrack-gender-options {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.viptrack-gender-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1rem;
+  border-radius: 0.625rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.viptrack-gender-btn:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.viptrack-gender-btn.active {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: white;
+}
+
+.viptrack-gender-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(100, 100, 100, 0.1);
+  border-color: rgba(100, 100, 100, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viptrack-gender-btn.disabled:hover {
+  border-color: rgba(100, 100, 100, 0.2);
+  transform: none;
+}
+
+.viptrack-quota-full {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(248, 113, 113, 0.8);
+}
+
+.viptrack-quota-badge {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(248, 113, 113, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.viptrack-quota-message {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 10px;
+  color: rgb(252, 211, 77);
+  font-size: 0.8125rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Quota Full Message */
+.viptrack-quota-full-message {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  border-radius: 1rem;
+}
+
+.viptrack-quota-full-message svg {
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.viptrack-quota-full-message h3 {
+  color: #9ca3af;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: inherit;
+}
+
+.viptrack-quota-full-message p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  margin: 0;
+  font-family: inherit;
+}
+
+/* RSVP Submit Button */
+.viptrack-rsvp-submit {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  margin-top: 0.75rem;
+  border-radius: 0.625rem;
+  background: rgba(139, 92, 246, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  color: rgb(196, 181, 253);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.viptrack-rsvp-submit:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.viptrack-rsvp-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.viptrack-btn-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: viptrack-spin 0.8s linear infinite;
+}
+
+/* RSVP Done */
+.viptrack-rsvp-done {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 1rem;
+}
+
+.viptrack-rsvp-done svg {
+  color: #10b981;
+  margin-bottom: 12px;
+}
+
+.viptrack-rsvp-done h3 {
+  color: #10b981;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: inherit;
+}
+
+.viptrack-rsvp-done p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin: 0;
+  font-family: inherit;
+}
+
+/* Right Column - Progress Card */
+.viptrack-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.viptrack-progress-card {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.viptrack-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.viptrack-progress-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+.viptrack-progress-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  margin: 0;
+  font-family: inherit;
+}
+
+.viptrack-progress-count {
+  text-align: right;
+}
+
+.viptrack-count-big {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #a78bfa;
+  font-family: inherit;
+}
+
+.viptrack-count-total {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: inherit;
+}
+
+/* Progress Bar */
+.viptrack-progressbar {
+  margin-bottom: 1.5rem;
+}
+
+.viptrack-progressbar-track {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.viptrack-progressbar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  border-radius: 5px;
+  transition: width 0.5s ease-out;
+}
+
+/* Gender Stats */
+.viptrack-gender-stats {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.viptrack-gender-stat {
+  flex: 1;
+  text-align: center;
+}
+
+.viptrack-gender-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.viptrack-gender-pay-icon {
+  color: #a78bfa;
+}
+
+.viptrack-gender-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+}
+
+.viptrack-gender-value {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* Guests Preview */
+.viptrack-guests-preview {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1.25rem;
+}
+
+.viptrack-guests-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.viptrack-guests-header svg {
+  color: #a78bfa;
+}
+
+.viptrack-guests-header h3 {
+  color: white;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: inherit;
+}
+
+.viptrack-guests-count,
+.viptrack-paid-count {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.625rem;
+  margin-bottom: 0.5rem;
+}
+
+.viptrack-guests-icon {
+  color: #10b981;
+}
+
+.viptrack-paid-icon {
+  color: #f59e0b;
+}
+
+.viptrack-guests-count span,
+.viptrack-paid-count span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+/* Guest List */
+.viptrack-guests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.viptrack-guest-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.viptrack-guest-item:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.viptrack-guest-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.viptrack-guest-avatar svg {
+  color: #c4b5fd;
+}
+
+.viptrack-guest-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.viptrack-guest-contribution {
+  color: #10b981;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 0.375rem;
+  margin-left: auto;
+}
+
+.viptrack-host-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.15));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fbbf24;
+}
+
+/* Info Card Header */
+.viptrack-info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+.viptrack-info-header svg {
+  color: #a78bfa;
+}
+
+.viptrack-type-label {
+  color: #a78bfa;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+}
+
+/* Order Summary Card */
+.viptrack-order-summary {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.viptrack-order-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+}
+
+.viptrack-order-header svg {
+  color: #a78bfa;
+}
+
+.viptrack-order-header h2 {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+/* Pricing Section */
+.viptrack-pricing-section {
+  margin-bottom: 0;
+}
+
+.viptrack-pricing-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.viptrack-pricing-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.viptrack-pricing-gender-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.viptrack-pricing-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viptrack-pricing-detail-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+}
+
+.viptrack-pricing-detail-label svg {
+  color: #10b981;
+}
+
+.viptrack-pricing-detail-value {
+  color: #10b981;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.viptrack-pricing-fee .viptrack-pricing-detail-value {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.viptrack-pricing-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.viptrack-pricing-total span:first-child {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.viptrack-pricing-total span:last-child {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.viptrack-pricing-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.viptrack-pricing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.viptrack-pricing-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.viptrack-pricing-final {
+  color: #10b981;
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.viptrack-consumables-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 0.625rem;
+}
+
+.viptrack-consumables-note svg {
+  color: #a78bfa;
+}
+
+.viptrack-consumables-note span {
+  color: #a78bfa;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* Mobile: Stack pricing columns */
+@media (max-width: 480px) {
+  .viptrack-pricing-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Selected Price Summary */
+.viptrack-selected-price {
+  margin-top: 1rem;
+}
+
+.viptrack-selected-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.viptrack-fee-row {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+}
+
+.viptrack-total-row {
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+}
+
+.viptrack-total-row span:last-child {
+  color: #10b981;
+  font-size: 1.25rem;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .viptrack-container {
+    padding: 2rem 1rem 2.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .viptrack-container > * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .viptrack-two-columns {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .viptrack-section,
+  .viptrack-column-left,
+  .viptrack-column-right {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .viptrack-info-card,
+  .viptrack-guests-card,
+  .viptrack-progress-card,
+  .viptrack-order-summary,
+  .viptrack-rsvp-form,
+  .viptrack-find-payment,
+  .viptrack-banner,
+  .viptrack-payment-progress-widget,
+  .viptrack-consumables-widget {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Ensure all nested elements respect container */
+  .viptrack-guests-list,
+  .viptrack-guest-item,
+  .viptrack-pricing-breakdown,
+  .viptrack-pricing-column,
+  .viptrack-find-payment-form,
+  .viptrack-find-payment-row {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .viptrack-guest-item {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .viptrack-guest-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .viptrack-guest-contribution {
+    flex-shrink: 0;
+  }
+
+  .viptrack-payment-badge {
+    flex-shrink: 0;
+  }
+
+  .viptrack-title {
+    font-size: 1.75rem;
+  }
+
+  .viptrack-price-amount {
+    font-size: 2.25rem;
+  }
+
+  .viptrack-column-right {
+    position: static;
+  }
+
+  .viptrack-rsvp-form {
+    padding: 1.25rem;
+  }
+
+  .viptrack-form-group input,
+  .viptrack-phone-input input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .viptrack-form-group .birth-date-input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .viptrack-gender-btn {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .viptrack-phone-input {
+    grid-template-columns: 120px 1fr;
+    gap: 0.625rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .viptrack-rsvp-form {
+    padding: 1rem;
+  }
+
+  .viptrack-rsvp-title {
+    font-size: 1rem;
+  }
+
+  .viptrack-form-group label {
+    font-size: 0.8125rem;
+  }
+
+  .viptrack-form-group input,
+  .viptrack-phone-input input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .viptrack-form-group .birth-date-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .viptrack-gender-btn {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .viptrack-phone-input {
+    grid-template-columns: 110px 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* Payment Status Badges */
+.viptrack-payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+}
+
+.viptrack-payment-badge.paid {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.viptrack-payment-badge.unpaid {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+/* Find My Payment Section */
+.viptrack-find-payment {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.viptrack-find-payment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.viptrack-find-payment-header h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.viptrack-find-payment-header svg {
+  color: #a78bfa;
+}
+
+.viptrack-find-payment-desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.viptrack-find-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.viptrack-find-payment-row {
+  display: flex;
+  gap: 12px;
+}
+
+.viptrack-find-payment-row input {
+  flex: 1;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.viptrack-find-payment-row input:focus {
+  outline: none;
+  border-color: rgba(167, 139, 250, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.viptrack-find-payment-row input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.viptrack-find-payment-row button,
+.viptrack-find-payment-btn {
+  padding: 14px 24px;
+  background: rgba(139, 92, 246, 0.15) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border-radius: 10px;
+  color: #a78bfa !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.viptrack-find-payment-row button:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.viptrack-find-payment-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Specific class for find payment button */
+.viptrack-find-payment-btn {
+  padding: 14px 24px !important;
+  background: rgba(139, 92, 246, 0.15) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border-radius: 10px !important;
+  color: #a78bfa !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.viptrack-find-payment-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.25) !important;
+  border-color: rgba(139, 92, 246, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.viptrack-find-payment-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .viptrack-find-payment-row {
+    flex-direction: column;
+  }
+
+  .viptrack-find-payment-row button {
+    width: 100%;
+  }
+
+  .viptrack-payment-badge {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+}
+
+/* ============================================
+   CONSUMABLES WIDGET - EYE-CATCHING
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse-flame {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.viptrack-consumables-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 32px;
+}
+
+.viptrack-consumables-widget-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.viptrack-consumables-widget-left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.viptrack-consumables-widget-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(167, 139, 250, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.viptrack-consumables-widget-icon svg {
+  color: #a78bfa;
+  width: 24px;
+  height: 24px;
+}
+
+.viptrack-consumables-widget-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viptrack-consumables-widget-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.viptrack-consumables-widget-amount {
+  color: #10b981;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Contributions by gender */
+.viptrack-consumables-widget-contributions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.viptrack-consumables-contribution-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.viptrack-contribution-gender {
+  color: #c4b5fd;
+  font-size: 0.625rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.viptrack-contribution-value {
+  color: #10b981;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* Progress Section */
+.viptrack-consumables-widget-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.viptrack-consumables-widget-progress-bar {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.viptrack-consumables-widget-progress-fill {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa, #8b5cf6);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  animation: gradient-shift 3s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.viptrack-progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer-fill 2s infinite;
+}
+
+@keyframes shimmer-fill {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Progress Bar Row with Roulette Button */
+.viptrack-progress-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.viptrack-progress-bar-row .viptrack-consumables-widget-progress-bar,
+.viptrack-progress-bar-row .viptrack-payment-progress-bar {
+  flex: 1;
+}
+
+.viptrack-roulette-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border: 2px solid rgba(251, 191, 36, 0.5);
+  border-radius: 12px;
+  color: #fbbf24;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+  animation: roulette-glow 2s ease-in-out infinite;
+}
+
+.viptrack-roulette-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+@keyframes roulette-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+  }
+}
+
+.viptrack-consumables-widget-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viptrack-consumables-widget-progress-left {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.viptrack-flame-icon {
+  color: #f97316;
+  animation: pulse-flame 1.5s ease-in-out infinite;
+}
+
+.viptrack-consumables-widget-percent {
+  color: #a78bfa;
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.viptrack-consumables-widget-progress-right {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+}
+
+.viptrack-consumables-widget-progress-right svg {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* CTA */
+.viptrack-consumables-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.1));
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 0.5rem;
+  color: #c4b5fd;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.viptrack-consumables-cta svg {
+  color: #a78bfa;
+}
+
+/* Mobile Adjustments for Consumables Widget */
+@media (max-width: 640px) {
+  .viptrack-consumables-widget {
+    padding: 1rem;
+  }
+
+  .viptrack-consumables-widget-top {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .viptrack-consumables-widget-contributions {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .viptrack-consumables-widget-amount {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================
+   CELEBRATION MODAL
+   ============================================ */
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes celebration-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes amount-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.viptrack-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: celebration-pop 0.4s ease-out;
+}
+
+.viptrack-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.viptrack-confetti-piece {
+  position: absolute;
+  top: -50px;
+  font-size: 2rem;
+  animation: confetti-fall 3s ease-in-out infinite;
+}
+
+.viptrack-confetti-piece:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 2.5s; }
+.viptrack-confetti-piece:nth-child(2) { left: 25%; animation-delay: 0.2s; animation-duration: 3s; }
+.viptrack-confetti-piece:nth-child(3) { left: 40%; animation-delay: 0.4s; animation-duration: 2.8s; }
+.viptrack-confetti-piece:nth-child(4) { left: 55%; animation-delay: 0.1s; animation-duration: 3.2s; }
+.viptrack-confetti-piece:nth-child(5) { left: 70%; animation-delay: 0.5s; animation-duration: 2.6s; }
+.viptrack-confetti-piece:nth-child(6) { left: 85%; animation-delay: 0.3s; animation-duration: 2.9s; }
+.viptrack-confetti-piece:nth-child(7) { left: 15%; animation-delay: 0.6s; animation-duration: 3.1s; }
+.viptrack-confetti-piece:nth-child(8) { left: 75%; animation-delay: 0.15s; animation-duration: 2.7s; }
+
+.viptrack-celebration-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 1.5rem;
+  max-width: 340px;
+  margin: 0 1rem;
+  animation: celebration-pop 0.5s ease-out 0.1s both;
+}
+
+.viptrack-celebration-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.2));
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.viptrack-celebration-icon svg {
+  color: #a78bfa;
+  width: 36px;
+  height: 36px;
+}
+
+.viptrack-celebration-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.viptrack-celebration-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.viptrack-celebration-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  animation: amount-bounce 2s ease-in-out infinite;
+}
+
+.viptrack-celebration-plus {
+  color: #10b981;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.viptrack-celebration-value {
+  color: #10b981;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.viptrack-celebration-total {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.viptrack-celebration-total strong {
+  color: #a78bfa;
+  font-weight: 700;
+}
+
+.viptrack-celebration-close {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: rgba(139, 92, 246, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  border-radius: 0.625rem;
+  color: #a78bfa;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.viptrack-celebration-close:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+.viptrack-celebration-close:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   PAYMENT PROGRESS WIDGET - Professional Animation
+   ============================================ */
+
+.viptrack-payment-progress-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(10, 10, 15, 0.6);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 32px;
+}
+
+.viptrack-payment-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.viptrack-payment-progress-header > svg {
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.viptrack-payment-progress-titles {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viptrack-payment-progress-header h3 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+  font-family: inherit;
+}
+
+.viptrack-payment-progress-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-family: inherit;
+}
+
+.viptrack-payment-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.1));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  color: #a78bfa;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* Money Flow Container */
+.viptrack-money-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+/* Wallet Cards */
+.viptrack-wallet {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  cursor: default;
+}
+
+.viptrack-wallet-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.viptrack-wallet-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.viptrack-wallet-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-family: inherit;
+}
+
+.viptrack-wallet-amount {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-family: inherit;
+}
+
+/* Source Wallet (Goal - Ghost style) */
+.viptrack-wallet-source {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px dashed rgba(255, 255, 255, 0.1);
+}
+
+.viptrack-wallet-source .viptrack-wallet-icon {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+}
+
+.viptrack-wallet-source .viptrack-wallet-icon svg {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Destination Wallet (Pot - Active style) */
+.viptrack-wallet-dest {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(167, 139, 250, 0.06));
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.viptrack-wallet-icon-active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.2));
+  border: 1.5px solid rgba(139, 92, 246, 0.5);
+}
+
+.viptrack-wallet-icon-active svg {
+  color: #a78bfa;
+}
+
+.viptrack-amount-green {
+  color: #a78bfa !important;
+}
+
+/* Money Stream Animation */
+.viptrack-money-stream {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.viptrack-money-particle {
+  font-size: 1.125rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  position: absolute;
+}
+
+/* Payment Progress Bar */
+.viptrack-payment-progress-bar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.viptrack-payment-progress-bar {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.viptrack-payment-progress-fill {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa, #8b5cf6);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: payment-gradient-shift 3s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes payment-gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.viptrack-payment-progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  animation: payment-shimmer 2s infinite;
+}
+
+@keyframes payment-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.viptrack-payment-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viptrack-payment-progress-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-family: inherit;
+}
+
+.viptrack-payment-progress-percent {
+  color: #a78bfa;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* Mobile Adjustments for Payment Progress */
+@media (max-width: 640px) {
+  .viptrack-payment-progress-widget {
+    padding: 0.875rem;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .viptrack-banner {
+    width: 100%;
+  }
+
+  .viptrack-consumables-widget {
+    width: 100%;
+  }
+
+  .viptrack-money-flow {
+    gap: 0.25rem;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .viptrack-wallet {
+    padding: 0.5rem 0.625rem;
+    gap: 0.375rem;
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .viptrack-wallet-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .viptrack-wallet-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .viptrack-wallet-info {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .viptrack-wallet-amount {
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .viptrack-wallet-label {
+    font-size: 0.5625rem;
+  }
+
+  .viptrack-money-stream {
+    min-width: 35px;
+    flex-shrink: 0;
+  }
+
+  .viptrack-money-particle {
+    font-size: 0.875rem;
+  }
+}

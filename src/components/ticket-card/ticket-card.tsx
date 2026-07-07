@@ -1,4 +1,7 @@
 // components/ticket-card/ticket-card.tsx
+// PERFORMANCE: Memoized to prevent unnecessary re-renders in lists
+import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Download, QrCode, Calendar, MapPin, CheckCircle } from "lucide-react";
 import type { PurchasedTicketInfo } from "../../types/types";
 import "./ticket-card.css";
@@ -7,18 +10,21 @@ interface TicketCardProps {
   ticket: PurchasedTicketInfo;
 }
 
-export const TicketCard = ({ ticket }: TicketCardProps) => {
-  const eventName = ticket.events?.name || "Event";
+export const TicketCard = memo(({ ticket }: TicketCardProps) => {
+  const { t, i18n } = useTranslation('common');
+
+  const eventName = ticket.events?.name || t('qr.event');
   const eventDate = ticket.events?.event_date || "";
   const venueName = ticket.events?.venues?.name || "";
   const venueLocation = ticket.events?.venues?.location || "";
-  const ticketType = ticket.ticket_types?.name || "General Admission";
+  const ticketType = ticket.ticket_types?.name || t('qr.generalAdmission');
   const validated = !!ticket.validated_at;
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
+    const locale = i18n.language === 'es' ? 'es-GT' : 'en-US';
+    return date.toLocaleDateString(locale, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -27,7 +33,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
   };
 
   const handleDownload = () => {
-    console.log("Download ticket:", ticket.id);
+    // TODO: Implement ticket PDF download
   };
 
   return (
@@ -39,19 +45,19 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
         {validated && (
           <div className="ticket-card-validated-badge">
             <CheckCircle size={16} />
-            <span>Validated</span>
+            <span>{t('qr.validated')}</span>
           </div>
         )}
       </div>
 
       <div className="ticket-card-body">
         <h3 className="ticket-card-event-name">{eventName}</h3>
-        
+
         <div className="ticket-card-details">
           <div className="ticket-card-detail">
             <Calendar className="ticket-card-icon" />
             <div>
-              <p className="ticket-card-detail-label">Date</p>
+              <p className="ticket-card-detail-label">{t('qr.date')}</p>
               <p className="ticket-card-detail-value">{formatDate(eventDate)}</p>
             </div>
           </div>
@@ -59,7 +65,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
           <div className="ticket-card-detail">
             <MapPin className="ticket-card-icon" />
             <div>
-              <p className="ticket-card-detail-label">Venue</p>
+              <p className="ticket-card-detail-label">{t('qr.location')}</p>
               <p className="ticket-card-detail-value">{venueName}</p>
               {venueLocation && (
                 <p className="ticket-card-detail-sub">{venueLocation}</p>
@@ -70,16 +76,16 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
 
         <div className="ticket-card-qr">
           <QrCode size={80} />
-          <p className="ticket-card-qr-text">Present this code at entrance</p>
+          <p className="ticket-card-qr-text">{t('qr.presentCode')}</p>
         </div>
       </div>
 
       <div className="ticket-card-footer">
         <button onClick={handleDownload} className="ticket-card-download-btn">
           <Download size={16} />
-          Download
+          {t('buttons.download')}
         </button>
       </div>
     </div>
   );
-};
+});

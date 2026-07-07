@@ -1,5 +1,6 @@
 import { Footer } from '../../components/footer/footer';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Cookie, Shield, BarChart3, Target, Settings, Mail, Building2, ChevronRight } from 'lucide-react';
 import { CookieSettingsButton } from '../../components/cookie-banner/cookie-banner';
 import fondoImage from '../../assets/fondo.png';
@@ -7,13 +8,25 @@ import './cookie-policy-page.css';
 import { SEO } from '../../components/seo/seo';
 
 export const CookiePolicyPage = () => {
+  const { t, i18n } = useTranslation('legal');
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
+
+  // Helper function to build language-prefixed URLs
+  const buildUrl = (path: string) => `/${currentLang}${path}`;
+
   return (
     <div className="cookie-policy-page">
       <SEO
-        title="Política de Cookies"
-        description="Política de cookies de Pull Events. Conoce cómo usamos cookies para mejorar tu experiencia en nuestra plataforma de eventos en Guatemala."
-        keywords="cookies, política de cookies, pull events, privacidad, guatemala"
-        canonicalUrl="https://web.pullevents.com/cookie-policy"
+        title={t('cookiePolicy.title')}
+        description={currentLang === 'es'
+          ? "Política de cookies de Pull Events. Conoce cómo usamos cookies para mejorar tu experiencia en nuestra plataforma de eventos en Guatemala."
+          : "Pull Events Cookie Policy. Learn how we use cookies to improve your experience on our event platform in Guatemala."
+        }
+        keywords={currentLang === 'es'
+          ? "cookies, política de cookies, pull events, privacidad, guatemala"
+          : "cookies, cookie policy, pull events, privacy, guatemala"
+        }
         noIndex={false}
       />
       {/* Background with blur */}
@@ -560,8 +573,8 @@ export const CookiePolicyPage = () => {
               new platform features. We will notify you of any relevant changes
               through the website.
             </p>
-            <Link to="/" className="back-home-link">
-              Back to home page
+            <Link to={buildUrl("/venues/aurora-hall/events")} className="back-home-link">
+              {currentLang === 'es' ? 'Volver a la página principal' : 'Back to home page'}
             </Link>
           </div>
         </main>

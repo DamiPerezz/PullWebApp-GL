@@ -2,7 +2,7 @@
 .group-confirmation-wrapper {
   flex: 1;
   position: relative;
-  overflow: hidden;
+  background: transparent;
 }
 
 .group-confirmation-bg-blur {
@@ -21,8 +21,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 150px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+  height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0f 0%, rgba(10, 10, 15, 0.7) 10%, transparent 30%);
   pointer-events: none;
 }
 
@@ -50,7 +50,7 @@
 .group-confirmation-container {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 5rem 1.5rem 3rem;
+  padding: 2rem 1.5rem 3rem;
 }
 
 /* Header Section */
@@ -97,25 +97,7 @@
   margin: 0;
 }
 
-/* Main Content Card */
-.group-confirmation-main-card {
-  padding: 1.5rem;
-  border-radius: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(15, 15, 21, 0.5);
-  backdrop-filter: blur(48px);
-}
-
-.group-confirmation-section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  margin: 0 0 1.5rem 0;
-  letter-spacing: -0.01em;
-  text-align: center;
-}
-
-/* Two-column grid */
+/* Two-column grid - directly on background */
 .group-confirmation-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -442,6 +424,7 @@
 .group-confirmation-actions {
   display: flex;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .group-confirmation-actions .group-confirmation-button {
@@ -481,11 +464,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .group-confirmation-container {
-    padding: 4rem 1.5rem 2.5rem;
-  }
-
-  .group-confirmation-main-card {
-    padding: 1.25rem;
+    padding: 1.5rem 1.5rem 2.5rem;
   }
 
   .group-confirmation-grid {
@@ -503,11 +482,7 @@
 
 @media (max-width: 640px) {
   .group-confirmation-container {
-    padding: 3rem 1.1rem 2rem;
-  }
-
-  .group-confirmation-main-card {
-    padding: 1rem;
+    padding: 1.5rem 1.1rem 2rem;
   }
 
   .group-confirmation-icon-wrapper {
@@ -527,6 +502,6 @@
 
 @media (min-width: 1280px) {
   .group-confirmation-container {
-    padding: 5rem 2rem 3rem;
+    padding: 2rem 2rem 3rem;
   }
 }

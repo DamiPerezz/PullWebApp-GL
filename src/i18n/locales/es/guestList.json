@@ -1,0 +1,80 @@
+{
+  "card": {
+    "free": "GRATIS",
+    "spots": "{{available}} disponibles",
+    "signUp": "Registrarse",
+    "full": "Lista Llena",
+    "maleOnly": "Solo Hombres",
+    "femaleOnly": "Solo Mujeres"
+  },
+  "signup": {
+    "title": "Datos del Responsable",
+    "guestCount": "Acompañantes",
+    "guestCountHelp": "¿Cuántas personas vienen contigo?",
+    "submit": "Confirmar Registro",
+    "summary": "Resumen",
+    "responsible": "Responsable",
+    "companions": "Acompañantes",
+    "totalPeople": "Total de personas",
+    "price": "Precio",
+    "email": "Correo electrónico",
+    "genderRequired": "Selecciona tu género",
+    "genderRestricted": "Esta lista tiene restricción de género",
+    "error": "Error al registrarse. Inténtalo de nuevo.",
+    "errorEmailExists": "Este email ya está registrado en esta lista. Usa otro email o verifica tu registro anterior.",
+    "errorInvalidData": "Los datos ingresados no son válidos. Verifica la información e inténtalo de nuevo.",
+    "errorListNotFound": "Esta lista ya no está disponible.",
+    "pendingNote": "Tu solicitud será revisada por el staff. Te notificaremos por correo cuando sea aprobada."
+  },
+  "confirmation": {
+    "title": "¡Registro Exitoso!",
+    "description": "Tu solicitud ha sido enviada y está pendiente de aprobación por el staff.",
+    "pendingApproval": "Pendiente de Aprobación",
+    "pendingDescription": "Tu registro está siendo revisado por el equipo del venue. Te notificaremos por correo cuando haya una actualización.",
+    "timeline": {
+      "registered": "Registrado",
+      "registeredDesc": "Tu solicitud ha sido recibida",
+      "staffReview": "Revisión del Staff",
+      "staffReviewDesc": "El equipo está revisando tu solicitud",
+      "approved": "Aprobado",
+      "approvedDesc": "Recibirás tu entrada por correo"
+    },
+    "code": "Código de Verificación",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "codeHint": "Guarda este código para consultar el estado de tu registro",
+    "details": "Detalles del Registro",
+    "list": "Lista",
+    "responsible": "Responsable",
+    "totalPeople": "Total de personas",
+    "people": "personas",
+    "importantInfo": "Información Importante",
+    "infoList": {
+      "registered": "Tu registro ha sido recibido y está en proceso de revisión",
+      "staffReview": "El staff del venue revisará tu solicitud",
+      "approved": "Si es aprobado, recibirás tu entrada por correo electrónico",
+      "emailUpdates": "Te mantendremos informado sobre el estado de tu solicitud"
+    },
+    "returnToVenue": "Volver al Venue",
+    "notFound": "Registro no encontrado",
+    "notFoundDescription": "No se encontró información de este registro",
+    "goHome": "Ir al Inicio"
+  },
+  "status": {
+    "pending": "Pendiente de aprobación",
+    "approved": "¡Aprobado!",
+    "rejected": "Rechazado",
+    "cancelled": "Cancelado",
+    "notFoundTitle": "Registro no encontrado",
+    "notFoundDescription": "No se encontró información para este código de verificación",
+    "verificationCode": "Código",
+    "ticketReady": "Tu entrada está lista. Revisa tu correo.",
+    "cancel": "Cancelar Registro",
+    "cancelConfirmTitle": "¿Cancelar registro?",
+    "cancelConfirmText": "¿Estás seguro de que deseas cancelar tu registro en esta lista? Esta acción no se puede deshacer.",
+    "keepSignup": "No, mantener",
+    "confirmCancel": "Sí, cancelar",
+    "cancelling": "Cancelando...",
+    "viewEvent": "Ver Evento"
+  }
+}

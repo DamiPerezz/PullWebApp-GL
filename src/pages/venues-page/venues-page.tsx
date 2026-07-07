@@ -5,8 +5,13 @@ import { useEffect, useState } from "react";
 import type { VenueInfo } from "../../types/types";
 import { getAllVenues } from "../../controller/venues-page-controller";
 import { SEO } from "../../components/seo/seo";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
 export const VenuesPage = () => {
+  const { t, i18n } = useTranslation('common');
+  const { lang } = useParams<{ lang: string }>();
+  const currentLang = lang || i18n.language || 'es';
   const [venues, setVenues] = useState<VenueInfo[]>([]);
   const [loading, setIsLoading] = useState<boolean>(true);
 
@@ -24,12 +29,12 @@ export const VenuesPage = () => {
   return (
     <Layout>
       <SEO
-        title="Discotecas y Venues"
-        description="Descubre las mejores discotecas, bares y venues de Guatemala. Reserva mesas VIP, compra entradas y vive la mejor vida nocturna guatemalteca."
-        keywords="discotecas guatemala, venues guatemala, bares guatemala, antros guatemala, vida nocturna guatemala, clubs nocturnos, reservar mesa vip"
-        canonicalUrl="https://web.pullevents.com/venues"
-        ogTitle="Mejores Discotecas y Venues en Guatemala"
-        ogDescription="Explora las discotecas más exclusivas de Guatemala. Reserva tu mesa VIP y vive noches inolvidables."
+        title={t('venues.seo.title')}
+        description={t('venues.seo.description')}
+        keywords={t('venues.seo.keywords')}
+        canonicalUrl={`https://web.pullevents.com/${currentLang}/venues`}
+        ogTitle={t('venues.seo.ogTitle')}
+        ogDescription={t('venues.seo.ogDescription')}
       />
       <div className="venues-page-wrapper">
         <div className="venues-page-background" />
@@ -37,15 +42,15 @@ export const VenuesPage = () => {
         <main className="venues-page-content">
           <section className="venues-title-section">
             <h2 className="venues-main-title">
-              Discover <span className="venues-title-gradient">amazing</span> venues
+              {t('venues.discoverTitle')} <span className="venues-title-gradient">{t('venues.discoverHighlight')}</span> {t('venues.discoverTitleEnd')}
             </h2>
-            <p className="venues-subtitle">Explore the best venues in your city</p>
+            <p className="venues-subtitle">{t('venues.subtitle')}</p>
           </section>
 
           {loading ? (
             <div className="venues-loading">
               <div className="venues-loading-spinner" />
-              <p className="venues-loading-text">Loading venues...</p>
+              <p className="venues-loading-text">{t('venues.loading')}</p>
             </div>
           ) : venues.length !== 0 ? (
             <section className="venues-grid-container">
@@ -57,7 +62,7 @@ export const VenuesPage = () => {
             </section>
           ) : (
             <div className="venues-empty">
-              <p className="venues-empty-text">No venues available at the moment</p>
+              <p className="venues-empty-text">{t('venues.empty')}</p>
             </div>
           )}
         </main>

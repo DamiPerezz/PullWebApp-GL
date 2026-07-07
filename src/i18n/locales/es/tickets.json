@@ -1,0 +1,56 @@
+{
+  "purchase": {
+    "title": "Comprar Entradas",
+    "selectTickets": "Seleccionar Entradas",
+    "attendeeDetails": "Datos del Asistente",
+    "review": "Revisar",
+    "payment": "Pago",
+    "quantity": "Cantidad",
+    "ticketsSelected": "{{count}} entrada seleccionada",
+    "ticketsSelected_plural": "{{count}} entradas seleccionadas",
+    "maxTickets": "Máximo {{max}} entradas por pedido",
+    "minTickets": "Mínimo {{min}} entradas requeridas",
+    "perPerson": "por persona",
+    "groupNote": "Máximo {{max}} entradas. Descarga tu entrada desde el correo de confirmación."
+  },
+  "userForm": {
+    "title": "Datos del Asistente",
+    "attendee": "Asistente {{number}}",
+    "sameAsFirst": "Igual que el primer asistente",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo Electrónico",
+    "phone": "Teléfono",
+    "birthDate": "Fecha de Nacimiento",
+    "gender": "Género",
+    "male": "Masculino",
+    "female": "Femenino",
+    "other": "Otro",
+    "preferNotToSay": "Prefiero no decir",
+    "required": "Requerido",
+    "optional": "Opcional"
+  },
+  "summary": {
+    "title": "Resumen del Pedido",
+    "tickets": "Entradas",
+    "subtotal": "Subtotal",
+    "serviceFee": "Cargo por Servicio",
+    "total": "Total",
+    "proceedToPayment": "Proceder al Pago",
+    "free": "Gratis"
+  },
+  "prePurchase": {
+    "title": "Obtener Entradas",
+    "selectQuantity": "Seleccionar Cantidad",
+    "continue": "Continuar",
+    "ticketInfo": "Información del Ticket",
+    "includes": "Incluye",
+    "restrictions": "Restricciones"
+  },
+  "errors": {
+    "title": "Error",
+    "invalidParams": "Parámetros de ticket inválidos. Por favor intenta de nuevo.",
+    "loadingFailed": "Error al cargar información del ticket. Por favor intenta de nuevo.",
+    "backToEvents": "Volver a Eventos"
+  }
+}

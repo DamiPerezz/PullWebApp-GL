@@ -1,5 +1,6 @@
 // table-map-selector.tsx
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { VIPTable } from '../../types/types';
 import { ZoneMarker } from '../zone-marker/zone-marker';
 import mapImage from '../../assets/map.png';
@@ -31,7 +32,7 @@ const ZONE_POSITIONS: Record<string, { left: string; top: string }> = {
 // Función para determinar el tipo de zona basándose en el nombre
 const getZoneTypeFromName = (zoneName: string): 'vip-premium' | 'vip' | 'standard' => {
   const lowerName = zoneName.toLowerCase();
-  
+
   if (lowerName.includes('premium')) {
     return 'vip-premium';
   } else if (lowerName.includes('vip')) {
@@ -42,18 +43,19 @@ const getZoneTypeFromName = (zoneName: string): 'vip-premium' | 'vip' | 'standar
 };
 
 export const TableMapSelector = ({ tables, selectedTable, onSelect }: TableMapSelectorProps) => {
+  const { t } = useTranslation('common');
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
 
   // Agrupar mesas por zona
   const zones: ZoneData[] = Array.from(new Set(tables.map(t => t.zone))).map(zoneName => {
     const zoneTables = tables.filter(t => t.zone === zoneName);
     const availableTables = zoneTables.filter(t => t.is_available);
-    
+
     const position = ZONE_POSITIONS[zoneName] || { left: '50%', top: '50%' };
-    
+
     // Determinar el tipo desde el nombre de la zona
     const zoneType = getZoneTypeFromName(zoneName);
-    
+
     return {
       zone: zoneName,
       zoneType: zoneType,
@@ -75,9 +77,9 @@ export const TableMapSelector = ({ tables, selectedTable, onSelect }: TableMapSe
   return (
     <div className="table-map-container">
       <div className="table-map-visual">
-        <img 
-          src={mapImage} 
-          alt="Venue Map" 
+        <img
+          src={mapImage}
+          alt="Venue Map"
           className="table-map-background"
         />
         <div className="table-map-overlay" />
@@ -85,7 +87,7 @@ export const TableMapSelector = ({ tables, selectedTable, onSelect }: TableMapSe
         {zones.map((zoneData) => {
           const isSelected = selectedTable && zoneData.tables.some(t => t.id === selectedTable.id);
           const isAvailable = zoneData.availableCount > 0;
-          
+
           return (
             <ZoneMarker
               key={zoneData.zone}
@@ -110,15 +112,15 @@ export const TableMapSelector = ({ tables, selectedTable, onSelect }: TableMapSe
       <div className="table-map-legend">
         <div className="table-map-legend-item">
           <div className="table-map-legend-color vip-premium"></div>
-          <span>VIP Premium</span>
+          <span>{t('zones.vipPremium')}</span>
         </div>
         <div className="table-map-legend-item">
           <div className="table-map-legend-color vip"></div>
-          <span>VIP</span>
+          <span>{t('zones.vip')}</span>
         </div>
         <div className="table-map-legend-item">
           <div className="table-map-legend-color standard"></div>
-          <span>Standard</span>
+          <span>{t('zones.standard')}</span>
         </div>
       </div>
     </div>
