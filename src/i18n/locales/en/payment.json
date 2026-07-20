@@ -45,7 +45,11 @@
       "staffReviewDesc": "Staff is reviewing your order",
       "ticketsSent": "Tickets Sent",
       "ticketsSentDesc": "You'll receive tickets via email"
-    }
+    },
+    "confirmedTitle": "Payment Confirmed!",
+    "confirmedDescription": "Your payment was processed successfully. Your tickets are on the way.",
+    "ticketsSentTitle": "Tickets sent",
+    "ticketsSentBody": "We've emailed your tickets with the QR code. Check your inbox (and the spam folder, just in case)."
   },
   "cancel": {
     "title": "Payment Cancelled",

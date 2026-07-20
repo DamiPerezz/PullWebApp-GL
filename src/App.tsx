@@ -66,6 +66,7 @@ import { VenueNavBar } from "./components/venue-nav-bar/venue-nav-bar";
 import { Footer } from "./components/footer/footer";
 import { CookieBanner } from "./components/cookie-banner/cookie-banner";
 import { MobileTabBar } from "./components/mobile-tab-bar/mobile-tab-bar";
+import { DEFAULT_VENUE_SLUG } from './config/venue';
 
 // ========================================
 // LOADING FALLBACK COMPONENT
@@ -102,7 +103,7 @@ const LanguageDetector = () => {
   };
 
   const lang = getPreferredLanguage();
-  return <Navigate to={`/${lang}/venues/aurora-hall/events`} replace />;
+  return <Navigate to={`/${lang}/venues/${DEFAULT_VENUE_SLUG}/events`} replace />;
 };
 
 // ========================================
@@ -146,7 +147,7 @@ const LanguageWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // If invalid language, redirect to default
   if (!isValidLang) {
-    return <Navigate to="/es/venues/aurora-hall/events" replace />;
+    return <Navigate to={`/es/venues/${DEFAULT_VENUE_SLUG}/events`} replace />;
   }
 
   return <>{children}</>;
@@ -195,12 +196,12 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* DEFAULT REDIRECT */}
-      <Route path="/" element={<Navigate to="venues/aurora-hall/events" replace />} />
+      <Route path="/" element={<Navigate to={`venues/${DEFAULT_VENUE_SLUG}/events`} replace />} />
 
       {/* PUBLIC ROUTES - Redirect /venues to Plus venue */}
       <Route
         path="/venues"
-        element={<Navigate to="aurora-hall/events" replace />}
+        element={<Navigate to={`${DEFAULT_VENUE_SLUG}/events`} replace />}
       />
 
       {/* /events and /aboutUs routes - Not implemented yet */}

@@ -45,7 +45,11 @@
       "staffReviewDesc": "El staff está revisando tu pedido",
       "ticketsSent": "Entradas Enviadas",
       "ticketsSentDesc": "Recibirás las entradas por correo"
-    }
+    },
+    "confirmedTitle": "¡Pago Confirmado!",
+    "confirmedDescription": "Tu pago se ha procesado correctamente. Tus entradas van en camino.",
+    "ticketsSentTitle": "Entradas enviadas",
+    "ticketsSentBody": "Hemos enviado tus entradas con el código QR a tu correo electrónico. Revisa tu bandeja de entrada (y la carpeta de spam por si acaso)."
   },
   "cancel": {
     "title": "Pago Cancelado",

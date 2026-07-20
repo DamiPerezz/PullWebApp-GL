@@ -5,6 +5,7 @@ import { FileText, CreditCard, AlertTriangle, Scale, Ban, RefreshCw, Mail, Build
 import fondoImage from '../../assets/fondo.png';
 import '../cookie-policy-page/cookie-policy-page.css';
 import { SEO } from '../../components/seo/seo';
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 export const TermsOfServicePage = () => {
   const { t, i18n } = useTranslation('legal');
@@ -513,7 +514,7 @@ export const TermsOfServicePage = () => {
               These Terms and Conditions were last updated in <strong>December 2024</strong>.
               By using Pull, you confirm that you have read, understood, and accepted these Terms.
             </p>
-            <Link to={buildUrl("/venues/aurora-hall/events")} className="back-home-link">
+            <Link to={buildUrl(`/venues/${DEFAULT_VENUE_SLUG}/events`)} className="back-home-link">
               {currentLang === 'es' ? 'Volver a la página principal' : 'Back to home page'}
             </Link>
           </div>

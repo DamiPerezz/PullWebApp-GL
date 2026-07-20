@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import './ticket-receipt.css'
 import type { TicketType } from '../../types/types'
 import { ShoppingCart, ChevronLeft } from 'lucide-react'
+import { SERVICE_FEE_RATE } from '../../config/fees';
 
 export const TicketReceipt = (
     { quantity, ticketDetails, onConfirm, buttonText, disabled = false }
@@ -23,7 +24,7 @@ export const TicketReceipt = (
                           ticketDetails.currency || 'Q';
     
     const subtotal = ticketDetails.ticket_price * quantity;
-    const serviceFee = subtotal * 0.112;
+    const serviceFee = subtotal * SERVICE_FEE_RATE;
     const total = subtotal + serviceFee;
 
     return (

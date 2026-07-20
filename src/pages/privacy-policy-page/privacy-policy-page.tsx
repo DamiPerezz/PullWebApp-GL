@@ -5,6 +5,7 @@ import { Shield, Lock, Eye, Database, Users, Globe, Mail, Building2, ChevronRigh
 import fondoImage from '../../assets/fondo.png';
 import '../cookie-policy-page/cookie-policy-page.css';
 import { SEO } from '../../components/seo/seo';
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 export const PrivacyPolicyPage = () => {
   const { t, i18n } = useTranslation('legal');
@@ -517,7 +518,7 @@ export const PrivacyPolicyPage = () => {
               We reserve the right to modify it to adapt to legislative changes or
               new features. We will notify you of any relevant changes.
             </p>
-            <Link to={buildUrl("/venues/aurora-hall/events")} className="back-home-link">
+            <Link to={buildUrl(`/venues/${DEFAULT_VENUE_SLUG}/events`)} className="back-home-link">
               {currentLang === 'es' ? 'Volver a la página principal' : 'Back to home page'}
             </Link>
           </div>

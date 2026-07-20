@@ -156,6 +156,13 @@ export const UserDetailsForm = forwardRef<{ submit: (onSubmit: (data: any) => vo
       submit: (onSubmit) => {
         if (validate()) {
           onSubmit({ usuarios: formData });
+        } else {
+          // Don't fail silently: bring the first invalid field into view so
+          // the user sees why the button "did nothing".
+          setTimeout(() => {
+            const firstError = document.querySelector('.user-form-error');
+            firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 50);
         }
       },
     }));

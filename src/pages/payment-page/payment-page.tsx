@@ -11,11 +11,11 @@ import {
   getTicketInfo,
   getEventDetailedInfo,
   createPendingOrder,
-  simulateStripePayment,
+  payOrder,
   getOrderDataAfterCancel,
 } from "../../controller/purchase-pages-controller";
 import type { TicketType, EventDetailedInfo } from "../../types/types";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, CreditCard } from "lucide-react";
 import { EventInfoCard } from "../../components/event-info-card/event-info-card";
 import { apiClient } from "../../utils/axios";
 
@@ -37,6 +37,31 @@ export const PaymentPage = () => {
 
   const formRef = useRef<{ submit: (onSubmit: any) => void }>(null);
   const navigate = useNavigate();
+
+  // Card state (direct-card flow — the backend charges via the gateway).
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+
+  const formatCardNumber = (v: string) =>
+    v.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
+
+  const formatExpiry = (v: string) => {
+    const digits = v.replace(/\D/g, "").slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return digits.slice(0, 2) + "/" + digits.slice(2);
+  };
+
+  const cardValid = () => {
+    const num = cardNumber.replace(/\s/g, "");
+    const [mm, yy] = cardExpiry.split("/");
+    return (
+      num.length >= 12 &&
+      mm && Number(mm) >= 1 && Number(mm) <= 12 &&
+      yy && yy.length === 2 &&
+      cardCvv.length >= 3
+    );
+  };
 
   const [ticketDetails, setTicketDetails] = useState<TicketType>({} as TicketType);
   const [eventInfo, setEventInfo] = useState<EventDetailedInfo | null>(null);
@@ -99,6 +124,11 @@ export const PaymentPage = () => {
   const onSubmit = async (formData: any) => {
     if (processing) return;
 
+    if (!cardValid()) {
+      setError("Completa los datos de la tarjeta (número, vencimiento MM/AA y CVV)");
+      return;
+    }
+
     setProcessing(true);
     setError(null);
 
@@ -146,7 +176,7 @@ export const PaymentPage = () => {
         ticketTypeId!,
         ticketDetails.ticket_name,
         ticketDetails.ticket_price,
-        ticketDetails.currency || 'EUR',
+        ticketDetails.currency || 'GTQ',
         formData
       );
 
@@ -156,8 +186,18 @@ export const PaymentPage = () => {
 
       const orderId = orderResponse.order_id;
 
-      // Simular pago de Stripe
-      const paymentResponse = await simulateStripePayment(orderId);
+      // Cobro real con tarjeta: el backend hace las dos transacciones
+      // atómicas (parte del venue + fee de servicio) contra la pasarela.
+      // El payment_link_code de la orden recién creada es obligatorio
+      // (anti-carding: sin él el backend no toca la pasarela).
+      const num = cardNumber.replace(/\s/g, "");
+      const [mm, yy] = cardExpiry.split("/");
+      const paymentResponse = await payOrder(orderId, orderResponse.payment_link_code, {
+        number: num,
+        exp_month: mm,
+        exp_year: yy,
+        cvv: cardCvv,
+      });
 
       if (!paymentResponse.success) {
         throw new Error(paymentResponse.error || t('page.paymentSimulationFailed'));
@@ -200,6 +240,11 @@ export const PaymentPage = () => {
   }
 
   const ticketGender = getTicketGender(ticketDetails.ticket_name || '');
+
+  // Private events hold the payment until staff approves the request.
+  const requiresApproval = Boolean(
+    (eventInfo as any)?.is_private || (eventInfo as any)?.require_approval
+  );
 
   return (
     <Layout>
@@ -254,6 +299,26 @@ export const PaymentPage = () => {
 
                 <div className="payment-page-grid">
                   <div className="payment-page-left">
+                    {requiresApproval && (
+                      <div className="payment-approval-notice">
+                        <div className="payment-approval-notice-title">
+                          🔒 Evento privado — requiere aprobación
+                        </div>
+                        <p>
+                          Este es un evento privado. Al continuar,{" "}
+                          <strong>se retiene el importe pero NO se cobra todavía</strong>.
+                          El equipo del local revisa tu solicitud (hasta 48&nbsp;h):
+                        </p>
+                        <ul>
+                          <li>✅ Si te <strong>aceptan</strong>, se cobra y recibes tu entrada con el QR por correo.</li>
+                          <li>↩️ Si te <strong>rechazan</strong> o pasan 48&nbsp;h, se libera la retención y no se te cobra nada.</li>
+                        </ul>
+                        <p className="payment-approval-notice-foot">
+                          No hace falta que llames: te avisaremos por correo en cada paso.
+                        </p>
+                      </div>
+                    )}
+
                     <UserDetailsForm
                       quantity={Number(quantity!)}
                       ref={formRef}
@@ -261,13 +326,58 @@ export const PaymentPage = () => {
                       ticketGender={ticketGender}
                       minAge={eventInfo?.min_age}
                     />
+
+                    <div className="payment-card-section">
+                      <div className="payment-card-header">
+                        <CreditCard size={18} />
+                        <span>Datos de pago</span>
+                      </div>
+                      <div className="payment-card-fields">
+                        <input
+                          className="payment-card-input payment-card-number"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="cc-number"
+                          placeholder="Número de tarjeta"
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                          disabled={processing}
+                        />
+                        <div className="payment-card-row">
+                          <input
+                            className="payment-card-input"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="cc-exp"
+                            placeholder="MM/AA"
+                            value={cardExpiry}
+                            onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                            disabled={processing}
+                          />
+                          <input
+                            className="payment-card-input"
+                            type="password"
+                            inputMode="numeric"
+                            autoComplete="cc-csc"
+                            placeholder="CVV"
+                            maxLength={4}
+                            value={cardCvv}
+                            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
+                            disabled={processing}
+                          />
+                        </div>
+                      </div>
+                      <p className="payment-card-note">
+                        Pago seguro procesado por Cybersource. No almacenamos los datos de tu tarjeta.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="payment-page-right">
                     <TicketReceipt
                       quantity={Number(quantity!)}
                       ticketDetails={ticketDetails}
-                      buttonText={processing ? t('page.processing') : t('page.proceedToPayment')}
+                      buttonText={processing ? t('page.processing') : (requiresApproval ? 'Solicitar entrada' : t('page.proceedToPayment'))}
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
                       disabled={processing}
                     />

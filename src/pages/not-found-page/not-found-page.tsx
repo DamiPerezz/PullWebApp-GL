@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layout } from '../../components/layout/layout';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import './not-found-page.css';
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 export const NotFoundPage = () => {
   const { t } = useTranslation();
@@ -14,7 +15,7 @@ export const NotFoundPage = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate(`/${currentLang}/venues/aurora-hall/events`);
+      navigate(`/${currentLang}/venues/${DEFAULT_VENUE_SLUG}/events`);
     }
   };
 

@@ -32,7 +32,7 @@ export const VenuesPage = () => {
         title={t('venues.seo.title')}
         description={t('venues.seo.description')}
         keywords={t('venues.seo.keywords')}
-        canonicalUrl={`https://web.pullevents.com/${currentLang}/venues`}
+        canonicalUrl={`${(typeof window!=='undefined'?window.location.origin:'https://web.pullevents.com')}/${currentLang}/venues`}
         ogTitle={t('venues.seo.ogTitle')}
         ogDescription={t('venues.seo.ogDescription')}
       />

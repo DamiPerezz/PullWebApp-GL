@@ -5,6 +5,7 @@ import { Calendar, Wallet, User, LogOut, ArrowLeft, HelpCircle, X, Send, Clock, 
 import { useAuth } from "../../context/AuthContext";
 import { apiClient } from "../../utils/axios";
 import "./venue-nav-bar.css";
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 const PullLogo = "/logo.svg";
 
@@ -56,7 +57,7 @@ export const VenueNavBar = () => {
   };
 
   const handleBackFromWallet = () => {
-    navigate(buildUrl('/venues/aurora-hall/events'));
+    navigate(buildUrl(`/venues/${DEFAULT_VENUE_SLUG}/events`));
   };
 
   const handleBackFromGroupGuest = () => {

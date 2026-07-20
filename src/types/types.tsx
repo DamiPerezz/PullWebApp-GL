@@ -108,6 +108,9 @@ export type EventDetailedInfo = {
   min_age?: number | string;
   dress_code?: string;
   description?: string;
+  // Private events require staff approval before the ticket is issued.
+  is_private?: boolean;
+  require_approval?: boolean;
 };
 
 export type TicketType = {

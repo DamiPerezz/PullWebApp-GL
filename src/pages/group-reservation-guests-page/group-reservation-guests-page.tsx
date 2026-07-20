@@ -7,6 +7,7 @@ import { EventInfoCard } from '../../components/event-info-card/event-info-card'
 import type { EventDetailedInfo, VIPBottle } from '../../types/types';
 import { createGroupReservation } from '../../controller/group-reservation-controller';
 import './group-reservation-guests-page.css';
+import { SERVICE_FEE_RATE, SERVICE_FEE_MULTIPLIER } from '../../config/fees';
 
 interface BottleSelection {
   bottle: VIPBottle;
@@ -71,8 +72,8 @@ export const GroupReservationGuestsPage = () => {
     const menCount = state.menCount;
     const initialMen: GuestFormData[] = [];
 
-    // Service fee multiplier (11.2%)
-    const FEE_MULTIPLIER = 1.112;
+    // Service fee multiplier (per-venue, see config/fees.ts)
+    const FEE_MULTIPLIER = SERVICE_FEE_MULTIPLIER;
 
     // If organizer is male, add them first
     if (state.organizerData.gender === 'male') {
@@ -159,7 +160,7 @@ export const GroupReservationGuestsPage = () => {
   };
 
   const calculateServiceFee = () => {
-    return calculateHostPayment() * 0.112; // 11.2% service fee on host payment
+    return calculateHostPayment() * SERVICE_FEE_RATE; // service fee on host payment
   };
 
   const calculateGrandTotal = () => {
@@ -168,7 +169,7 @@ export const GroupReservationGuestsPage = () => {
 
   // Calculate the total amount for the entire reservation (all guests + bottles, all with 11.2% fee)
   const calculateReservationTotal = () => {
-    return calculateTotal() * 1.112; // All entries + bottles with 11.2% fee
+    return calculateTotal() * SERVICE_FEE_MULTIPLIER; // All entries + bottles with fee
   };
 
   const validateForm = () => {

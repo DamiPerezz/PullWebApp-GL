@@ -12,6 +12,7 @@ import type { TicketType, EventDetailedInfo } from "../../types/types";
 import { getTicketInfo, getEventDetailedInfo } from "../../controller/purchase-pages-controller";
 import { validateSlug, validateBase64Id } from "../../utils/security";
 import { useTranslation } from "react-i18next";
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 export const PrePurchasePage = () => {
   const { t, i18n } = useTranslation('tickets');
@@ -90,7 +91,7 @@ export const PrePurchasePage = () => {
           <div className="pre-purchase-error">
             <h2>{t('errors.title')}</h2>
             <p>{t(`errors.${error}`)}</p>
-            <button onClick={() => navigate(buildUrl('/venues/aurora-hall/events'))} className="pre-purchase-error-button">
+            <button onClick={() => navigate(buildUrl(`/venues/${DEFAULT_VENUE_SLUG}/events`))} className="pre-purchase-error-button">
               {t('errors.backToEvents')}
             </button>
           </div>

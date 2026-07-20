@@ -17,7 +17,13 @@ interface SEOProps {
   structuredData?: object;
 }
 
-const BASE_URL = "https://web.pullevents.com";
+// Canonical/OG base URL. Prefer the deployment's own origin so each tenant's
+// domain gets correct canonical + OG tags; fall back to the env var, then to
+// the platform domain only when neither is available (e.g. SSR/build).
+const BASE_URL =
+  (typeof window !== "undefined" && window.location?.origin) ||
+  import.meta.env.VITE_SITE_BASE_URL ||
+  "https://web.pullevents.com";
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.jpg`;
 const SITE_NAME = "Pull Events";
 

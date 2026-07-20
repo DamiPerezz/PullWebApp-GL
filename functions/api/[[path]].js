@@ -7,21 +7,32 @@
 // sidestep CORS entirely (same-origin requests).
 //
 // The catch-all `[[path]]` segment captures everything after /api/, so
-// /api/v1/venues -> https://pull-api-v2-demo.fly.dev/api/v1/venues, etc.
+// /api/v1/venues -> <UPSTREAM>/api/v1/venues, etc.
 
-const UPSTREAM = "https://pull-api-v2-demo.fly.dev";
+// Each Pages project sets its own UPSTREAM env var (Cloudflare Pages →
+// Settings → Environment variables). This fallback is the 511 Events
+// production backend; a project that forgets UPSTREAM still reaches a real
+// backend rather than the old demo.
+const DEFAULT_UPSTREAM = "https://pull-api-v2-prod.fly.dev";
 
 export async function onRequest(context) {
-  const { request } = context;
+  const { request, env } = context;
   const url = new URL(request.url);
 
+  const upstream = (env && env.UPSTREAM) || DEFAULT_UPSTREAM;
+
   // Rebuild the upstream URL preserving the full path + query.
-  const upstreamURL = UPSTREAM + url.pathname + url.search;
+  const upstreamURL = upstream + url.pathname + url.search;
 
   // Forward method, headers, body. Strip CF-injected headers.
   const headers = new Headers(request.headers);
+  // Strip client-controlled forwarding headers so the backend derives the
+  // real IP from Fly-Client-IP, not a spoofable X-Forwarded-For (audit A2).
+  // Also drop the browser's Origin: this is a same-origin server-side fetch,
+  // so the backend's CORS allowlist should not gate it (otherwise it 403s
+  // "Origin not allowed" on the purchase POST).
   ["host", "cf-connecting-ip", "cf-ipcountry", "cf-ray", "cf-visitor",
-   "x-forwarded-proto", "x-real-ip"].forEach((h) => headers.delete(h));
+   "x-forwarded-proto", "x-real-ip", "x-forwarded-for", "origin"].forEach((h) => headers.delete(h));
 
   const init = {
     method: request.method,

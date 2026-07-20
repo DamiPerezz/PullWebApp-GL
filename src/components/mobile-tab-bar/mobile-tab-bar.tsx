@@ -2,6 +2,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { Home, Wallet, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import "./mobile-tab-bar.css";
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 export const MobileTabBar = () => {
   const { lang } = useParams();
@@ -13,7 +14,7 @@ export const MobileTabBar = () => {
   return (
     <nav className="mobile-tab-bar">
       <NavLink
-        to={buildUrl("/venues/aurora-hall/events")}
+        to={buildUrl(`/venues/${DEFAULT_VENUE_SLUG}/events`)}
         className={({ isActive }) =>
           `mobile-tab-bar__item ${isActive ? "mobile-tab-bar__item--active" : ""}`
         }

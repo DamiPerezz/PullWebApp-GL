@@ -113,7 +113,7 @@ export const EventDetailedPage = () => {
         endDate: `${eventDetailedInfo.date}T${eventDetailedInfo.close_time}`,
         location: eventDetailedInfo.location,
         image: eventDetailedInfo.event_img,
-        url: `https://web.pullevents.com/event/${eventId}`,
+        url: `${(typeof window!=='undefined'?window.location.origin:'https://web.pullevents.com')}/event/${eventId}`,
         price: ticketTypes[0]?.ticket_price,
         currency: "GTQ",
         availability: ticketTypes.some(t => t.ticket_quantity > 0) ? "InStock" : "SoldOut"
@@ -126,7 +126,7 @@ export const EventDetailedPage = () => {
                     title={eventDetailedInfo.event_name}
                     description={eventDetailedInfo.description || `Compra entradas para ${eventDetailedInfo.event_name} en ${eventDetailedInfo.location}. ${formattedDate}.`}
                     keywords={`${eventDetailedInfo.event_name}, entradas ${eventDetailedInfo.location}, eventos guatemala, fiestas ${eventDetailedInfo.location}`}
-                    canonicalUrl={`https://web.pullevents.com/event/${eventId}`}
+                    canonicalUrl={`${(typeof window!=='undefined'?window.location.origin:'https://web.pullevents.com')}/event/${eventId}`}
                     ogTitle={`${eventDetailedInfo.event_name} | Pull Events`}
                     ogDescription={`Compra entradas para ${eventDetailedInfo.event_name}. ${formattedDate} en ${eventDetailedInfo.location}.`}
                     ogImage={eventDetailedInfo.event_img}
@@ -196,6 +196,12 @@ export const EventDetailedPage = () => {
                                     <h1 className="event-detailed-title">
                                         {eventDetailedInfo?.event_name}
                                     </h1>
+
+                                    {((eventDetailedInfo as any)?.is_private || (eventDetailedInfo as any)?.require_approval) && (
+                                        <div className="event-private-badge">
+                                            🔒 Evento privado · requiere aprobación del organizador
+                                        </div>
+                                    )}
 
                                     {/* Tags - age and dress code only */}
                                     {(eventDetailedInfo?.min_age || eventDetailedInfo?.dress_code) && (

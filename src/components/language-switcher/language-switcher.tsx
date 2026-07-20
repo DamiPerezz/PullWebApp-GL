@@ -4,6 +4,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Globe } from 'lucide-react';
 import './language-switcher.css';
+import { DEFAULT_VENUE_SLUG } from '../../config/venue';
 
 interface LanguageOption {
   code: string;
@@ -51,7 +52,7 @@ export const LanguageSwitcher = () => {
 
     // Update URL - replace language prefix
     const pathWithoutLang = location.pathname.replace(/^\/(en|es)/, '');
-    const newPath = `/${langCode}${pathWithoutLang || '/venues/aurora-hall/events'}`;
+    const newPath = `/${langCode}${pathWithoutLang || `/venues/${DEFAULT_VENUE_SLUG}/events`}`;
 
     navigate(newPath + location.search + location.hash, { replace: true });
     setIsOpen(false);

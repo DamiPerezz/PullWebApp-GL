@@ -327,3 +327,87 @@
         transition: none !important;
     }
 }
+/* ===== Card payment section (direct-card NeoNet/Cybersource flow) ===== */
+.payment-card-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.payment-card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.payment-card-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.payment-card-input:focus {
+  border-color: rgba(168, 85, 255, 0.6);
+}
+
+.payment-card-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.payment-card-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ===== Private-event approval notice ===== */
+.payment-approval-notice {
+  margin-bottom: 1.5rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(168, 85, 255, 0.10);
+  border: 1px solid rgba(168, 85, 255, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.payment-approval-notice-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: rgb(216, 180, 254);
+}
+.payment-approval-notice p { margin: 0 0 0.6rem; }
+.payment-approval-notice ul {
+  margin: 0.4rem 0 0.6rem;
+  padding-left: 1.1rem;
+}
+.payment-approval-notice li { margin-bottom: 0.35rem; }
+.payment-approval-notice-foot {
+  margin: 0.4rem 0 0 !important;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}

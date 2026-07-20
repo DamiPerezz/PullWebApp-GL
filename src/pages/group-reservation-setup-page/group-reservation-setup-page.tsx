@@ -10,6 +10,7 @@ import type { EventDetailedInfo, VIPBottle, VIPMixer, TicketType } from '../../t
 import { getEventDetailedInfo, getTicketTypes } from '../../controller/event-controller';
 import { getAvailableBottles, getAvailableMixers } from '../../controller/group-reservation-controller';
 import './group-reservation-setup-page.css';
+import { SERVICE_FEE_RATE } from '../../config/fees';
 
 interface BottleSelection {
   bottle: VIPBottle;
@@ -17,7 +18,7 @@ interface BottleSelection {
   mixer?: VIPMixer; // One mixer per bottle (required when bottle selected)
 }
 
-const SERVICE_FEE_PERCENTAGE = 0.112; // 11.2%
+const SERVICE_FEE_PERCENTAGE = SERVICE_FEE_RATE;
 
 export const GroupReservationSetupPage = () => {
   const { eventId, lang } = useParams<{ eventId: string; lang: string }>();

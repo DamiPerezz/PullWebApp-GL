@@ -127,6 +127,12 @@ export const PaymentSuccessPage = () => {
   // SECURITY: Display reference - prefer server data, fallback to validated UUID prefix
   const displayReference = orderNumber || orderId.slice(0, 8).toUpperCase();
 
+  // PUBLIC vs PRIVATE: a private-event order is held awaiting staff approval
+  // (payment_authorized); a public order is already confirmed with tickets on
+  // the way. Show the right messaging for each.
+  const orderStatus = orderData?.order?.status;
+  const isPendingApproval = orderStatus === 'payment_authorized';
+
   return (
     <Layout>
       <div className="payment-success-wrapper">
@@ -148,49 +154,61 @@ export const PaymentSuccessPage = () => {
               <div className="payment-success-icon-wrapper">
                 <CheckCircle className="payment-success-icon" />
               </div>
-              <h1 className="payment-success-title">{t('success.title')}</h1>
+              <h1 className="payment-success-title">{isPendingApproval ? t('success.title') : t('success.confirmedTitle')}</h1>
               <div className="payment-success-description">
-                <p>{t('success.description')}</p>
+                <p>{isPendingApproval ? t('success.description') : t('success.confirmedDescription')}</p>
               </div>
             </div>
 
             {/* Two Column Grid */}
             <div className="payment-success-grid">
-              {/* Left Column - Pending Staff Approval */}
+              {/* Left Column - status card (private=pending approval, public=tickets sent) */}
               <div className="payment-success-grid-left">
                 <div className="payment-status-card">
-                  <div className="payment-status-header">
-                    <Clock />
-                    <span>{t('success.pendingApproval')}</span>
-                  </div>
-                  <div className="payment-status-body">
-                    <p>
-                      {t('success.pendingDescription')}
-                    </p>
-                    <div className="payment-status-timeline">
-                      <div className="timeline-step timeline-step-completed">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h4>{t('success.timeline.paymentAuthorized')}</h4>
-                          <p>{t('success.timeline.paymentAuthorizedDesc')}</p>
+                  {isPendingApproval ? (
+                    <>
+                      <div className="payment-status-header">
+                        <Clock />
+                        <span>{t('success.pendingApproval')}</span>
+                      </div>
+                      <div className="payment-status-body">
+                        <p>{t('success.pendingDescription')}</p>
+                        <div className="payment-status-timeline">
+                          <div className="timeline-step timeline-step-completed">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h4>{t('success.timeline.paymentAuthorized')}</h4>
+                              <p>{t('success.timeline.paymentAuthorizedDesc')}</p>
+                            </div>
+                          </div>
+                          <div className="timeline-step timeline-step-current">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h4>{t('success.timeline.staffReview')}</h4>
+                              <p>{t('success.timeline.staffReviewDesc')}</p>
+                            </div>
+                          </div>
+                          <div className="timeline-step timeline-step-pending">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              <h4>{t('success.timeline.ticketsSent')}</h4>
+                              <p>{t('success.timeline.ticketsSentDesc')}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="timeline-step timeline-step-current">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h4>{t('success.timeline.staffReview')}</h4>
-                          <p>{t('success.timeline.staffReviewDesc')}</p>
-                        </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="payment-status-header">
+                        <CheckCircle />
+                        <span>{t('success.ticketsSentTitle')}</span>
                       </div>
-                      <div className="timeline-step timeline-step-pending">
-                        <div className="timeline-dot"></div>
-                        <div className="timeline-content">
-                          <h4>{t('success.timeline.ticketsSent')}</h4>
-                          <p>{t('success.timeline.ticketsSentDesc')}</p>
-                        </div>
+                      <div className="payment-status-body">
+                        <p>{t('success.ticketsSentBody')}</p>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -228,13 +246,19 @@ export const PaymentSuccessPage = () => {
                 {/* Important Information */}
                 <div className="payment-info-box payment-info-box-blue">
                   <h3>{t('success.importantInfo')}</h3>
-                  <ul>
-                    <li dangerouslySetInnerHTML={{ __html: t('success.infoList.authorized') }} />
-                    <li>{t('success.infoList.staffReview')}</li>
-                    <li>{t('success.infoList.approved')}</li>
-                    <li>{t('success.infoList.rejected')}</li>
-                    <li>{t('success.infoList.emailUpdates')}</li>
-                  </ul>
+                  {isPendingApproval ? (
+                    <ul>
+                      <li dangerouslySetInnerHTML={{ __html: t('success.infoList.authorized') }} />
+                      <li>{t('success.infoList.staffReview')}</li>
+                      <li>{t('success.infoList.approved')}</li>
+                      <li>{t('success.infoList.rejected')}</li>
+                      <li>{t('success.infoList.emailUpdates')}</li>
+                    </ul>
+                  ) : (
+                    <ul>
+                      <li>{t('success.ticketsSentBody')}</li>
+                    </ul>
+                  )}
                 </div>
               </div>
             </div>

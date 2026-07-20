@@ -1,6 +1,7 @@
 // controller/purchase-pages-controller.ts
 // SECURITY: Using apiClient for consistent cookie-based authentication and error handling
 import { apiClient } from '../utils/axios';
+import { SERVICE_FEE_MULTIPLIER } from '../config/fees';
 
 export const getTicketInfo = async (eventSlug: string, ticketTypeId: string) => {
   const response = await apiClient.get(
@@ -40,9 +41,21 @@ export const createPendingOrder = async (
     owner_instagram: usuario.owner_instagram,
   }));
 
-  // Calculate total with 11.2% service fee
+  // Total with the per-venue service fee (see config/fees.ts)
   const subtotal = ticketPrice * formData.usuarios.length;
-  const totalAmount = subtotal * 1.112; // Include 11.2% service fee
+  const totalAmount = subtotal * SERVICE_FEE_MULTIPLIER;
+
+  return createOrderRequest(eventId, ticketTypeId, ticketsData, totalAmount, currency, formData);
+};
+
+const createOrderRequest = async (
+  eventId: string,
+  ticketTypeId: string,
+  ticketsData: any[],
+  totalAmount: number,
+  currency: string,
+  formData: any
+) => {
 
   const requestData = {
     event_id: eventId,
@@ -61,6 +74,25 @@ export const createPendingOrder = async (
 export const simulateStripePayment = async (orderId: string) => {
   const response = await apiClient.post(`/orders/simulate-payment`, {
     order_id: orderId,
+  });
+  return response.data;
+};
+
+// Direct-card payment (NeoNet/Cybersource): the backend performs the two
+// atomic sales (venue share + service fee) and only then issues tickets.
+// paymentLinkCode is the anti-carding proof returned by create-pending-order:
+// the backend refuses to touch the gateway without it.
+export const payOrder = async (
+  orderId: string,
+  paymentLinkCode: string,
+  card: { number: string; exp_month: string; exp_year: string; cvv: string },
+  turnstileToken?: string
+) => {
+  const response = await apiClient.post(`/orders/pay`, {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+    card,
+    ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
   });
   return response.data;
 };

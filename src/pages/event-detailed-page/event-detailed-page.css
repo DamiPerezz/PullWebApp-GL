@@ -1038,3 +1038,15 @@
         transition: none !important;
     }
 }
+/* Private-event badge under the event title */
+.event-private-badge {
+  display: inline-block;
+  margin: 0.5rem 0 0.25rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(168, 85, 255, 0.15);
+  border: 1px solid rgba(168, 85, 255, 0.4);
+  color: rgb(216, 180, 254);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
