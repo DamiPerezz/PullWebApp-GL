@@ -358,15 +358,18 @@ export const LoginPage = () => {
                 <label htmlFor="code" className="login-page__label">
                   {t('form.verificationCode')}
                 </label>
+                {/* El backend genera códigos de 6 DÍGITOS (%06d) — la UI
+                    pedía 8 alfanuméricos y el botón nunca se habilitaba. */}
                 <input
                   id="code"
                   type="text"
+                  inputMode="numeric"
                   value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8))}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   className="login-page__input login-page__input--code"
-                  placeholder="XXXXXXXX"
+                  placeholder="000000"
                   required
-                  maxLength={8}
+                  maxLength={6}
                   autoFocus
                 />
               </div>
@@ -381,7 +384,7 @@ export const LoginPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || code.length !== 8}
+                  disabled={isLoading || code.length !== 6}
                   className="login-page__submit"
                 >
                   {isLoading ? (
