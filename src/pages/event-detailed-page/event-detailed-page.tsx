@@ -93,17 +93,23 @@ export const EventDetailedPage = () => {
         );
     }
 
-    const open = eventDetailedInfo?.open_time.slice(0, 5);
-    const close = eventDetailedInfo?.close_time.slice(0, 5);
+    // ?. en CADA nivel: si open_time/close_time llegan null (dato de backend),
+    // .slice sobre null lanzaba y —sin Error Boundary— dejaba TODA la web en
+    // blanco. Ahora degrada a "".
+    const open = eventDetailedInfo?.open_time?.slice(0, 5);
+    const close = eventDetailedInfo?.close_time?.slice(0, 5);
 
-    const date = new Date(eventDetailedInfo?.date || '');
+    const parsedDate = new Date(eventDetailedInfo?.date || '');
+    const dateValid = !isNaN(parsedDate.getTime());
     const dateLocale = currentLang === 'es' ? 'es-GT' : 'en-US';
-    const formattedDate = date.toLocaleDateString(dateLocale, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    const formattedDate = dateValid
+        ? parsedDate.toLocaleDateString(dateLocale, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })
+        : '';
 
     // Generate structured data for SEO
     const eventStructuredData = eventDetailedInfo ? generateEventStructuredData({

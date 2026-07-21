@@ -59,16 +59,26 @@ export const PrePurchasePage = () => {
       });
   }, [eventId, ticketTypeId]);
 
+  // Stock real disponible. Ojo: `x || 3` daba 3 cuando el stock es 0 (0 es
+  // falsy) → una entrada AGOTADA dejaba elegir 1-3 y avanzar al pago para
+  // fallar al final. Ahora el tope respeta el stock y bloquea si es 0.
+  const stock = Number(ticketDetails.ticket_quantity ?? 0);
+  const soldOut = stock <= 0;
+  const maxAllowed = Math.max(
+    1,
+    Math.min(ticketDetails.max_quantity || 3, soldOut ? 1 : stock)
+  );
+
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
     const minQuantity = ticketDetails.min_quantity || 1;
-    const maxQuantity = ticketDetails.max_quantity || Math.min(3, ticketDetails.ticket_quantity || 3);
-    if (newQuantity >= minQuantity && newQuantity <= maxQuantity) {
+    if (newQuantity >= minQuantity && newQuantity <= maxAllowed) {
       setQuantity(newQuantity);
     }
   };
 
   const handleConfirm = () => {
+    if (soldOut) return;
     navigate(buildUrl(`/event/${eventId}/tickets/${ticketTypeId}/${quantity}`));
   };
 
@@ -101,7 +111,7 @@ export const PrePurchasePage = () => {
   }
 
   const minQuantity = ticketDetails.min_quantity || 1;
-  const maxQuantity = ticketDetails.max_quantity || Math.min(3, ticketDetails.ticket_quantity || 3);
+  const maxQuantity = maxAllowed; // tope real (respeta el stock; ver arriba)
   const currencySymbol = ticketDetails.currency === 'GTQ' ? 'Q' :
                         ticketDetails.currency === 'USD' ? '$' :
                         ticketDetails.currency === 'EUR' ? '€' :
@@ -179,6 +189,8 @@ export const PrePurchasePage = () => {
                   quantity={quantity}
                   ticketDetails={ticketDetails}
                   onConfirm={handleConfirm}
+                  disabled={soldOut}
+                  buttonText={soldOut ? t('purchase.soldOut', 'Agotado') : undefined}
                 />
               </div>
             </div>

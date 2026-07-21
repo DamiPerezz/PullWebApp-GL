@@ -19,7 +19,8 @@
     "failedToCreateOrder": "Failed to create pending order",
     "paymentSimulationFailed": "Payment simulation failed",
     "unexpectedError": "An unexpected error occurred. Please try again.",
-    "paymentSuccessDescConfirmed": "Payment confirmed! Your tickets are on their way to your email with the PDF and QR codes."
+    "paymentSuccessDescConfirmed": "Payment confirmed! Your tickets are on their way to your email with the PDF and QR codes.",
+    "networkError": "The connection dropped while processing your payment. Do NOT pay again — check your email or your order status in a few minutes."
   },
   "success": {
     "title": "Payment Authorized!",

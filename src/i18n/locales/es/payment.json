@@ -19,7 +19,8 @@
     "failedToCreateOrder": "Error al crear el pedido pendiente",
     "paymentSimulationFailed": "La simulación del pago falló",
     "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
-    "paymentSuccessDescConfirmed": "¡Pago confirmado! Tus entradas van en camino a tu correo con el PDF y los códigos QR."
+    "paymentSuccessDescConfirmed": "¡Pago confirmado! Tus entradas van en camino a tu correo con el PDF y los códigos QR.",
+    "networkError": "Se perdió la conexión al procesar el pago. NO vuelvas a pagar — revisa tu correo o el estado de tu pedido en unos minutos."
   },
   "success": {
     "title": "¡Pago Autorizado!",

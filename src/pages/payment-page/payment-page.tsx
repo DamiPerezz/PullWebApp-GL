@@ -36,6 +36,11 @@ export const PaymentPage = () => {
   const cancelledParam = searchParams.get("cancelled");
 
   const formRef = useRef<{ submit: (onSubmit: any) => void }>(null);
+  // Orden ya creada, reutilizada entre reintentos: recrearla en cada intento
+  // generaba una orden (y un cargo) nueva por reintento tras un timeout de red
+  // → doble cobro. Con esto, un reintento reusa la misma orden y el backend
+  // (claim atómico) lo resuelve sin recobrar.
+  const orderRef = useRef<{ orderId: string; code: string } | null>(null);
   const navigate = useNavigate();
 
   // Card state (direct-card flow — the backend charges via the gateway).
@@ -170,29 +175,38 @@ export const PaymentPage = () => {
         throw new Error(t('page.couldNotDetermineEventId'));
       }
 
-      // Crear orden pendiente
-      const orderResponse = await createPendingOrder(
-        realEventID!, // ← ID REAL del evento
-        ticketTypeId!,
-        ticketDetails.ticket_name,
-        ticketDetails.ticket_price,
-        ticketDetails.currency || 'GTQ',
-        formData
-      );
-
-      if (!orderResponse.success) {
-        throw new Error(orderResponse.error || t('page.failedToCreateOrder'));
+      // Crear la orden UNA sola vez; en reintentos se reusa la existente.
+      let orderId: string | undefined = orderRef.current?.orderId;
+      let linkCode: string | undefined = orderRef.current?.code;
+      if (!orderId) {
+        const orderResponse = await createPendingOrder(
+          realEventID!, // ← ID REAL del evento
+          ticketTypeId!,
+          ticketDetails.ticket_name,
+          ticketDetails.ticket_price,
+          ticketDetails.currency || 'GTQ',
+          formData
+        );
+        if (!orderResponse.success) {
+          throw new Error(orderResponse.error || t('page.failedToCreateOrder'));
+        }
+        const newId: string = orderResponse.order_id;
+        const newCode: string = orderResponse.payment_link_code;
+        orderId = newId;
+        linkCode = newCode;
+        orderRef.current = { orderId: newId, code: newCode };
       }
 
-      const orderId = orderResponse.order_id;
+      if (!orderId || !linkCode) {
+        throw new Error(t('page.failedToCreateOrder'));
+      }
 
       // Cobro real con tarjeta: el backend hace las dos transacciones
       // atómicas (parte del venue + fee de servicio) contra la pasarela.
-      // El payment_link_code de la orden recién creada es obligatorio
-      // (anti-carding: sin él el backend no toca la pasarela).
+      // El payment_link_code de la orden es obligatorio (anti-carding).
       const num = cardNumber.replace(/\s/g, "");
       const [mm, yy] = cardExpiry.split("/");
-      const paymentResponse = await payOrder(orderId, orderResponse.payment_link_code, {
+      const paymentResponse = await payOrder(orderId, linkCode, {
         number: num,
         exp_month: mm,
         exp_year: yy,
@@ -212,14 +226,17 @@ export const PaymentPage = () => {
       }, 3000);
 
     } catch (error: any) {
-      // El mensaje del BACKEND primero: axios siempre trae .message
-      // ("Request failed with status code 402"), así que si se comprueba
-      // antes, el motivo real del rechazo (tarjeta declinada, demasiados
-      // intentos...) no se muestra nunca.
+      // El mensaje del BACKEND primero (402/403/409 traen error.response.data).
+      // Si NO hay response (timeout/red móvil), NO mostrar el técnico
+      // "Request failed with status code…" en inglés: el cobro pudo pasar, así
+      // que se pide NO reintentar y revisar el correo.
       let errorMessage = t('page.unexpectedError');
+      const noResponse = !error.response;
 
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
+      } else if (noResponse) {
+        errorMessage = t('page.networkError');
       } else if (error.message) {
         errorMessage = error.message;
       }

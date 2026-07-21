@@ -48,6 +48,12 @@ export async function onRequest(context) {
   // Rebuild the upstream URL preserving the full path + query.
   const upstreamURL = upstream + url.pathname + url.search;
 
+  // IP real del comprador (Cloudflare la pone auténtica en su edge). Se
+  // reenvía al backend con un secreto compartido para que el rate limit use
+  // la IP del COMPRADOR, no la de salida de Cloudflare (que es la misma para
+  // todos → colapsaría los límites y daría 429 masivo al abrir la venta).
+  const realClientIP = request.headers.get("cf-connecting-ip");
+
   // Forward method, headers, body. Strip CF-injected headers.
   const headers = new Headers(request.headers);
   // Strip client-controlled forwarding headers so the backend derives the
@@ -56,7 +62,16 @@ export async function onRequest(context) {
   // so the backend's CORS allowlist should not gate it (otherwise it 403s
   // "Origin not allowed" on the purchase POST).
   ["host", "cf-connecting-ip", "cf-ipcountry", "cf-ray", "cf-visitor",
-   "x-forwarded-proto", "x-real-ip", "x-forwarded-for", "origin"].forEach((h) => headers.delete(h));
+   "x-forwarded-proto", "x-real-ip", "x-forwarded-for", "origin",
+   "x-pull-client-ip", "x-pull-proxy-auth"].forEach((h) => headers.delete(h));
+
+  // Reenviar la IP real del comprador + el secreto que prueba que venimos de
+  // este proxy (el backend solo confía en X-Pull-Client-IP con el secreto
+  // correcto; un ataque directo a fly.dev no lo conoce).
+  if (realClientIP && env && env.PROXY_SHARED_SECRET) {
+    headers.set("X-Pull-Client-IP", realClientIP);
+    headers.set("X-Pull-Proxy-Auth", env.PROXY_SHARED_SECRET);
+  }
 
   const init = {
     method: request.method,
