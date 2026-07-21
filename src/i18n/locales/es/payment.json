@@ -6,7 +6,7 @@
     "proceedToPayment": "Proceder al Pago",
     "cancelledWarning": "El pago fue cancelado. Tus datos del formulario se han conservado. Puedes intentar de nuevo cuando estés listo.",
     "paymentSuccessTitle": "¡Pago Exitoso!",
-    "paymentSuccessDesc": "Tu pedido ha sido enviado y está pendiente de aprobación del staff. Recibirás un correo de confirmación en breve.",
+    "paymentSuccessDesc": "Tu solicitud está enviada y pendiente de aprobación del local. El importe está retenido, no cobrado — te avisaremos por correo con la decisión.",
     "redirecting": "Redirigiendo...",
     "processingOrder": "Procesando tu pedido...",
     "processingWait": "Por favor espera mientras confirmamos tu pago",
@@ -18,7 +18,8 @@
     "couldNotDetermineEventId": "No se pudo determinar el ID del evento",
     "failedToCreateOrder": "Error al crear el pedido pendiente",
     "paymentSimulationFailed": "La simulación del pago falló",
-    "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo."
+    "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
+    "paymentSuccessDescConfirmed": "¡Pago confirmado! Tus entradas van en camino a tu correo con el PDF y los códigos QR."
   },
   "success": {
     "title": "¡Pago Autorizado!",

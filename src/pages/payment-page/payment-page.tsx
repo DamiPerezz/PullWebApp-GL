@@ -212,12 +212,16 @@ export const PaymentPage = () => {
       }, 3000);
 
     } catch (error: any) {
+      // El mensaje del BACKEND primero: axios siempre trae .message
+      // ("Request failed with status code 402"), así que si se comprueba
+      // antes, el motivo real del rechazo (tarjeta declinada, demasiados
+      // intentos...) no se muestra nunca.
       let errorMessage = t('page.unexpectedError');
 
-      if (error.message) {
-        errorMessage = error.message;
-      } else if (error.response?.data?.error) {
+      if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
       setError(errorMessage);
@@ -411,7 +415,12 @@ export const PaymentPage = () => {
                   {t('page.paymentSuccessTitle')}
                 </h2>
                 <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "1.125rem", marginBottom: "2rem", maxWidth: "600px" }}>
-                  {t('page.paymentSuccessDesc')}
+                  {/* Público = ya cobrado y confirmado; privado = retenido
+                      pendiente de aprobación. Antes TODOS veían "pendiente
+                      de aprobación", falso para el 100% de compras públicas. */}
+                  {requiresApproval
+                    ? t('page.paymentSuccessDesc')
+                    : t('page.paymentSuccessDescConfirmed')}
                 </p>
                 <div className="payment-page-loading-spinner" style={{ margin: "0 auto" }}></div>
                 <p style={{ color: "rgba(255, 255, 255, 0.6)", marginTop: "1rem" }}>

@@ -6,7 +6,7 @@
     "proceedToPayment": "Proceed to Payment",
     "cancelledWarning": "Payment was cancelled. Your form data has been preserved. You can try again when ready.",
     "paymentSuccessTitle": "Payment Successful!",
-    "paymentSuccessDesc": "Your order has been submitted and is pending staff approval. You'll receive an email confirmation shortly.",
+    "paymentSuccessDesc": "Your request has been submitted and is pending venue approval. The amount is held, not charged — we will email you the decision.",
     "redirecting": "Redirecting...",
     "processingOrder": "Processing your order...",
     "processingWait": "Please wait while we confirm your payment",
@@ -18,7 +18,8 @@
     "couldNotDetermineEventId": "Could not determine event ID",
     "failedToCreateOrder": "Failed to create pending order",
     "paymentSimulationFailed": "Payment simulation failed",
-    "unexpectedError": "An unexpected error occurred. Please try again."
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "paymentSuccessDescConfirmed": "Payment confirmed! Your tickets are on their way to your email with the PDF and QR codes."
   },
   "success": {
     "title": "Payment Authorized!",
