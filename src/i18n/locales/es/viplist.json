@@ -28,7 +28,7 @@
       "consumablesIncluded": "Consumibles Incluidos",
       "feeNote": "Incluye {{percentage}}% de costes de gestión",
       "basePrice": "Precio base",
-      "serviceFee": "Costes de gestión",
+      "serviceFee": "Gasto de gestión",
       "total": "Total"
     },
     "successBanner": {

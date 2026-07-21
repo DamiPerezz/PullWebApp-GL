@@ -28,7 +28,7 @@
       "consumablesIncluded": "Consumables Included",
       "feeNote": "Includes {{percentage}}% service fee",
       "basePrice": "Base price",
-      "serviceFee": "Service fee",
+      "serviceFee": "Management fee",
       "total": "Total"
     },
     "successBanner": {
