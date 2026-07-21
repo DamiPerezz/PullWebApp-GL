@@ -15,9 +15,33 @@
 // backend rather than the old demo.
 const DEFAULT_UPSTREAM = "https://pull-api-v2-prod.fly.dev";
 
+// CORS del PROXY: la web real es same-origin (no lo necesita), pero la app
+// móvil en modo web (expo web, localhost) y cualquier build nativa que pase
+// por aquí sí hacen peticiones cross-origin con Authorization → preflight.
+// El backend no puede reflejar el Origin porque se lo quitamos a propósito,
+// así que el CORS lo respondemos aquí. SIN allow-credentials: los flujos con
+// cookie (wallet) son same-origin y así el navegador nunca manda cookies
+// cross-site.
+function corsHeaders(request) {
+  const origin = request.headers.get("origin");
+  if (!origin) return {};
+  return {
+    "access-control-allow-origin": origin,
+    "access-control-allow-methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+    "access-control-allow-headers": "Content-Type, Authorization, X-Requested-With, X-Request-ID",
+    "access-control-max-age": "86400",
+    "vary": "Origin",
+  };
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
+
+  // Preflight: contestar aquí, sin molestar al backend.
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders(request) });
+  }
 
   const upstream = (env && env.UPSTREAM) || DEFAULT_UPSTREAM;
 
@@ -56,6 +80,9 @@ export async function onRequest(context) {
   // the edge.
   const respHeaders = new Headers(response.headers);
   ["transfer-encoding", "connection"].forEach((h) => respHeaders.delete(h));
+  for (const [k, v] of Object.entries(corsHeaders(request))) {
+    respHeaders.set(k, v);
+  }
 
   return new Response(response.body, {
     status: response.status,
