@@ -9,11 +9,22 @@
 // The catch-all `[[path]]` segment captures everything after /api/, so
 // /api/v1/venues -> <UPSTREAM>/api/v1/venues, etc.
 
-// Each Pages project sets its own UPSTREAM env var (Cloudflare Pages →
-// Settings → Environment variables). This fallback is the 511 Events
-// production backend; a project that forgets UPSTREAM still reaches a real
-// backend rather than the old demo.
+// Each Pages project/environment sets its own UPSTREAM env var (Cloudflare
+// Pages → Settings → Environment variables; OJO: Production y Preview se
+// configuran POR SEPARADO). Resolución:
+//   - Hostnames de PRODUCCIÓN (lista de abajo): env.UPSTREAM, con fallback
+//     al backend prod — si la variable se pierde, prod sigue funcionando.
+//   - Cualquier OTRO hostname (staging.*.pages.dev, previews, la demo):
+//     env.UPSTREAM es OBLIGATORIA. Sin ella se responde 503 en alto, en vez
+//     de mandar tráfico de staging/demo a PRODUCCIÓN en silencio (órdenes
+//     de prueba en la BD real).
 const DEFAULT_UPSTREAM = "https://pull-api-v2-prod.fly.dev";
+const PROD_HOSTS = new Set([
+  "pull-511-events.pages.dev",
+  "511events.pullevents.com",
+  "pullevents.com",
+  "www.pullevents.com",
+]);
 
 // CORS del PROXY: la web real es same-origin (no lo necesita), pero la app
 // móvil en modo web (expo web, localhost) y cualquier build nativa que pase
@@ -43,7 +54,26 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: corsHeaders(request) });
   }
 
-  const upstream = (env && env.UPSTREAM) || DEFAULT_UPSTREAM;
+  let upstream = env && env.UPSTREAM;
+  if (!upstream) {
+    if (PROD_HOSTS.has(url.hostname)) {
+      upstream = DEFAULT_UPSTREAM;
+    } else {
+      // Host no-productivo sin UPSTREAM: fallar en alto. Configurar la
+      // variable en Cloudflare Pages → Settings → Environment variables
+      // (entorno Preview para staging.<proyecto>.pages.dev).
+      return new Response(
+        JSON.stringify({
+          error: "proxy_upstream_not_configured",
+          message:
+            `Este despliegue (${url.hostname}) no tiene la variable UPSTREAM ` +
+            "configurada y no es un hostname de producción. Se corta aquí para " +
+            "no mandar tráfico de staging/demo al backend de PRODUCCIÓN.",
+        }),
+        { status: 503, headers: { "content-type": "application/json", ...corsHeaders(request) } },
+      );
+    }
+  }
 
   // Rebuild the upstream URL preserving the full path + query.
   const upstreamURL = upstream + url.pathname + url.search;

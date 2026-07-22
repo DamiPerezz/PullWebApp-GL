@@ -136,8 +136,10 @@ export default defineConfig(({ mode }) => ({
     middlewareMode: false,
     // Proxy API requests to local backend
     proxy: {
+      // Backend Go local (go run main.go escucha en 8080; antes decía 3000,
+      // donde no hay nada — el dev server no llegaba a ningún backend).
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },

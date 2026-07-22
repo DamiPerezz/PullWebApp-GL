@@ -10,10 +10,15 @@
 pull-api
 
 # Environment Variables - SECURITY: Never commit secrets
-# Only .env.example should be committed (with placeholder values)
+# Only .env.example should be committed (with placeholder values).
+# Excepción deliberada: .env.production y .env.staging SÍ van a git — solo
+# llevan variables VITE_* PÚBLICAS (acaban en el bundle del navegador igual;
+# aquí no hay secretos) y son las que fijan el sabor de cada build.
 .env
 .env.*
 !.env.example
+!.env.production
+!.env.staging
 
 # Frontend (Node)
 node_modules/
