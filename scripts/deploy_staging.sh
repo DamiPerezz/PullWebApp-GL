@@ -24,6 +24,17 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
+# Mismos guards que prod: un .env local o una VITE_* de shell pisarían el
+# .env.staging commiteado y el build dejaría de ser reproducible.
+if [ -f .env.local ] || [ -f .env.staging.local ]; then
+  echo "ERROR: existe .env.local o .env.staging.local — pisarían la build. Bórralos."
+  exit 1
+fi
+if env | grep -q '^VITE_'; then
+  echo "ERROR: hay variables VITE_* en la shell:"; env | grep '^VITE_' | cut -d= -f1
+  exit 1
+fi
+
 echo "== Build (modo staging) =="
 npm run build:staging
 

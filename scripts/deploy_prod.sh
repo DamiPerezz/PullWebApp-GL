@@ -32,8 +32,34 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 git fetch origin main --quiet
-if ! git merge-base --is-ancestor HEAD origin/main; then
-  echo "ERROR: HEAD no está en origin/main. Haz 'git push' primero."
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+  if git merge-base --is-ancestor HEAD origin/main; then
+    behind=$(git rev-list --count HEAD..origin/main)
+    echo "ERROR: HEAD está $behind commit(s) POR DETRÁS de origin/main — deployarías"
+    echo "       código viejo y el tag mentiría. Haz 'git pull' primero."
+    if [ "${ALLOW_OLD_DEPLOY:-}" = "1" ]; then
+      echo "(ALLOW_OLD_DEPLOY=1 — rollback deliberado, continuando)"
+    else
+      echo "       Rollback deliberado: ALLOW_OLD_DEPLOY=1 bash scripts/deploy_prod.sh"
+      exit 1
+    fi
+  else
+    echo "ERROR: HEAD no está pusheado a origin/main. Haz 'git push' primero."
+    exit 1
+  fi
+fi
+
+# Vite deja que un .env local (gitignored) o una VITE_* exportada en la shell
+# PISEN los .env.production/.env.staging commiteados — el build dejaría de ser
+# reproducible desde git. Bloquear ambas vías.
+if [ -f .env.local ] || [ -f .env.production.local ]; then
+  echo "ERROR: existe .env.local o .env.production.local — pisarían el build de"
+  echo "       producción con valores que git no ve. Bórralos o renómbralos."
+  exit 1
+fi
+if env | grep -q '^VITE_'; then
+  echo "ERROR: hay variables VITE_* exportadas en la shell — pisarían los .env"
+  echo "       commiteados:"; env | grep '^VITE_' | cut -d= -f1
   exit 1
 fi
 
@@ -46,15 +72,22 @@ npx wrangler pages deploy dist --project-name "$PROJECT" --branch main
 
 echo "== Health check =="
 sleep 3
-if curl -sf --max-time 15 "$URL" >/dev/null; then
-  echo "WEB OK ($URL)"
+# La raíz estática puede responder 200 aunque la Function esté rota: el check
+# real es una llamada API a través del proxy (ejercita Function+UPSTREAM+backend).
+if curl -sf --max-time 20 "$URL/api/v1/venues/events/get-venue-info/511-events" >/dev/null; then
+  echo "WEB+PROXY+API OK"
 else
-  echo "ERROR: $URL no responde. NO se ha creado tag."
+  echo "ERROR: el API vía proxy no responde ($URL/api/v1/...). NO se ha creado tag."
+  echo "       Mira las env vars del proyecto Pages y flyctl logs del backend."
   exit 1
 fi
 
-tag="web-prod-$(date +%Y%m%d-%H%M)"
-git tag -a "$tag" -m "Deploy web $PROJECT commit $commit"
-git push origin "$tag" --quiet
-echo ""
-echo "== DEPLOYADO: $commit → $URL  (tag: $tag) =="
+tag="web-prod-$(date +%Y%m%d-%H%M%S)"
+if git tag -a "$tag" -m "Deploy web $PROJECT commit $commit" && git push origin "$tag" --quiet; then
+  echo ""
+  echo "== DEPLOYADO: $commit → $URL  (tag: $tag) =="
+else
+  echo ""
+  echo "== DEPLOYADO: $commit → $URL — PERO el tag falló; créalo a mano: =="
+  echo "  git tag -a $tag -m 'Deploy web $PROJECT commit $commit' && git push origin $tag"
+fi

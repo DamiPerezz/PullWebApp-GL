@@ -75,6 +75,21 @@ export async function onRequest(context) {
     }
   }
 
+  // Normalizar: una barra final en la variable UPSTREAM produciría
+  // https://backend//api/... → 404 de Gin en TODAS las rutas.
+  upstream = String(upstream).replace(/\/+$/, "");
+  try {
+    new URL(upstream);
+  } catch {
+    return new Response(
+      JSON.stringify({
+        error: "proxy_upstream_invalid",
+        message: `La variable UPSTREAM no es una URL válida.`,
+      }),
+      { status: 503, headers: { "content-type": "application/json", ...corsHeaders(request) } },
+    );
+  }
+
   // Rebuild the upstream URL preserving the full path + query.
   const upstreamURL = upstream + url.pathname + url.search;
 
@@ -98,9 +113,26 @@ export async function onRequest(context) {
   // Reenviar la IP real del comprador + el secreto que prueba que venimos de
   // este proxy (el backend solo confía en X-Pull-Client-IP con el secreto
   // correcto; un ataque directo a fly.dev no lo conoce).
-  if (realClientIP && env && env.PROXY_SHARED_SECRET) {
+  // Sin el secreto, el rate limit del backend vería la IP de salida de
+  // Cloudflare (la misma para todos) y colapsaría en 429 al abrir la venta:
+  // en hosts no-productivos fallamos en alto; en producción seguimos
+  // funcionando pero marcamos la degradación en un header de respuesta.
+  const sharedSecret = env && env.PROXY_SHARED_SECRET;
+  if (!sharedSecret && !PROD_HOSTS.has(url.hostname)) {
+    return new Response(
+      JSON.stringify({
+        error: "proxy_shared_secret_not_configured",
+        message:
+          `Este despliegue (${url.hostname}) no tiene PROXY_SHARED_SECRET ` +
+          "configurada (Cloudflare Pages → Settings → Environment variables, " +
+          "entorno Preview para staging).",
+      }),
+      { status: 503, headers: { "content-type": "application/json", ...corsHeaders(request) } },
+    );
+  }
+  if (realClientIP && sharedSecret) {
     headers.set("X-Pull-Client-IP", realClientIP);
-    headers.set("X-Pull-Proxy-Auth", env.PROXY_SHARED_SECRET);
+    headers.set("X-Pull-Proxy-Auth", sharedSecret);
   }
 
   const init = {
@@ -116,7 +148,7 @@ export async function onRequest(context) {
   } catch (err) {
     return new Response(
       JSON.stringify({ error: "proxy_upstream_failure", message: String(err) }),
-      { status: 502, headers: { "content-type": "application/json" } },
+      { status: 502, headers: { "content-type": "application/json", ...corsHeaders(request) } },
     );
   }
 
@@ -125,6 +157,7 @@ export async function onRequest(context) {
   // the edge.
   const respHeaders = new Headers(response.headers);
   ["transfer-encoding", "connection"].forEach((h) => respHeaders.delete(h));
+  if (!sharedSecret) respHeaders.set("x-pull-proxy-degraded", "no-shared-secret");
   for (const [k, v] of Object.entries(corsHeaders(request))) {
     respHeaders.set(k, v);
   }
