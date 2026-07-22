@@ -37,6 +37,13 @@ import {
 import { validateVIPCode } from '../../utils/security';
 import './vip-list-tracking-page.css';
 
+// Final list states: 'completed' (list locked, nothing changes anymore) and
+// 'cancelled'. 'open' (RSVPs coming in) and 'closed' (payments coming in)
+// still change, so the page keeps polling for those. Once final, polling
+// stops for good — each poll consumes a Cloudflare Pages Function invocation.
+const isReservationFinal = (resv: VIPListReservation | null): boolean =>
+  resv?.status === 'completed' || resv?.status === 'cancelled';
+
 export const VIPListTrackingPage = () => {
   const { lang, trackingCode: rawTrackingCode } = useParams<{ lang: string; trackingCode: string }>();
   const navigate = useNavigate();
@@ -97,6 +104,25 @@ export const VIPListTrackingPage = () => {
   useEffect(() => {
     if (!trackingCode) return;
 
+    // Poll with brakes: every 60s, only while the tab is visible, and stop
+    // for good once the list reaches a final state — each request consumes
+    // a Cloudflare Pages Function invocation.
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let reachedFinalState = false;
+
+    const stopPolling = () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const startPolling = () => {
+      if (interval === null && !reachedFinalState && document.visibilityState === 'visible') {
+        interval = setInterval(fetchReservation, 60000);
+      }
+    };
+
     const fetchReservation = async () => {
       try {
         const data = await getVIPListByTrackingCode(trackingCode);
@@ -106,16 +132,40 @@ export const VIPListTrackingPage = () => {
         if (data.reservation?.events?.image) {
           setEventImage(data.reservation.events.image);
         }
+        setError(null);
         setLoading(false);
+        reachedFinalState = isReservationFinal(data.reservation);
       } catch {
         setError(t('tracking.errors.loadFailed'));
         setLoading(false);
+        // Don't keep hammering a failing endpoint; the refetch on focus
+        // below retries in case it was a transient failure.
+        reachedFinalState = true;
+      }
+      if (reachedFinalState) {
+        stopPolling();
+      } else {
+        startPolling();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        stopPolling();
+      } else {
+        // Back on the tab: one immediate fetch (even after a final state,
+        // just in case) and resume polling only if still needed.
+        fetchReservation();
       }
     };
 
     fetchReservation();
-    const interval = setInterval(fetchReservation, 15000);
-    return () => clearInterval(interval);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trackingCode, t]);
 
   const formatDate = (dateStr: string) => {

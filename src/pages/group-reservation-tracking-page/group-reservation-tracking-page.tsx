@@ -89,6 +89,27 @@ const PERKS: Perk[] = [
   { threshold: 12, nameKey: 'tracking.perks.premiumArea', descKey: 'tracking.perks.premiumAreaDesc', icon: <Star size={16} /> }
 ];
 
+// Final reservation states: the venue rejected/cancelled it, or it is already
+// approved and every guest is fully resolved (paid + complete data, or ticket
+// issued). From that point the backend has nothing left to change, so the
+// tracking page can stop polling — each poll consumes a Cloudflare Pages
+// Function invocation.
+const isReservationFinal = (resv: GroupReservation): boolean => {
+  // 9 = cancelled (current backend), 10 = rejected (legacy value this page renders)
+  if (resv.status_id === 9 || resv.status_id === 10) return true;
+  // 7/8 = approved; anything else is still pending venue review
+  if (resv.status_id !== 7 && resv.status_id !== 8) return false;
+  // Approved: only final once no guest has pending actions
+  // (mirrors getGuestStatus === 'ready' for every guest)
+  return (resv.guests || []).every((guest, index) => {
+    if (index === 0) return true; // organizer is always ready
+    if (guest.ticket_id) return true;
+    const hasPaid = guest.host_pays || !!guest.paid_at;
+    const hasCompleteData = !!(guest.name && guest.last_name && guest.email && guest.gender);
+    return hasPaid && hasCompleteData;
+  });
+};
+
 export const GroupReservationTrackingPage = () => {
   const { lang, paymentLinkCode } = useParams<{ lang: string; paymentLinkCode: string }>();
   const navigate = useNavigate();
@@ -125,6 +146,25 @@ export const GroupReservationTrackingPage = () => {
   useEffect(() => {
     if (!paymentLinkCode) return;
 
+    // Poll with brakes: every 30s, only while the tab is visible, and stop
+    // for good once the reservation reaches a final state — each request
+    // consumes a Cloudflare Pages Function invocation.
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let reachedFinalState = false;
+
+    const stopPolling = () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const startPolling = () => {
+      if (interval === null && !reachedFinalState && document.visibilityState === 'visible') {
+        interval = setInterval(fetchReservation, 30000);
+      }
+    };
+
     const fetchReservation = async () => {
       try {
         const data = await getGroupReservationByPaymentLink(paymentLinkCode);
@@ -138,16 +178,40 @@ export const GroupReservationTrackingPage = () => {
         if (data.event_image) {
           setEventImage(data.event_image);
         }
+        setError(null);
         setLoading(false);
+        reachedFinalState = isReservationFinal(reservationWithData);
       } catch {
         setError(t('tracking.errors.loadFailed'));
         setLoading(false);
+        // Don't keep hammering a failing endpoint; the refetch on focus
+        // below retries in case it was a transient failure.
+        reachedFinalState = true;
+      }
+      if (reachedFinalState) {
+        stopPolling();
+      } else {
+        startPolling();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        stopPolling();
+      } else {
+        // Back on the tab: one immediate fetch (even after a final state,
+        // just in case) and resume polling only if still needed.
+        fetchReservation();
       }
     };
 
     fetchReservation();
-    const interval = setInterval(fetchReservation, 10000);
-    return () => clearInterval(interval);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [paymentLinkCode]);
 
   // =========================================
