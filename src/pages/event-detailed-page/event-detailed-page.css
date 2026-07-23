@@ -401,6 +401,24 @@
     color: rgb(239, 68, 68);
 }
 
+/* Público / privado — visible junto a edad y código de vestimenta */
+.event-detailed-tag.privacy-public {
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    color: rgb(110, 231, 183);
+}
+.event-detailed-tag.privacy-public svg {
+    color: rgb(52, 211, 153);
+}
+.event-detailed-tag.privacy-private {
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    color: rgb(252, 211, 77);
+}
+.event-detailed-tag.privacy-private svg {
+    color: rgb(251, 191, 36);
+}
+
 .event-detailed-tag.dress-code {
     background: rgba(168, 85, 255, 0.15);
     border: 1px solid rgba(168, 85, 255, 0.4);

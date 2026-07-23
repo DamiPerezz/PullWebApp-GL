@@ -5,7 +5,7 @@ import { Layout } from '../../components/layout/layout';
 import { TicketTypeCard } from '../../components/ticket-type-card/ticket-type-card';
 import { DivTicketTypeCard } from '../../components/ticket-type-card/div-ticket-type-card';
 import { GuestListCard } from '../../components/guest-list-card/guest-list-card';
-import { Calendar, Clock, MapPin, Plus, Shirt, X, Ticket, Users, ClipboardList, MessageCircle, Crown } from 'lucide-react';
+import { Calendar, Clock, MapPin, Plus, Shirt, X, Ticket, Users, ClipboardList, MessageCircle, Crown, Lock, Globe } from 'lucide-react';
 import type { EventDetailedInfo, TicketType, GuestListType } from '../../types/types';
 import './event-detailed-page.css';
 import { getEventDetailedInfo } from '../../controller/event-controller';
@@ -209,9 +209,15 @@ export const EventDetailedPage = () => {
                                         </div>
                                     )}
 
-                                    {/* Tags - age and dress code only */}
-                                    {(eventDetailedInfo?.min_age || eventDetailedInfo?.dress_code) && (
+                                    {/* Tags - público/privado (siempre), edad y código de vestimenta */}
+                                    {(() => {
+                                        const isPrivate = Boolean((eventDetailedInfo as any)?.is_private || (eventDetailedInfo as any)?.require_approval);
+                                        return (
                                         <div className="event-detailed-tags event-detailed-tags-info">
+                                            <div className={`event-detailed-tag ${isPrivate ? 'privacy-private' : 'privacy-public'}`}>
+                                                {isPrivate ? <Lock size={14} /> : <Globe size={14} />}
+                                                <span>{isPrivate ? 'Privado' : 'Público'}</span>
+                                            </div>
                                             {eventDetailedInfo?.min_age && (
                                                 <div className="event-detailed-tag age">
                                                     <Plus size={14} />
@@ -225,7 +231,8 @@ export const EventDetailedPage = () => {
                                                 </div>
                                             )}
                                         </div>
-                                    )}
+                                        );
+                                    })()}
 
                                     {/* Date - plain text with icon */}
                                     <div className="event-detailed-date-time date">
