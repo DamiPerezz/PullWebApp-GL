@@ -75,6 +75,10 @@ export const PaymentPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [cancelledOrderData, setCancelledOrderData] = useState<any>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  // Consentimiento explícito para eventos privados: el usuario debe leer y
+  // aceptar el flujo de aprobación (retención sin cobro hasta que el local
+  // acepte) ANTES de ver el formulario de datos. Transparencia.
+  const [approvalAccepted, setApprovalAccepted] = useState<boolean>(false);
 
   const getTicketGender = (ticketName: string): 'male' | 'female' | null => {
     const nameLower = ticketName.toLowerCase();
@@ -275,6 +279,72 @@ export const PaymentPage = () => {
           style={{ backgroundImage: `url(${eventInfo?.event_img})` }}
         />
         <div className="payment-page-bg-overlay" />
+
+        {requiresApproval && !approvalAccepted && !paymentSuccess && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="approval-modal-title"
+            style={{
+              position: "fixed", inset: 0, zIndex: 1000,
+              background: "rgba(3, 3, 8, 0.82)", backdropFilter: "blur(4px)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: "1rem",
+            }}
+          >
+            <div style={{
+              maxWidth: "460px", width: "100%",
+              background: "#14141c",
+              border: "1px solid rgba(139, 92, 246, 0.35)",
+              borderRadius: "16px", padding: "1.5rem",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+              color: "#e8e8ee",
+            }}>
+              <div style={{ fontSize: "2rem", textAlign: "center", marginBottom: "0.5rem" }}>🔒</div>
+              <h3 id="approval-modal-title" style={{
+                margin: "0 0 0.75rem", textAlign: "center",
+                fontSize: "1.25rem", fontWeight: 700, color: "#ffffff",
+              }}>
+                Evento privado — requiere aprobación
+              </h3>
+              <p style={{ margin: "0 0 0.75rem", fontSize: "0.95rem", lineHeight: 1.55, color: "rgba(255,255,255,0.8)" }}>
+                Antes de continuar, es importante que sepas cómo funciona la compra
+                en este evento:
+              </p>
+              <ul style={{ margin: "0 0 0.75rem", paddingLeft: "1.1rem", fontSize: "0.92rem", lineHeight: 1.6, color: "rgba(255,255,255,0.78)" }}>
+                <li>Al enviar tu solicitud, <strong style={{ color: "#fff" }}>se retiene el importe en tu tarjeta pero NO se te cobra todavía</strong>.</li>
+                <li>El equipo del local revisa tu solicitud (hasta 48&nbsp;h).</li>
+                <li>Si te <strong style={{ color: "#fff" }}>aceptan</strong>, se cobra y recibes tu entrada con el QR por correo.</li>
+                <li>Si te <strong style={{ color: "#fff" }}>rechazan</strong> o pasan 48&nbsp;h sin respuesta, <strong style={{ color: "#fff" }}>se libera la retención y no se te cobra nada</strong>.</li>
+              </ul>
+              <p style={{ margin: "0 0 1.25rem", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)" }}>
+                Te avisaremos por correo en cada paso. No hace falta que llames.
+              </p>
+              <div style={{ display: "flex", gap: "0.75rem" }}>
+                <button
+                  onClick={() => navigate(-1)}
+                  style={{
+                    flex: 1, padding: "0.75rem", borderRadius: "10px",
+                    border: "1px solid rgba(255,255,255,0.18)", background: "transparent",
+                    color: "rgba(255,255,255,0.8)", fontSize: "0.95rem", cursor: "pointer",
+                  }}
+                >
+                  Volver
+                </button>
+                <button
+                  onClick={() => setApprovalAccepted(true)}
+                  style={{
+                    flex: 2, padding: "0.75rem", borderRadius: "10px", border: "none",
+                    background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                    color: "#fff", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer",
+                  }}
+                >
+                  Acepto y continúo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="payment-page-content">
           <div className="payment-page-container">
