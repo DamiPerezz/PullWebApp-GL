@@ -96,10 +96,14 @@ export const simulateStripePayment = async (orderId: string) => {
 // (una línea). Las alternativas solo se prueban ante un 404/405 —
 // "ruta inexistente" garantiza que el backend no hizo nada, así que reintentar
 // no puede duplicar un cobro.
-export const CHECKOUT_ENDPOINT = '/orders/pay';
+// VERIFICADO en producción: el checkout alojado de dLocal vive en
+// /orders/checkout (controllers.CreateCheckout) y devuelve checkout_url.
+// OJO: /orders/pay es el endpoint ANTIGUO de tarjeta cruda — llamarlo aquí
+// devolvía "Datos de tarjeta incompletos" (400), y como no es 404/405 los
+// fallbacks ni se probaban.
+export const CHECKOUT_ENDPOINT = '/orders/checkout';
 const CHECKOUT_ENDPOINT_FALLBACKS = [
   '/orders/create-checkout-session',
-  '/orders/dlocal/checkout',
 ];
 
 export type CheckoutStart = {
