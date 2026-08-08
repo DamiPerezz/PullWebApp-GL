@@ -212,7 +212,7 @@ export const TermsOfServicePage = () => {
                   </div>
                   <h3>Payment</h3>
                   <p>
-                    Complete payment securely through our gateway (Stripe).
+                    Complete payment securely through our gateway (dLocal).
                     We accept credit and debit cards.
                   </p>
                 </div>
@@ -314,7 +314,7 @@ export const TermsOfServicePage = () => {
 
               <h3>6.2 Payment methods</h3>
               <p>
-                We accept credit and debit cards through Stripe. Payment processing
+                We accept credit and debit cards through dLocal. Payment processing
                 complies with PCI-DSS security standards.
               </p>
 

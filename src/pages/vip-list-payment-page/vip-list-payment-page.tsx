@@ -641,7 +641,7 @@ export const VIPListPaymentPage = () => {
 
             <div className="vippay-secure-note">
               <Shield size={14} />
-              <span>Pago seguro encriptado • Procesado por NeoNet/Cybersource</span>
+              <span>Pago seguro encriptado • Procesado por dLocal</span>
             </div>
 
           </div>

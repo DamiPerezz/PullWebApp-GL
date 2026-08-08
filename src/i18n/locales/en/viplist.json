@@ -152,7 +152,7 @@
     "managementFee": "Management fee (15%)",
     "total": "Total",
     "payNow": "Pay {{amount}}",
-    "secureNote": "Secure payment processed by Stripe",
+    "secureNote": "Secure payment processed by dLocal",
     "success": {
       "title": "Payment Confirmed!",
       "message": "Your ticket is ready. See you at the event!",

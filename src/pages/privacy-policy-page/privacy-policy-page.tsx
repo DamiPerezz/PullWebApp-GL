@@ -171,7 +171,8 @@ export const PrivacyPolicyPage = () => {
                 </li>
                 <li>
                   <strong>Payment data:</strong> Credit/debit card information processed
-                  securely through Stripe (we do not store complete card numbers).
+                  securely through dLocal (we never see or store your card number:
+                  it is entered directly on the payment processor's page).
                 </li>
                 <li>
                   <strong>Profile picture:</strong> Photo you can voluntarily upload to your account.
@@ -344,8 +345,8 @@ export const PrivacyPolicyPage = () => {
                   information with the venue where you will attend the event, to verify your entry.
                 </li>
                 <li>
-                  <strong>Payment processors (Stripe):</strong> Your payment information is processed
-                  securely through Stripe, complying with PCI-DSS standards.
+                  <strong>Payment processors (dLocal):</strong> Your payment information is processed
+                  securely through dLocal, complying with PCI-DSS standards.
                 </li>
                 <li>
                   <strong>Infrastructure providers (Supabase):</strong> We store data
