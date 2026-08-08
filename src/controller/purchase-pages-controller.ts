@@ -78,22 +78,96 @@ export const simulateStripePayment = async (orderId: string) => {
   return response.data;
 };
 
-// Direct-card payment (NeoNet/Cybersource): the backend performs the two
-// atomic sales (venue share + service fee) and only then issues tickets.
-// paymentLinkCode is the anti-carding proof returned by create-pending-order:
-// the backend refuses to touch the gateway without it.
-export const payOrder = async (
+// ============================================================================
+// dLocal Go — CHECKOUT ALOJADO
+//
+// dLocal Go NO acepta la tarjeta cruda: el backend crea el pago
+// (POST /v1/payments) y devuelve una `redirect_url` a la página de dLocal.
+// El comprador paga ALLÍ y vuelve a nuestro `success_url`. El pago nace
+// PENDING y se confirma por WEBHOOK, así que al volver la orden puede seguir
+// en `pending`/`processing` unos segundos — la web no debe cantar victoria.
+//
+// `payment_link_code` sigue siendo obligatorio (anti-carding): es la prueba
+// de que quien paga es quien creó la orden (flujo público) o quien recibió el
+// enlace de aprobación por correo (flujo privado).
+// ============================================================================
+
+// Ruta canónica. Si el backend acaba exponiendo otro nombre, se cambia AQUÍ
+// (una línea). Las alternativas solo se prueban ante un 404/405 —
+// "ruta inexistente" garantiza que el backend no hizo nada, así que reintentar
+// no puede duplicar un cobro.
+export const CHECKOUT_ENDPOINT = '/orders/pay';
+const CHECKOUT_ENDPOINT_FALLBACKS = [
+  '/orders/create-checkout-session',
+  '/orders/dlocal/checkout',
+];
+
+export type CheckoutStart = {
+  redirectUrl: string;
+  paymentId?: string;
+  status?: string;
+};
+
+export type CheckoutUrls = {
+  successUrl: string;
+  backUrl: string;
+};
+
+export const startOrderCheckout = async (
   orderId: string,
   paymentLinkCode: string,
-  card: { number: string; exp_month: string; exp_year: string; cvv: string },
-  turnstileToken?: string
-) => {
-  const response = await apiClient.post(`/orders/pay`, {
+  urls: CheckoutUrls
+): Promise<CheckoutStart> => {
+  const body = {
     order_id: orderId,
     payment_link_code: paymentLinkCode,
-    card,
-    ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
-  });
+    success_url: urls.successUrl,
+    back_url: urls.backUrl,
+    // Alias históricos: los handlers de checkout del backend usan
+    // return_url/cancel_url. Mandar ambos evita un round-trip de integración.
+    return_url: urls.successUrl,
+    cancel_url: urls.backUrl,
+  };
+
+  let routeMissing: unknown = null;
+
+  for (const path of [CHECKOUT_ENDPOINT, ...CHECKOUT_ENDPOINT_FALLBACKS]) {
+    try {
+      const response = await apiClient.post(path, body);
+      const data = response.data || {};
+      const redirectUrl: string | undefined =
+        data.redirect_url || data.checkout_url || data.payment_url;
+
+      if (!redirectUrl) {
+        throw new Error(data.error || 'MISSING_REDIRECT_URL');
+      }
+
+      return {
+        redirectUrl,
+        paymentId: data.payment_id || data.dlocal_payment_id || data.session_id,
+        status: data.status,
+      };
+    } catch (error: any) {
+      const httpStatus = error?.response?.status;
+      // 404/405 = esa ruta no existe en este backend → probar la siguiente.
+      // Cualquier otro error (402 declinado, 403 código inválido, 409 ya
+      // pagada, 429 rate limit) es una respuesta REAL: se propaga tal cual.
+      if (httpStatus === 404 || httpStatus === 405) {
+        routeMissing = error;
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw routeMissing || new Error('CHECKOUT_UNAVAILABLE');
+};
+
+// Estado de una orden. Lo usan la página de pago (para retomar una orden del
+// enlace de aprobación) y la de éxito (para saber si el webhook ya confirmó).
+// Shape del backend: { order: {...fila...}, user, event, venue_id }
+export const getOrderDetails = async (orderId: string) => {
+  const response = await apiClient.get(`/orders/details/${orderId}`);
   return response.data;
 };
 

@@ -7,6 +7,7 @@ import { Layout } from '../../components/layout/layout';
 import { AlertTriangle, ArrowRight, RefreshCw } from 'lucide-react';
 import { getOrderDataAfterCancel } from '../../controller/purchase-pages-controller';
 import { validateUUID, validateSlug, validateNumeric } from '../../utils/security';
+import { validatePaymentLinkCode } from '../../utils/orderStatus';
 import './payment-cancel.css';
 
 export const PaymentCancelPage = () => {
@@ -23,6 +24,10 @@ export const PaymentCancelPage = () => {
   const eventId = useMemo(() => validateSlug(searchParams.get('event_id')), [searchParams]);
   const ticketTypeId = useMemo(() => validateUUID(searchParams.get('ticket_type_id')), [searchParams]);
   const quantity = useMemo(() => validateNumeric(searchParams.get('quantity'), 1, 10), [searchParams]);
+  // `code` = payment_link_code de la orden. Lo pone la página de pago en el
+  // back_url que le da a dLocal, para poder RETOMAR la misma orden si el
+  // comprador se echa atrás en la pasarela.
+  const code = useMemo(() => validatePaymentLinkCode(searchParams.get('code')), [searchParams]);
 
   const [loading, setLoading] = useState(true);
   const [_orderData, setOrderData] = useState<any>(null);
@@ -44,10 +49,17 @@ export const PaymentCancelPage = () => {
   }, [orderId]);
 
   const handleRetry = () => {
-    // Navegar de vuelta a la página de pago con los datos preservados
-    if (eventId && ticketTypeId && quantity && orderId) {
-      navigate(buildUrl(`/event/${eventId}/tickets/${ticketTypeId}/${quantity}?order_id=${orderId}&cancelled=true`));
+    if (!(eventId && ticketTypeId && quantity && orderId)) return;
+    const base = buildUrl(`/event/${eventId}/tickets/${ticketTypeId}/${quantity}`);
+    if (code) {
+      // Con el código se RETOMA la misma orden (no se crea otra, no se
+      // vuelve a reservar aforo): el comprador solo se echó atrás en dLocal.
+      navigate(`${base}?order_id=${orderId}&code=${code}`);
+      return;
     }
+    // Sin código: comportamiento clásico — repoblar el formulario con los
+    // datos de la orden y crear una nueva.
+    navigate(`${base}?order_id=${orderId}&cancelled=true`);
   };
 
   const handleGoHome = () => {

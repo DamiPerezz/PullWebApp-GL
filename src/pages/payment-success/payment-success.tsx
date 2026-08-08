@@ -1,11 +1,22 @@
 // pages/payment-success-page.tsx
 // SECURITY: Strict UUID validation and sanitization to prevent XSS/IDOR attacks
-import { useEffect, useState, useMemo } from 'react';
+//
+// dLOCAL GO: esta página es el `success_url` al que vuelve el comprador desde
+// la pasarela. **Volver aquí NO significa que el pago esté confirmado**: el
+// pago nace PENDING y se confirma por webhook, así que al aterrizar la orden
+// puede seguir en `pending`/`processing` unos segundos. Por eso se consulta el
+// estado real y se reintenta unas cuantas veces antes de decir nada.
+//
+// Antes esta página solo entendía `payment_authorized`: cualquier otro estado
+// (incluidos `awaiting_approval` y `approved_unpaid`, que NO han pagado)
+// caía en el "¡Pago confirmado!". Ahora cada estado tiene su mensaje.
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '../../components/layout/layout';
-import { CheckCircle, Clock, ArrowRight, Copy, Check, AlertCircle, Home } from 'lucide-react';
-import { apiClient } from '../../utils/axios';
+import { CheckCircle, Clock, ArrowRight, Copy, Check, AlertCircle, Home, Loader } from 'lucide-react';
+import { getOrderDetails } from '../../controller/purchase-pages-controller';
+import { classifyOrderStatus, type OrderStage } from '../../utils/orderStatus';
 import './payment-success.css';
 
 // SECURITY: Strict UUID v4 validation regex
@@ -32,6 +43,11 @@ const validateOrderId = (rawInput: string | null): string | null => {
   return sanitized;
 };
 
+// Espera del webhook: 10 intentos cada 3 s ≈ 30 s. Suficiente para el camino
+// feliz de dLocal sin dejar al comprador mirando un spinner eterno.
+const POLL_INTERVAL_MS = 3000;
+const POLL_MAX_ATTEMPTS = 10;
+
 export const PaymentSuccessPage = () => {
   const { t, i18n } = useTranslation('payment');
   const { lang } = useParams<{ lang: string }>();
@@ -49,6 +65,10 @@ export const PaymentSuccessPage = () => {
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  // true cuando se agotaron los reintentos y la orden sigue sin confirmar:
+  // no es un error, pero hay que decirle al comprador que NO vuelva a pagar.
+  const [waitTimedOut, setWaitTimedOut] = useState(false);
+  const attemptsRef = useRef(0);
 
   useEffect(() => {
     // SECURITY: Only make API call with validated UUID
@@ -57,15 +77,41 @@ export const PaymentSuccessPage = () => {
       return;
     }
 
-    // SECURITY: orderId is already validated as UUID, safe to use in URL
-    apiClient.get(`/orders/details/${orderId}`)
-      .then(response => {
-        setOrderData(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const poll = () => {
+      // SECURITY: orderId is already validated as UUID, safe to use in URL
+      getOrderDetails(orderId)
+        .then((data) => {
+          if (!alive) return;
+          setOrderData(data);
+          setLoading(false);
+
+          // El webhook de dLocal puede tardar: mientras la orden siga sin
+          // resolverse, se vuelve a preguntar.
+          const stage = classifyOrderStatus(data?.order?.status);
+          const settled = stage !== 'processing' && stage !== 'payable';
+          if (settled) return;
+
+          attemptsRef.current += 1;
+          if (attemptsRef.current >= POLL_MAX_ATTEMPTS) {
+            setWaitTimedOut(true);
+            return;
+          }
+          timer = setTimeout(poll, POLL_INTERVAL_MS);
+        })
+        .catch(() => {
+          if (alive) setLoading(false);
+        });
+    };
+
+    poll();
+
+    return () => {
+      alive = false;
+      if (timer) clearTimeout(timer);
+    };
   }, [orderId]);
 
   const handleCopyReference = () => {
@@ -127,11 +173,72 @@ export const PaymentSuccessPage = () => {
   // SECURITY: Display reference - prefer server data, fallback to validated UUID prefix
   const displayReference = orderNumber || orderId.slice(0, 8).toUpperCase();
 
-  // PUBLIC vs PRIVATE: a private-event order is held awaiting staff approval
-  // (payment_authorized); a public order is already confirmed with tickets on
-  // the way. Show the right messaging for each.
-  const orderStatus = orderData?.order?.status;
-  const isPendingApproval = orderStatus === 'payment_authorized';
+  const stage: OrderStage = classifyOrderStatus(orderData?.order?.status);
+
+  // `approved_unpaid` cae en 'payable' (se puede pagar), pero aquí merece su
+  // propio mensaje: la solicitud está aprobada y NO se ha pagado. Si el
+  // comprador aterriza aquí en ese estado, volvió sin completar el pago.
+  const rawStatus = String(orderData?.order?.status || '').toLowerCase();
+  const isApprovedUnpaid = rawStatus === 'approved_unpaid';
+
+  // Cada estado dice LA VERDAD sobre si hay dinero cobrado y qué falta.
+  const copyFor = (): { title: string; description: string; cardTitle: string; cardBody: string } => {
+    if (isApprovedUnpaid) {
+      return {
+        title: t('success.approvedUnpaid.title'),
+        description: t('success.approvedUnpaid.description'),
+        cardTitle: t('success.approvedUnpaid.cardTitle'),
+        cardBody: t('success.approvedUnpaid.cardBody'),
+      };
+    }
+    switch (stage) {
+      case 'confirmed':
+        return {
+          title: t('success.confirmedTitle'),
+          description: t('success.confirmedDescription'),
+          cardTitle: t('success.ticketsSentTitle'),
+          cardBody: t('success.ticketsSentBody'),
+        };
+      case 'awaitingApproval':
+        return {
+          title: t('success.awaiting.title'),
+          description: t('success.awaiting.description'),
+          cardTitle: t('success.awaiting.cardTitle'),
+          cardBody: t('success.awaiting.cardBody'),
+        };
+      case 'legacyHold':
+        return {
+          title: t('success.title'),
+          description: t('success.description'),
+          cardTitle: t('success.pendingApproval'),
+          cardBody: t('success.pendingDescription'),
+        };
+      case 'dead':
+        return {
+          title: t('success.failed.title'),
+          description: t('success.failed.description'),
+          cardTitle: t('success.failed.cardTitle'),
+          cardBody: t('success.failed.cardBody'),
+        };
+      // processing | payable | unknown → esperando la confirmación del webhook
+      default:
+        return {
+          title: t('success.confirming.title'),
+          description: t('success.confirming.description'),
+          cardTitle: t('success.confirming.cardTitle'),
+          cardBody: waitTimedOut ? t('success.confirming.slow') : t('success.confirming.cardBody'),
+        };
+    }
+  };
+
+  const current = copyFor();
+
+  const isConfirmed = stage === 'confirmed';
+  const isWaiting = !isApprovedUnpaid && (stage === 'processing' || stage === 'payable' || stage === 'unknown');
+  const isProblem = stage === 'dead';
+  const isLegacyHold = stage === 'legacyHold';
+
+  const HeaderIcon = isConfirmed ? CheckCircle : isProblem ? AlertCircle : isWaiting ? Loader : Clock;
 
   return (
     <Layout>
@@ -152,63 +259,61 @@ export const PaymentSuccessPage = () => {
             {/* Header Section */}
             <div className="payment-success-header">
               <div className="payment-success-icon-wrapper">
-                <CheckCircle className="payment-success-icon" />
+                <HeaderIcon className="payment-success-icon" />
               </div>
-              <h1 className="payment-success-title">{isPendingApproval ? t('success.title') : t('success.confirmedTitle')}</h1>
+              <h1 className="payment-success-title">{current.title}</h1>
               <div className="payment-success-description">
-                <p>{isPendingApproval ? t('success.description') : t('success.confirmedDescription')}</p>
+                <p>{current.description}</p>
               </div>
             </div>
 
             {/* Two Column Grid */}
             <div className="payment-success-grid">
-              {/* Left Column - status card (private=pending approval, public=tickets sent) */}
+              {/* Left Column - tarjeta de estado */}
               <div className="payment-success-grid-left">
                 <div className="payment-status-card">
-                  {isPendingApproval ? (
-                    <>
-                      <div className="payment-status-header">
-                        <Clock />
-                        <span>{t('success.pendingApproval')}</span>
-                      </div>
-                      <div className="payment-status-body">
-                        <p>{t('success.pendingDescription')}</p>
-                        <div className="payment-status-timeline">
-                          <div className="timeline-step timeline-step-completed">
-                            <div className="timeline-dot"></div>
-                            <div className="timeline-content">
-                              <h4>{t('success.timeline.paymentAuthorized')}</h4>
-                              <p>{t('success.timeline.paymentAuthorizedDesc')}</p>
-                            </div>
+                  <div className="payment-status-header">
+                    {isConfirmed ? <CheckCircle /> : isProblem ? <AlertCircle /> : <Clock />}
+                    <span>{current.cardTitle}</span>
+                  </div>
+                  <div className="payment-status-body">
+                    <p>{current.cardBody}</p>
+
+                    {/* La línea de tiempo solo tiene sentido en los flujos que
+                        esperan una decisión o una confirmación. */}
+                    {(isLegacyHold || isApprovedUnpaid || stage === 'awaitingApproval') && (
+                      <div className="payment-status-timeline">
+                        <div className="timeline-step timeline-step-completed">
+                          <div className="timeline-dot"></div>
+                          <div className="timeline-content">
+                            <h4>{t('success.timeline.requestSent')}</h4>
+                            <p>{t('success.timeline.requestSentDesc')}</p>
                           </div>
-                          <div className="timeline-step timeline-step-current">
-                            <div className="timeline-dot"></div>
-                            <div className="timeline-content">
-                              <h4>{t('success.timeline.staffReview')}</h4>
-                              <p>{t('success.timeline.staffReviewDesc')}</p>
-                            </div>
+                        </div>
+                        <div className={`timeline-step ${isApprovedUnpaid ? 'timeline-step-completed' : 'timeline-step-current'}`}>
+                          <div className="timeline-dot"></div>
+                          <div className="timeline-content">
+                            <h4>{t('success.timeline.staffReview')}</h4>
+                            <p>{t('success.timeline.staffReviewDesc')}</p>
                           </div>
-                          <div className="timeline-step timeline-step-pending">
-                            <div className="timeline-dot"></div>
-                            <div className="timeline-content">
-                              <h4>{t('success.timeline.ticketsSent')}</h4>
-                              <p>{t('success.timeline.ticketsSentDesc')}</p>
-                            </div>
+                        </div>
+                        <div className={`timeline-step ${isApprovedUnpaid ? 'timeline-step-current' : 'timeline-step-pending'}`}>
+                          <div className="timeline-dot"></div>
+                          <div className="timeline-content">
+                            <h4>{t('success.timeline.payLink')}</h4>
+                            <p>{t('success.timeline.payLinkDesc')}</p>
+                          </div>
+                        </div>
+                        <div className="timeline-step timeline-step-pending">
+                          <div className="timeline-dot"></div>
+                          <div className="timeline-content">
+                            <h4>{t('success.timeline.ticketsSent')}</h4>
+                            <p>{t('success.timeline.ticketsSentDesc')}</p>
                           </div>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="payment-status-header">
-                        <CheckCircle />
-                        <span>{t('success.ticketsSentTitle')}</span>
-                      </div>
-                      <div className="payment-status-body">
-                        <p>{t('success.ticketsSentBody')}</p>
-                      </div>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -246,13 +351,38 @@ export const PaymentSuccessPage = () => {
                 {/* Important Information */}
                 <div className="payment-info-box payment-info-box-blue">
                   <h3>{t('success.importantInfo')}</h3>
-                  {isPendingApproval ? (
+                  {isLegacyHold ? (
                     <ul>
                       <li dangerouslySetInnerHTML={{ __html: t('success.infoList.authorized') }} />
                       <li>{t('success.infoList.staffReview')}</li>
                       <li>{t('success.infoList.approved')}</li>
                       <li>{t('success.infoList.rejected')}</li>
                       <li>{t('success.infoList.emailUpdates')}</li>
+                    </ul>
+                  ) : stage === 'awaitingApproval' ? (
+                    <ul>
+                      <li>{t('success.awaiting.infoNoCharge')}</li>
+                      <li>{t('success.infoList.staffReview')}</li>
+                      <li>{t('success.awaiting.infoPayLink')}</li>
+                      <li>{t('success.awaiting.infoRejected')}</li>
+                      <li>{t('success.infoList.emailUpdates')}</li>
+                    </ul>
+                  ) : isApprovedUnpaid ? (
+                    <ul>
+                      <li>{t('success.approvedUnpaid.infoNotPaid')}</li>
+                      <li>{t('success.approvedUnpaid.infoUseLink')}</li>
+                      <li>{t('success.approvedUnpaid.infoDeadline')}</li>
+                    </ul>
+                  ) : isWaiting ? (
+                    <ul>
+                      <li>{t('success.confirming.infoWebhook')}</li>
+                      <li>{t('success.confirming.infoNoRetry')}</li>
+                      <li>{t('success.infoList.emailUpdates')}</li>
+                    </ul>
+                  ) : isProblem ? (
+                    <ul>
+                      <li>{t('success.failed.infoNoCharge')}</li>
+                      <li>{t('success.failed.infoRetry')}</li>
                     </ul>
                   ) : (
                     <ul>
