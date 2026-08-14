@@ -167,6 +167,87 @@ export const startOrderCheckout = async (
   throw routeMissing || new Error('CHECKOUT_UNAVAILABLE');
 };
 
+// ============================================================================
+// SMARTFIELDS — cobro con tarjeta DENTRO de nuestra web.
+//
+// Por qué no usamos el checkout con redirección: en Guatemala la cuenta de
+// dLocal no ofrece tarjeta, solo efectivo. Su página alojada muestra la lista
+// de métodos VACÍA. SmartFields no consulta esa lista — pintamos el formulario
+// nosotros y la tarjeta se tokeniza contra dLocal desde el navegador.
+//
+// LA TARJETA NUNCA TOCA NUESTRO SERVIDOR: los campos viven en un iframe de
+// dLocal y lo único que sale de aquí es un token de un solo uso.
+// ============================================================================
+
+export type SmartFieldsSession = {
+  checkoutToken: string;
+  apiKey: string;
+  amount: number;
+  currency: string;
+  country: string;
+  orderNumber?: string;
+  /** true si el backend reutilizó un cobro que ya estaba abierto. */
+  reused?: boolean;
+  /** true si la orden ya estaba pagada: no hay que cobrar nada. */
+  alreadyPaid?: boolean;
+};
+
+export const startSmartFieldsSession = async (
+  orderId: string,
+  paymentLinkCode: string
+): Promise<SmartFieldsSession> => {
+  const { data } = await apiClient.post('/orders/smartfields/session', {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+  });
+  if (data?.already_paid) {
+    return {
+      checkoutToken: '', apiKey: '', amount: 0, currency: '', country: '',
+      orderNumber: data.order_number, alreadyPaid: true,
+    };
+  }
+  if (!data?.checkout_token || !data?.api_key) {
+    throw new Error('SMARTFIELDS_SESSION_INCOMPLETE');
+  }
+  return {
+    checkoutToken: data.checkout_token,
+    apiKey: data.api_key,
+    amount: Number(data.amount) || 0,
+    currency: data.currency || 'GTQ',
+    country: data.country || 'GT',
+    orderNumber: data.order_number,
+    reused: Boolean(data.reused),
+  };
+};
+
+export type SmartFieldsResult = {
+  paid: boolean;
+  status?: string;
+  message: string;
+  /** true si no se pudo saber el resultado: NO afirmar que falló. */
+  indeterminate?: boolean;
+};
+
+export const confirmSmartFieldsPayment = async (
+  orderId: string,
+  paymentLinkCode: string,
+  cardToken: string,
+  installmentsId?: string
+): Promise<SmartFieldsResult> => {
+  const { data } = await apiClient.post('/orders/smartfields/confirm', {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+    card_token: cardToken,
+    ...(installmentsId ? { installments_id: installmentsId } : {}),
+  });
+  return {
+    paid: Boolean(data?.paid),
+    status: data?.status,
+    message: data?.message || '',
+    indeterminate: Boolean(data?.indeterminate),
+  };
+};
+
 // Estado de una orden. Lo usan la página de pago (para retomar una orden del
 // enlace de aprobación) y la de éxito (para saber si el webhook ya confirmó).
 // Shape del backend: { order: {...fila...}, user, event, venue_id }

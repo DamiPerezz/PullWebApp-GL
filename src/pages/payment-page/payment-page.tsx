@@ -1,33 +1,37 @@
 // payment-page.tsx
 // SECURITY: Using apiClient for consistent cookie-based authentication
 //
-// FLUJO dLOCAL GO (checkout alojado) — 2026-08:
+// FLUJO dLOCAL GO — SMARTFIELDS (actualizado 2026-08-14):
 //
-//   PÚBLICO   datos del asistente → crear orden → el backend crea el pago en
-//             dLocal y devuelve `redirect_url` → REDIRIGIMOS al comprador a la
-//             página de dLocal. Vuelve a /order/payment-success, que consulta
-//             el estado real (el pago se confirma por webhook, no aquí).
+//   PÚBLICO   datos del asistente → crear orden → se muestra el FORMULARIO DE
+//             TARJETA aquí mismo (componente SmartFieldsCard) → al pagar, se
+//             va a /order/payment-success.
 //
 //   PRIVADO   datos del asistente → crear orden → el backend responde
-//             `requires_approval: true` → NO se pide tarjeta y NO se redirige:
-//             se muestra "solicitud enviada". Si el local la aprueba, llega un
-//             correo con un ENLACE DE PAGO (?order_id=…&code=…) que vuelve a
-//             esta misma página en modo "retomar orden".
+//             `requires_approval: true` → NO se pide tarjeta: se muestra
+//             "solicitud enviada". Si el local la aprueba, llega un correo con
+//             un ENLACE DE PAGO (?order_id=…&code=…) que vuelve a esta misma
+//             página en modo "retomar orden", y ahí sí se pide la tarjeta.
 //
-// Aquí NUNCA se piden datos de tarjeta: dLocal Go no los acepta y el
-// comprador los introduce en la página de dLocal.
+// POR QUÉ YA NO SE REDIRIGE: antes se mandaba al comprador a la página alojada
+// de dLocal. En Guatemala esa página NO ofrece tarjeta —la cobertura de la
+// cuenta solo tiene efectivo— y mostraba la lista de métodos VACÍA: nadie
+// podía pagar. SmartFields no consulta esa lista.
+//
+// La tarjeta se teclea en un iframe SERVIDO POR dLOCAL y nunca pasa por
+// nuestro servidor: solo viaja un token de un solo uso.
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Layout } from "../../components/layout/layout";
 import "./payment-page.css";
 import { TicketReceipt } from "../../components/ticket-receipt/ticket-receipt";
 import { UserDetailsForm } from "../../components/user-details-form/user-details-form";
+import SmartFieldsCard from '../../components/smartfields-card/smartfields-card';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   getTicketInfo,
   getEventDetailedInfo,
   createPendingOrder,
-  startOrderCheckout,
   getOrderDetails,
   getOrderDataAfterCancel,
 } from "../../controller/purchase-pages-controller";
@@ -106,7 +110,13 @@ export const PaymentPage = () => {
   const [eventInfo, setEventInfo] = useState<EventDetailedInfo | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
   const [processing, setProcessing] = useState<boolean>(false);
-  const [redirecting, setRedirecting] = useState<boolean>(false);
+  // Ya no se redirige a ninguna pasarela: el pago ocurre en esta misma
+  // página con SmartFields. Se conserva la variable porque el overlay de
+  // carga la lee; siempre false.
+  const redirecting = false;
+  // Cobro con tarjeta EN ESTA PÁGINA (SmartFields). Sustituye a la
+  // redirección: en Guatemala el checkout alojado de dLocal no ofrece tarjeta.
+  const [cardPayment, setCardPayment] = useState<{ orderId: string; code: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cancelledOrderData, setCancelledOrderData] = useState<any>(null);
   // Evento privado: la solicitud se envió (sin cobro, sin tarjeta).
@@ -194,20 +204,18 @@ export const PaymentPage = () => {
   // Manda al comprador a la página de pago de dLocal. A partir de aquí el
   // pago ocurre FUERA de nuestra web; volverá por success_url (o back_url si
   // se echa atrás).
+  // Antes esto mandaba al comprador a la página de dLocal. Ya no: en Guatemala
+  // esa página no ofrece tarjeta (solo efectivo) y salía la lista vacía. Ahora
+  // el formulario se pinta AQUÍ con SmartFields; la tarjeta se tokeniza contra
+  // dLocal desde el navegador y nunca pasa por nuestro servidor.
   const goToCheckout = async (orderId: string, code: string) => {
-    const origin = window.location.origin;
-    const successUrl = `${origin}${buildUrl(`/order/payment-success?order_id=${orderId}`)}`;
-    // El `code` viaja en el back_url para que, si el comprador se echa atrás
-    // en dLocal, "intentar de nuevo" RETOME esta orden en vez de crear otra
-    // (y volver a reservar aforo).
-    const backUrl = `${origin}${buildUrl(
-      `/order/payment-cancel?order_id=${orderId}&code=${code}&event_id=${eventId}&ticket_type_id=${ticketTypeId}&quantity=${quantity}`
-    )}`;
+    setCardPayment({ orderId, code });
+    setProcessing(false);
+  };
 
-    const { redirectUrl } = await startOrderCheckout(orderId, code, { successUrl, backUrl });
-    setRedirecting(true);
-    // assign (y no replace): que el botón "atrás" del navegador devuelva aquí.
-    window.location.assign(redirectUrl);
+  const onCardPaid = () => {
+    const oid = cardPayment?.orderId || orderIdParam || '';
+    window.location.assign(buildUrl(`/order/payment-success?order_id=${oid}`));
   };
 
   const describeError = (err: unknown): string => {
@@ -403,10 +411,23 @@ export const PaymentPage = () => {
                   <p>{t('page.resume.payableBody')}</p>
                   {reference}
                 </div>
-                <div className="payment-redirect-notice">
-                  <ShieldCheck size={18} />
-                  <span>{t('page.redirectNotice')}</span>
-                </div>
+
+                {/* Formulario de tarjeta aquí mismo, igual que en la compra
+                    pública: el enlace de pago del correo cae en esta rama. */}
+                {cardPayment ? (
+                  <SmartFieldsCard
+                    orderId={cardPayment.orderId}
+                    paymentLinkCode={cardPayment.code}
+                    onPaid={onCardPaid}
+                    onAlreadyPaid={onCardPaid}
+                  />
+                ) : (
+                  <div className="payment-redirect-notice">
+                    <ShieldCheck size={18} />
+                    <span>{t('page.redirectNotice')}</span>
+                  </div>
+                )}
+
                 {!codeParam && (
                   <div className="payment-approval-notice payment-approval-notice-warn">
                     <p>{t('page.resume.missingCode')}</p>
@@ -419,7 +440,9 @@ export const PaymentPage = () => {
                   ticketDetails={ticketDetails}
                   buttonText={processing ? t('page.processing') : t('page.resume.payNow')}
                   onConfirm={onResumePay}
-                  disabled={processing || !codeParam}
+                  // Con el formulario ya en pantalla se paga desde ahí; dejar
+                  // este botón activo abriría un segundo cobro en dLocal.
+                  disabled={processing || !codeParam || Boolean(cardPayment)}
                 />
               </div>
             </div>
@@ -653,9 +676,21 @@ export const PaymentPage = () => {
                       minAge={eventInfo?.min_age}
                     />
 
-                    {/* Sin campos de tarjeta: dLocal Go no los acepta y el
-                        comprador los introduce en la pasarela. */}
-                    {!requiresApproval && (
+                    {/* Formulario de tarjeta de dLocal (SmartFields), aquí
+                        mismo. Antes se redirigía a la página de dLocal, pero
+                        en Guatemala esa página no ofrece tarjeta: mostraba la
+                        lista de métodos vacía. Los campos viven en un iframe
+                        de dLocal — la tarjeta no toca nuestro servidor. */}
+                    {!requiresApproval && cardPayment && (
+                      <SmartFieldsCard
+                        orderId={cardPayment.orderId}
+                        paymentLinkCode={cardPayment.code}
+                        onPaid={onCardPaid}
+                        onAlreadyPaid={onCardPaid}
+                      />
+                    )}
+
+                    {!requiresApproval && !cardPayment && (
                       <div className="payment-redirect-notice">
                         <ShieldCheck size={18} />
                         <span>{t('page.redirectNotice')}</span>
@@ -673,7 +708,10 @@ export const PaymentPage = () => {
                           : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
                       }
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
-                      disabled={processing}
+                      // Con el formulario de tarjeta ya en pantalla, este botón
+                      // sobra: pagar se hace desde el propio formulario. Dejarlo
+                      // activo crearía un segundo cobro en dLocal.
+                      disabled={processing || Boolean(cardPayment)}
                     />
                   </div>
                 </div>

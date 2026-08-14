@@ -138,8 +138,13 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Backend Go local (go run main.go escucha en 8080; antes decía 3000,
       // donde no hay nada — el dev server no llegaba a ningún backend).
+      //
+      // Para probar la web contra un backend YA DESPLEGADO sin levantar el Go
+      // en local (p. ej. verificar SmartFields con órdenes reales):
+      //   VITE_DEV_API_TARGET=https://pull-api-v2-prod.fly.dev npm run dev
+      // OJO: apuntando a producción, lo que hagas es REAL.
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_DEV_API_TARGET || 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },

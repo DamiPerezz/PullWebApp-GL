@@ -1,0 +1,87 @@
+/* Formulario de tarjeta de dLocal (SmartFields).
+   El input real es un iframe servido por dLocal, así que aquí solo se estiliza
+   la CAJA que lo contiene; el texto de dentro se configura desde el `style`
+   que se le pasa al SDK en smartfields-card.tsx. Cambiar colores de letra
+   aquí no tiene efecto: hay que tocarlo allí. */
+
+.smartfields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.smartfields__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.smartfields__field {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.15s ease;
+}
+
+.smartfields__field:focus-within {
+  border-color: rgba(96, 165, 250, 0.8);
+}
+
+.smartfields__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* "No sabemos si se cobró": ámbar, NUNCA rojo. Decirle al comprador que
+   falló cuando puede haberse cobrado es peor que no decir nada. */
+.smartfields__pending {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: rgb(252, 211, 77);
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.smartfields__error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: rgb(252, 165, 165);
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.smartfields__pay {
+  width: 100%;
+  padding: 0.9375rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgb(96, 165, 250), rgb(59, 130, 246));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+
+.smartfields__pay:hover:not(:disabled) { opacity: 0.92; }
+.smartfields__pay:active:not(:disabled) { transform: translateY(1px); }
+
+.smartfields__pay:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.smartfields__secure {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.4;
+}
