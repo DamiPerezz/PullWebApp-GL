@@ -186,6 +186,9 @@ export type SmartFieldsSession = {
   currency: string;
   country: string;
   orderNumber?: string;
+  /** Nombre del titular. El SDK lo EXIGE al tokenizar: sin él dLocal acepta
+   *  el token pero luego rechaza el cobro con "Missing payment method". */
+  clientName?: string;
   /** true si el backend reutilizó un cobro que ya estaba abierto. */
   reused?: boolean;
   /** true si la orden ya estaba pagada: no hay que cobrar nada. */
@@ -214,6 +217,7 @@ export const startSmartFieldsSession = async (
     apiKey: data.api_key,
     amount: Number(data.amount) || 0,
     currency: data.currency || 'GTQ',
+    clientName: data.client_name || '',
     country: data.country || 'GT',
     orderNumber: data.order_number,
     reused: Boolean(data.reused),

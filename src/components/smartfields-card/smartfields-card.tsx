@@ -83,6 +83,8 @@ export default function SmartFieldsCard({
 }: Props) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const cardFieldRef = useRef<any>(null);
+  // Nombre del titular: el SDK lo pide al tokenizar.
+  const cardholderRef = useRef<string>('');
   const mountedRef = useRef(false);
 
   const [phase, setPhase] = useState<'loading' | 'ready' | 'paying' | 'error'>('loading');
@@ -108,6 +110,7 @@ export default function SmartFieldsCard({
           return;
         }
         setAmount({ value: session.amount, currency: session.currency });
+        cardholderRef.current = session.clientName || '';
 
         // 2) Cargar el SDK y montar los campos.
         await loadSDK();
@@ -165,7 +168,14 @@ export default function SmartFieldsCard({
     try {
       // 3) Tokenizar. Aquí es donde dLocal lee la tarjeta de SU iframe —
       // nosotros solo recibimos el token.
-      const tokenResp = await window.dlocalGo!.createCardToken(cardFieldRef.current, {});
+      // OJO: el `name` NO es opcional en la práctica. Sin él dLocal crea el
+      // token igualmente, pero al confirmar el cobro responde
+      // 400 {"code":406,"message":"Missing payment method"} — un mensaje que
+      // no tiene nada que ver con la causa y manda a buscar al sitio
+      // equivocado (a la configuración de métodos de la cuenta).
+      const tokenResp = await window.dlocalGo!.createCardToken(cardFieldRef.current, {
+        name: cardholderRef.current,
+      });
       const cardToken = tokenResp?.token || tokenResp?.card_token || tokenResp?.id;
       if (!cardToken) throw new Error('No se pudo validar la tarjeta. Revisa los datos.');
 
