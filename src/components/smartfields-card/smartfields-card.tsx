@@ -176,8 +176,27 @@ export default function SmartFieldsCard({
       const tokenResp = await window.dlocalGo!.createCardToken(cardFieldRef.current, {
         name: cardholderRef.current,
       });
-      const cardToken = tokenResp?.token || tokenResp?.card_token || tokenResp?.id;
-      if (!cardToken) throw new Error('No se pudo validar la tarjeta. Revisa los datos.');
+
+      // SOLO `.token`, que es lo que documenta dLocal
+      // (`const { token: cardToken } = response`). Antes había una cadena de
+      // alternativas (token || card_token || id) y eso es peligroso: si la
+      // respuesta no trae `token`, se acababa mandando OTRO campo como si
+      // fuera la tarjeta, y dLocal respondía "Missing payment method" — un
+      // error que no señala en absoluto a esta línea.
+      const cardToken = tokenResp?.token;
+      if (!cardToken) {
+        // Se deja constancia de la FORMA de la respuesta (nunca su contenido:
+        // ahí puede haber datos de la tarjeta) para poder diagnosticarlo sin
+        // tener que pedirle al comprador que lo intente diez veces.
+        const forma = tokenResp && typeof tokenResp === 'object'
+          ? Object.keys(tokenResp).join(', ')
+          : typeof tokenResp;
+        // eslint-disable-next-line no-console
+        console.error('[SmartFields] createCardToken sin `token`. Campos devueltos:', forma);
+        throw new Error(
+          `No se pudo validar la tarjeta (respuesta inesperada de dLocal: ${forma}).`
+        );
+      }
 
       // 4) Confirmar en nuestro backend.
       const res: SmartFieldsResult = await confirmSmartFieldsPayment(
