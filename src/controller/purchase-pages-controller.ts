@@ -230,6 +230,10 @@ export type SmartFieldsResult = {
   message: string;
   /** true si no se pudo saber el resultado: NO afirmar que falló. */
   indeterminate?: boolean;
+  /** 3D Secure: el banco exige que el comprador se autentique antes de cobrar. */
+  requiresAction?: boolean;
+  /** A dónde hay que mandarlo para esa autenticación. */
+  redirectUrl?: string;
 };
 
 export const confirmSmartFieldsPayment = async (
@@ -249,6 +253,8 @@ export const confirmSmartFieldsPayment = async (
     status: data?.status,
     message: data?.message || '',
     indeterminate: Boolean(data?.indeterminate),
+    requiresAction: Boolean(data?.requires_action),
+    redirectUrl: data?.redirect_url,
   };
 };
 

@@ -209,6 +209,13 @@ export default function SmartFieldsCard({
         onPaid();
         return;
       }
+      // 3D SECURE: el banco quiere confirmar antes de cobrar. Se manda al
+      // comprador a su página; al volver, la de éxito consulta el estado real.
+      // Sin esto, una tarjeta que pida 3DS no se puede pagar NUNCA.
+      if (res.requiresAction && res.redirectUrl) {
+        window.location.assign(res.redirectUrl);
+        return;
+      }
       if (res.indeterminate) {
         // NO decir que falló: puede haberse cobrado.
         setPending(res.message);
