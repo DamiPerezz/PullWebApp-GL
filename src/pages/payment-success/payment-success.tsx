@@ -1,15 +1,22 @@
 // pages/payment-success-page.tsx
 // SECURITY: Strict UUID validation and sanitization to prevent XSS/IDOR attacks
 //
-// dLOCAL GO: esta página es el `success_url` al que vuelve el comprador desde
-// la pasarela. **Volver aquí NO significa que el pago esté confirmado**: el
-// pago nace PENDING y se confirma por webhook, así que al aterrizar la orden
-// puede seguir en `pending`/`processing` unos segundos. Por eso se consulta el
-// estado real y se reintenta unas cuantas veces antes de decir nada.
+// NeoNet/Cybersource (18-ago-2026): aquí se aterriza DESPUÉS de que el backend
+// haya cobrado o retenido en POST /orders/pay, así que el estado real ya está
+// escrito. Los dos finales legítimos son:
 //
-// Antes esta página solo entendía `payment_authorized`: cualquier otro estado
-// (incluidos `awaiting_approval` y `approved_unpaid`, que NO han pagado)
-// caía en el "¡Pago confirmado!". Ahora cada estado tiene su mensaje.
+//   PÚBLICO   `confirmed`          → cobrado, entradas emitidas.
+//   PRIVADO   `payment_authorized` → importe RETENIDO, sin cobrar, esperando
+//                                    la decisión del local. NO es "pagado" y
+//                                    esta página no debe decir que lo está.
+//
+// **Aterrizar aquí NO significa por sí solo que haya pago**: se lee el estado
+// real y cada uno tiene su mensaje. Se reintenta unas cuantas veces porque la
+// escritura del estado puede ir un pelo por detrás de la respuesta del cobro
+// (y porque las órdenes viejas de dLocal sí se confirmaban por webhook).
+//
+// Estados HISTÓRICOS de dLocal (`awaiting_approval`, `approved_unpaid`) siguen
+// contemplados: hay órdenes reales con ellos y NO han pagado nada.
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -43,8 +50,9 @@ const validateOrderId = (rawInput: string | null): string | null => {
   return sanitized;
 };
 
-// Espera del webhook: 10 intentos cada 3 s ≈ 30 s. Suficiente para el camino
-// feliz de dLocal sin dejar al comprador mirando un spinner eterno.
+// 10 intentos cada 3 s ≈ 30 s. Con el cobro síncrono de NeoNet basta y sobra;
+// el margen es para las órdenes viejas de dLocal, que se confirmaban por
+// webhook. Más tiempo sería dejar al comprador mirando un spinner eterno.
 const POLL_INTERVAL_MS = 3000;
 const POLL_MAX_ATTEMPTS = 10;
 
@@ -88,8 +96,9 @@ export const PaymentSuccessPage = () => {
           setOrderData(data);
           setLoading(false);
 
-          // El webhook de dLocal puede tardar: mientras la orden siga sin
-          // resolverse, se vuelve a preguntar.
+          // Mientras la orden siga sin resolverse (ni cobrada, ni retenida, ni
+          // muerta) se vuelve a preguntar: `payment_authorized` cuenta como
+          // resuelta, es el final legítimo del flujo privado.
           const stage = classifyOrderStatus(data?.order?.status);
           const settled = stage !== 'processing' && stage !== 'payable';
           if (settled) return;
@@ -206,7 +215,9 @@ export const PaymentSuccessPage = () => {
           cardTitle: t('success.awaiting.cardTitle'),
           cardBody: t('success.awaiting.cardBody'),
         };
-      case 'legacyHold':
+      // PRIVADO con retención: hay dinero BLOQUEADO pero no cobrado. El copy
+      // de estas claves lo dice explícitamente — no es "¡pagado!".
+      case 'authorizedHold':
         return {
           title: t('success.title'),
           description: t('success.description'),
@@ -236,7 +247,8 @@ export const PaymentSuccessPage = () => {
   const isConfirmed = stage === 'confirmed';
   const isWaiting = !isApprovedUnpaid && (stage === 'processing' || stage === 'payable' || stage === 'unknown');
   const isProblem = stage === 'dead';
-  const isLegacyHold = stage === 'legacyHold';
+  // Flujo privado vigente: importe retenido, pendiente de decisión.
+  const isHold = stage === 'authorizedHold';
 
   const HeaderIcon = isConfirmed ? CheckCircle : isProblem ? AlertCircle : isWaiting ? Loader : Clock;
 
@@ -280,14 +292,21 @@ export const PaymentSuccessPage = () => {
                     <p>{current.cardBody}</p>
 
                     {/* La línea de tiempo solo tiene sentido en los flujos que
-                        esperan una decisión o una confirmación. */}
-                    {(isLegacyHold || isApprovedUnpaid || stage === 'awaitingApproval') && (
+                        esperan una decisión o una confirmación. El tercer paso
+                        NO es el mismo en los dos: con retención se cobra solo,
+                        sin enlace; en el histórico de dLocal el comprador tenía
+                        que pagar con un enlace del correo. Poner "enlace de
+                        pago" en una retención haría esperar un correo que
+                        nunca llega. */}
+                    {(isHold || isApprovedUnpaid || stage === 'awaitingApproval') && (
                       <div className="payment-status-timeline">
                         <div className="timeline-step timeline-step-completed">
                           <div className="timeline-dot"></div>
                           <div className="timeline-content">
                             <h4>{t('success.timeline.requestSent')}</h4>
-                            <p>{t('success.timeline.requestSentDesc')}</p>
+                            <p>{isHold
+                              ? t('success.timeline.requestSentHoldDesc')
+                              : t('success.timeline.requestSentDesc')}</p>
                           </div>
                         </div>
                         <div className={`timeline-step ${isApprovedUnpaid ? 'timeline-step-completed' : 'timeline-step-current'}`}>
@@ -300,8 +319,12 @@ export const PaymentSuccessPage = () => {
                         <div className={`timeline-step ${isApprovedUnpaid ? 'timeline-step-current' : 'timeline-step-pending'}`}>
                           <div className="timeline-dot"></div>
                           <div className="timeline-content">
-                            <h4>{t('success.timeline.payLink')}</h4>
-                            <p>{t('success.timeline.payLinkDesc')}</p>
+                            <h4>{isHold
+                              ? t('success.timeline.holdCharge')
+                              : t('success.timeline.payLink')}</h4>
+                            <p>{isHold
+                              ? t('success.timeline.holdChargeDesc')
+                              : t('success.timeline.payLinkDesc')}</p>
                           </div>
                         </div>
                         <div className="timeline-step timeline-step-pending">
@@ -351,7 +374,7 @@ export const PaymentSuccessPage = () => {
                 {/* Important Information */}
                 <div className="payment-info-box payment-info-box-blue">
                   <h3>{t('success.importantInfo')}</h3>
-                  {isLegacyHold ? (
+                  {isHold ? (
                     <ul>
                       <li dangerouslySetInnerHTML={{ __html: t('success.infoList.authorized') }} />
                       <li>{t('success.infoList.staffReview')}</li>

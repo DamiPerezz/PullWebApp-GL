@@ -11,6 +11,18 @@
     "redirectBody": "Un momento, estamos preparando el formulario de pago. No cierres esta ventana.",
     "checkoutFailed": "No se pudo abrir la pasarela de pago. Espera unos segundos e inténtalo de nuevo.",
     "redirecting": "Redirigiendo...",
+    "paidTitle": "¡Pago confirmado!",
+    "paidBody": "Tus entradas con el código QR van de camino a tu correo.",
+    "paymentFailed": "No se pudo completar el pago. Revisa los datos de la tarjeta e inténtalo de nuevo.",
+    "card": {
+      "title": "Datos de pago",
+      "number": "Número de tarjeta",
+      "expiry": "MM/AA",
+      "cvv": "CVV",
+      "secureNote": "Pago seguro procesado por Cybersource. No almacenamos los datos de tu tarjeta.",
+      "holdNote": "Evento privado: al enviar la solicitud se RETENDRÁ el importe en tu tarjeta, pero solo se cobrará si el local aprueba tu solicitud. Si te rechazan o pasan 48 h, se libera y no se te cobra nada.",
+      "incomplete": "Completa los datos de la tarjeta (número, vencimiento MM/AA y CVV)."
+    },
     "processingOrder": "Procesando tu pedido...",
     "processingWait": "Un momento, estamos preparando tu pago",
     "failedToLoad": "Error al cargar la información del evento. Por favor intenta de nuevo.",
@@ -25,21 +37,22 @@
     "private": {
       "title": "Evento privado — requiere aprobación",
       "intro": "Antes de continuar, así funciona la entrada a este evento:",
-      "step1": "Envías tu solicitud gratis: no se piden datos de tarjeta y no se te cobra nada ahora.",
+      "step1": "Introduces tu tarjeta y se RETIENE el importe: aún no se te cobra nada.",
       "step2": "El equipo del local revisa tu solicitud (hasta 48 h).",
-      "step3": "Si te aceptan, recibes un correo con un enlace para pagar. Tienes 24 h para completarlo.",
-      "step4": "Si te rechazan o no pagas a tiempo, no pasa nada: nunca hubo ningún cargo.",
+      "step3": "Si te aceptan, se cobra la retención y recibes tus entradas con el QR por correo.",
+      "step4": "Si te rechazan o pasan 48 h sin respuesta, se libera la retención y no se te cobra nada.",
       "foot": "Te avisaremos por correo en cada paso. No hace falta que llames.",
       "back": "Volver",
       "accept": "Entendido, continuar",
       "noticeTitle": "Evento privado — requiere aprobación",
-      "noticeBody": "Ahora solo envías tu solicitud: no se piden datos de tarjeta y no se te cobra nada."
+      "noticeBody": "Al enviar la solicitud se retiene el importe en tu tarjeta, pero NO se te cobra todavía."
     },
     "requestSent": {
       "title": "¡Solicitud enviada!",
-      "body": "No se te ha cobrado nada. El equipo del local revisará tu solicitud y te avisaremos por correo.",
-      "detail": "Si te la aprueban, recibirás un correo con un enlace para pagar y recibir tus entradas.",
+      "body": "El importe está RETENIDO en tu tarjeta, pero todavía no se te ha cobrado. El equipo del local revisará tu solicitud y te avisaremos por correo.",
+      "detail": "Si te la aprueban, se cobra la retención y recibes tus entradas con el QR. Si te rechazan o pasan 48 h, se libera y no se te cobra nada.",
       "reference": "Referencia",
+      "viewStatus": "Ver el estado",
       "backToEvent": "Volver al evento"
     },
     "resume": {
@@ -47,6 +60,10 @@
       "payableBody": "Este pedido está esperando el pago. Introduce tu tarjeta abajo; cuando el pago se confirme recibirás tus entradas con el código QR por correo.",
       "payNow": "Pagar ahora",
       "missingCode": "Este enlace está incompleto. Abre el enlace de pago tal cual viene en tu correo (incluye el código).",
+      "approvedUnpaidTitle": "Este enlace de pago ya no funciona",
+      "approvedUnpaidBody": "Tu solicitud se aprobó con el sistema de pago anterior y ese enlace ya no puede cobrarse. No se te ha cobrado nada. Escribe al local con tu referencia y te lo resuelven.",
+      "holdTitle": "Solicitud pendiente de aprobación",
+      "holdBody": "El importe sigue RETENIDO en tu tarjeta y aún no se ha cobrado. El local tiene 48 h para decidir: si te aprueba se cobra y recibes las entradas; si te rechaza o caduca, se libera. No vuelvas a pagar.",
       "awaitingTitle": "Solicitud pendiente de aprobación",
       "awaitingBody": "El local todavía no ha decidido. No se te ha cobrado nada — te avisaremos por correo con la decisión.",
       "processingTitle": "Estamos confirmando tu pago",
@@ -61,10 +78,10 @@
     }
   },
   "success": {
-    "title": "¡Pago Autorizado!",
-    "description": "Tu pago ha sido autorizado exitosamente y está siendo retenido de forma segura.",
-    "pendingApproval": "Pendiente de Aprobación",
-    "pendingDescription": "Tu pedido está esperando la confirmación del staff. Una vez aprobado, se procesará tu pago y recibirás tus entradas por correo electrónico.",
+    "title": "Solicitud enviada — importe retenido",
+    "description": "Todavía no se te ha cobrado: el importe está retenido en tu tarjeta hasta que el local decida.",
+    "pendingApproval": "Pendiente de aprobación",
+    "pendingDescription": "El equipo del local revisa tu solicitud (hasta 48 h). Si te aprueban, se cobra la retención y recibes tus entradas con el QR por correo. Si te rechazan o caduca el plazo, se libera y no se te cobra nada.",
     "orderReference": "Referencia del Pedido",
     "copyReference": "Copiar Referencia",
     "copied": "¡Copiado!",
@@ -74,27 +91,30 @@
     "infoList": {
       "authorized": "Tu pago está <strong>autorizado pero aún no cobrado</strong>",
       "staffReview": "El staff revisará tu solicitud pronto (hasta 48 horas)",
-      "approved": "Si es aprobado, se procesará el pago y recibirás las entradas por correo",
-      "rejected": "Si es rechazado, la autorización será cancelada y los fondos devueltos",
+      "approved": "Si te aprueban, se cobra la retención y recibes las entradas por correo",
+      "rejected": "Si te rechazan o pasan 48 h, se libera la retención y no se te cobra nada",
       "emailUpdates": "Recibirás actualizaciones por correo sobre el estado de tu pedido"
     },
     "timeline": {
       "requestSent": "Solicitud enviada",
       "requestSentDesc": "Recibida, sin ningún cargo",
+      "requestSentHoldDesc": "Recibida, con el importe retenido",
       "staffReview": "Revisión del local",
       "staffReviewDesc": "El equipo está revisando tu solicitud",
       "payLink": "Enlace de pago",
       "payLinkDesc": "Si te aprueban, te llega por correo",
+      "holdCharge": "Cobro de la retención",
+      "holdChargeDesc": "Solo si te aprueban; si no, se libera",
       "ticketsSent": "Entradas enviadas",
       "ticketsSentDesc": "Al confirmarse el pago, con QR"
     },
     "confirming": {
-      "title": "Confirmando tu pago…",
-      "description": "Estamos esperando la confirmación de la pasarela. Suele tardar unos segundos.",
+      "title": "Comprobando tu pedido…",
+      "description": "Estamos leyendo el estado de tu pedido. Suele tardar unos segundos.",
       "cardTitle": "Pago en verificación",
-      "cardBody": "No cierres esta página. En cuanto la pasarela confirme el pago, emitiremos tus entradas y te las enviaremos por correo.",
+      "cardBody": "No cierres esta página. En cuanto el pago quede confirmado, emitiremos tus entradas y te las enviaremos por correo.",
       "slow": "Está tardando más de lo normal. NO vuelvas a pagar: en cuanto se confirme te llegará el correo con tus entradas. Si en unos minutos no recibes nada, contacta al local con tu referencia.",
-      "infoWebhook": "La confirmación llega desde la pasarela, no desde esta página",
+      "infoWebhook": "El estado lo confirma la pasarela, no esta página",
       "infoNoRetry": "No repitas el pago: podrías pagar dos veces"
     },
     "awaiting": {

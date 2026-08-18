@@ -327,9 +327,77 @@
         transition: none !important;
     }
 }
-/* ===== Aviso de redirección (checkout alojado dLocal) =====
-   Sustituye al formulario de tarjeta: con dLocal Go el comprador introduce
-   la tarjeta en la pasarela, aquí no se pide nada. */
+/* ===== Formulario de tarjeta (NeoNet/Cybersource, flujo vigente) =====
+   El comprador teclea la tarjeta AQUÍ y el backend cobra contra la pasarela.
+   Mismo bloque para evento público y privado: lo único que cambia es la nota
+   del pie (cobro inmediato vs. retención). */
+.payment-card-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.payment-card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.payment-card-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.payment-card-input:focus {
+  border-color: rgba(168, 85, 255, 0.6);
+}
+
+.payment-card-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.payment-card-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* La nota de la retención vive aquí: es lo último que se lee antes de teclear
+   la tarjeta, así que NO se pinta en gris apagado como una coletilla legal. */
+.payment-card-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ===== Aviso de redirección (checkout alojado dLocal) — FUERA DE USO =====
+   Lo usaba la variante de dLocal, que sustituía el formulario de tarjeta por
+   un aviso de "te llevamos a la pasarela". Desde el 18-ago-2026 ninguna página
+   lo pinta; se conserva por si se retoma dLocal (ver smartfields-card). */
 .payment-redirect-notice {
   display: flex;
   align-items: center;
@@ -468,6 +536,14 @@
 
 .payment-status-panel-button:hover {
   opacity: 0.9;
+}
+
+/* Segunda acción del panel (p. ej. "volver al evento" junto a "ver estado"):
+   dos botones morados iguales harían dudar de cuál es el bueno. */
+.payment-status-panel-button-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 640px) {

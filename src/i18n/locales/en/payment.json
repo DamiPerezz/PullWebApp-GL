@@ -11,6 +11,18 @@
     "redirectBody": "One moment, we're preparing the payment form. Don't close this window.",
     "checkoutFailed": "We couldn't open the payment page. Wait a few seconds and try again.",
     "redirecting": "Redirecting...",
+    "paidTitle": "Payment confirmed!",
+    "paidBody": "Your tickets with the QR code are on their way to your inbox.",
+    "paymentFailed": "We couldn't complete the payment. Check your card details and try again.",
+    "card": {
+      "title": "Payment details",
+      "number": "Card number",
+      "expiry": "MM/YY",
+      "cvv": "CVV",
+      "secureNote": "Secure payment processed by Cybersource. We don't store your card details.",
+      "holdNote": "Private event: sending the request will HOLD the amount on your card, and it's only charged if the venue approves your request. If they decline or 48 h pass, the hold is released and nothing is charged.",
+      "incomplete": "Complete your card details (number, MM/YY expiry and CVV)."
+    },
     "processingOrder": "Processing your order...",
     "processingWait": "One moment, we're preparing your payment",
     "failedToLoad": "Failed to load event information. Please try again.",
@@ -25,21 +37,22 @@
     "private": {
       "title": "Private event — approval required",
       "intro": "Before you continue, here's how tickets work for this event:",
-      "step1": "You send your request for free: no card details are asked for and nothing is charged now.",
+      "step1": "You enter your card and the amount is HELD: nothing is charged yet.",
       "step2": "The venue team reviews your request (up to 48 h).",
-      "step3": "If they accept, you get an email with a payment link. You have 24 h to complete it.",
-      "step4": "If they decline or you don't pay in time, nothing happens: there was never a charge.",
+      "step3": "If they accept, the hold is charged and you get your tickets with the QR by email.",
+      "step4": "If they decline or 48 h pass with no answer, the hold is released and nothing is charged.",
       "foot": "We'll email you at every step. No need to call.",
       "back": "Go back",
       "accept": "Got it, continue",
       "noticeTitle": "Private event — approval required",
-      "noticeBody": "For now you're only sending a request: no card details are asked for and nothing is charged."
+      "noticeBody": "Sending the request holds the amount on your card, but you are NOT charged yet."
     },
     "requestSent": {
       "title": "Request sent!",
-      "body": "Nothing has been charged. The venue team will review your request and we'll email you.",
-      "detail": "If they approve it, you'll get an email with a payment link to complete your tickets.",
+      "body": "The amount is HELD on your card, but you haven't been charged yet. The venue team will review your request and we'll email you.",
+      "detail": "If they approve it, the hold is charged and you get your tickets with the QR. If they decline or 48 h pass, it's released and nothing is charged.",
       "reference": "Reference",
+      "viewStatus": "View status",
       "backToEvent": "Back to the event"
     },
     "resume": {
@@ -47,6 +60,10 @@
       "payableBody": "This order is waiting for payment. Enter your card below; once the payment is confirmed you'll get your tickets with the QR code by email.",
       "payNow": "Pay now",
       "missingCode": "This link is incomplete. Open the payment link exactly as it came in your email (it includes the code).",
+      "approvedUnpaidTitle": "This payment link no longer works",
+      "approvedUnpaidBody": "Your request was approved under the previous payment system and that link can no longer be charged. Nothing has been charged to you. Contact the venue with your reference and they'll sort it out.",
+      "holdTitle": "Request pending approval",
+      "holdBody": "The amount is still HELD on your card and hasn't been charged. The venue has 48 h to decide: if they approve, it's charged and you get your tickets; if they decline or it expires, it's released. Don't pay again.",
       "awaitingTitle": "Request pending approval",
       "awaitingBody": "The venue hasn't decided yet. Nothing has been charged — we'll email you the decision.",
       "processingTitle": "We're confirming your payment",
@@ -61,10 +78,10 @@
     }
   },
   "success": {
-    "title": "Payment Authorized!",
-    "description": "Your payment has been successfully authorized and is being held securely.",
-    "pendingApproval": "Pending Staff Approval",
-    "pendingDescription": "Your order is now waiting for staff confirmation. Once approved, your payment will be processed and you'll receive your tickets via email.",
+    "title": "Request sent — amount held",
+    "description": "You haven't been charged yet: the amount is held on your card until the venue decides.",
+    "pendingApproval": "Pending approval",
+    "pendingDescription": "The venue team reviews your request (up to 48 h). If they approve, the hold is charged and you get your tickets with the QR by email. If they decline or the deadline passes, it's released and nothing is charged.",
     "orderReference": "Order Reference",
     "copyReference": "Copy Reference",
     "copied": "Copied!",
@@ -74,27 +91,30 @@
     "infoList": {
       "authorized": "Your payment is <strong>authorized but not yet charged</strong>",
       "staffReview": "The venue will review your request shortly (up to 48 hours)",
-      "approved": "If approved, payment will be processed and tickets sent to your email",
-      "rejected": "If rejected, the authorization will be cancelled and funds returned",
+      "approved": "If approved, the hold is charged and tickets are sent to your email",
+      "rejected": "If declined or 48 h pass, the hold is released and nothing is charged",
       "emailUpdates": "You'll receive email updates about your order status"
     },
     "timeline": {
       "requestSent": "Request sent",
       "requestSentDesc": "Received, with no charge",
+      "requestSentHoldDesc": "Received, with the amount held",
       "staffReview": "Venue review",
       "staffReviewDesc": "The team is reviewing your request",
       "payLink": "Payment link",
       "payLinkDesc": "If approved, it arrives by email",
+      "holdCharge": "Hold charged",
+      "holdChargeDesc": "Only if approved; otherwise it's released",
       "ticketsSent": "Tickets sent",
       "ticketsSentDesc": "Once the payment clears, with QR"
     },
     "confirming": {
-      "title": "Confirming your payment…",
-      "description": "We're waiting for the gateway to confirm. This usually takes a few seconds.",
+      "title": "Checking your order…",
+      "description": "We're reading your order status. This usually takes a few seconds.",
       "cardTitle": "Payment being verified",
-      "cardBody": "Don't close this page. As soon as the gateway confirms the payment, we'll issue your tickets and email them to you.",
+      "cardBody": "Don't close this page. As soon as the payment is confirmed, we'll issue your tickets and email them to you.",
       "slow": "This is taking longer than usual. Do NOT pay again: you'll get the email with your tickets as soon as it clears. If nothing arrives in a few minutes, contact the venue with your reference.",
-      "infoWebhook": "Confirmation comes from the gateway, not from this page",
+      "infoWebhook": "The gateway confirms the status, not this page",
       "infoNoRetry": "Don't repeat the payment: you could be charged twice"
     },
     "awaiting": {

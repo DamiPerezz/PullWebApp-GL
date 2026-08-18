@@ -79,28 +79,84 @@ export const simulateStripePayment = async (orderId: string) => {
 };
 
 // ============================================================================
-// dLocal Go — CHECKOUT ALOJADO
+// NeoNet / Cybersource — TARJETA EN NUESTRA PÁGINA (flujo vigente 18-ago-2026)
 //
-// dLocal Go NO acepta la tarjeta cruda: el backend crea el pago
-// (POST /v1/payments) y devuelve una `redirect_url` a la página de dLocal.
-// El comprador paga ALLÍ y vuelve a nuestro `success_url`. El pago nace
-// PENDING y se confirma por WEBHOOK, así que al volver la orden puede seguir
-// en `pending`/`processing` unos segundos — la web no debe cantar victoria.
+// El comprador teclea la tarjeta en nuestro formulario y el backend cobra
+// contra la pasarela en la MISMA petición: cuando esto responde, el resultado
+// ya es definitivo (no hay webhook de por medio, al revés que con dLocal).
 //
-// `payment_link_code` sigue siendo obligatorio (anti-carding): es la prueba
-// de que quien paga es quien creó la orden (flujo público) o quien recibió el
-// enlace de aprobación por correo (flujo privado).
+// PÚBLICO   captura inmediata → la orden queda `confirmed` y salen las
+//           entradas por correo.
+// PRIVADO   NO se captura: se AUTORIZA y el dinero queda RETENIDO en la
+//           tarjeta → la orden queda `payment_authorized`. El staff decide:
+//           aprobar (captura y emite entradas), rechazar (reversa) o dejar
+//           pasar 48 h (el job de caducidad reversa solo). NO hay enlace de
+//           pago posterior: la tarjeta se pide UNA vez, al solicitar.
+//
+// UN SOLO COBRO POR COMPRA (decisión del 18-ago-2026): el comprador sigue
+// pagando el 8% de recargo, pero como un único apunte. Desde la web se manda
+// UN total (el que ya calcula `config/fees.ts` al crear la orden) y UNA
+// llamada; cómo se reparte ese dinero entre venue y plataforma es cosa del
+// backend. TRAMPA: si el backend vuelve a partirlo en dos cargos a la misma
+// tarjeta, el comprador ve dos apuntes en su extracto y llama al local — y eso
+// no se arregla desde aquí.
+//
+// `payment_link_code` es OBLIGATORIO (anti-carding): sin él el backend
+// responde 403 y no toca la pasarela. Es la prueba de que quien paga es quien
+// creó la orden. TRAMPA: viene de `create-pending-order`, no de la URL — si
+// se pierde entre reintentos, el cobro no se puede completar.
+//
+// Respuestas del backend que hay que saber leer:
+//   200 {success, pending_approval:true}  → privado: dinero RETENIDO, no cobrado
+//   200 {success, message:"Payment confirmed", tickets} → público: cobrado
+//   402 {error, declined:true}            → tarjeta rechazada, sin cargo
+//   403 {error}                           → payment_link_code inválido
+//   409 {error, status}                   → la orden ya no es pagable
+//   429 {error}                           → demasiados intentos
+//   501 {error, use_hosted_checkout:true} → la pasarela configurada NO acepta
+//        tarjeta cruda (pasa si el venue vuelve a quedar apuntando a dLocal)
 // ============================================================================
 
-// Ruta canónica. Si el backend acaba exponiendo otro nombre, se cambia AQUÍ
-// (una línea). Las alternativas solo se prueban ante un 404/405 —
-// "ruta inexistente" garantiza que el backend no hizo nada, así que reintentar
-// no puede duplicar un cobro.
+export const payOrder = async (
+  orderId: string,
+  paymentLinkCode: string,
+  card: { number: string; exp_month: string; exp_year: string; cvv: string },
+  turnstileToken?: string
+) => {
+  const response = await apiClient.post(`/orders/pay`, {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+    card,
+    ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
+  });
+  return response.data;
+};
+
+// ============================================================================
+// dLocal Go — CHECKOUT ALOJADO  ·  FUERA DEL FLUJO desde el 18-ago-2026
+//
+// Se abandonó dLocal y se volvió a NeoNet (arriba). Nada de este bloque se
+// llama ya desde la web. Se conserva a propósito, sin borrar, por si se
+// retoma dLocal: volver a montarlo desde cero costaría días.
+//
+// Cómo funcionaba: dLocal Go NO acepta la tarjeta cruda — el backend creaba
+// el pago (POST /v1/payments) y devolvía una `redirect_url` a la página de
+// dLocal. El comprador pagaba ALLÍ y volvía a nuestro `success_url`. El pago
+// nacía PENDING y se confirmaba por WEBHOOK, así que al volver la orden podía
+// seguir en `pending`/`processing` unos segundos — la web no debía cantar
+// victoria.
+// ============================================================================
+
+// Ruta canónica del checkout ALOJADO. Si el backend acaba exponiendo otro
+// nombre, se cambia AQUÍ (una línea). Las alternativas solo se prueban ante un
+// 404/405 — "ruta inexistente" garantiza que el backend no hizo nada, así que
+// reintentar no puede duplicar un cobro.
 // VERIFICADO en producción: el checkout alojado de dLocal vive en
 // /orders/checkout (controllers.CreateCheckout) y devuelve checkout_url.
-// OJO: /orders/pay es el endpoint ANTIGUO de tarjeta cruda — llamarlo aquí
-// devolvía "Datos de tarjeta incompletos" (400), y como no es 404/405 los
-// fallbacks ni se probaban.
+// OJO si alguien reactiva esto: `/orders/checkout` y `/orders/pay` NO son
+// intercambiables. `/orders/pay` (el del flujo vigente) espera la tarjeta en el
+// body y responde 400 "Datos de tarjeta incompletos" si se le llama con este
+// payload — y como 400 no es 404/405, los fallbacks de abajo ni se probarían.
 export const CHECKOUT_ENDPOINT = '/orders/checkout';
 const CHECKOUT_ENDPOINT_FALLBACKS = [
   '/orders/create-checkout-session',
@@ -168,15 +224,19 @@ export const startOrderCheckout = async (
 };
 
 // ============================================================================
-// SMARTFIELDS — cobro con tarjeta DENTRO de nuestra web.
+// SMARTFIELDS (dLocal) — FUERA DEL FLUJO desde el 18-ago-2026
 //
-// Por qué no usamos el checkout con redirección: en Guatemala la cuenta de
-// dLocal no ofrece tarjeta, solo efectivo. Su página alojada muestra la lista
-// de métodos VACÍA. SmartFields no consulta esa lista — pintamos el formulario
-// nosotros y la tarjeta se tokeniza contra dLocal desde el navegador.
+// Ya no se llama desde ninguna página: el cobro vuelve a ser `payOrder` contra
+// NeoNet. Se conserva junto a `components/smartfields-card` por si se retoma
+// dLocal. Si alguien lo reactiva, ojo: los endpoints `/orders/smartfields/*`
+// del backend siguen existiendo, pero el venue tiene que estar configurado con
+// la pasarela dLocal o responderán con la pasarela equivocada.
 //
-// LA TARJETA NUNCA TOCA NUESTRO SERVIDOR: los campos viven en un iframe de
-// dLocal y lo único que sale de aquí es un token de un solo uso.
+// Cómo funcionaba: en Guatemala la cuenta de dLocal no ofrece tarjeta, solo
+// efectivo, y su página alojada mostraba la lista de métodos VACÍA. SmartFields
+// no consulta esa lista — pintábamos el formulario nosotros y la tarjeta se
+// tokenizaba contra dLocal desde el navegador, dentro de un iframe suyo, sin
+// pasar nunca por nuestro servidor.
 // ============================================================================
 
 export type SmartFieldsSession = {

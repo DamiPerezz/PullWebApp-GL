@@ -1,42 +1,43 @@
 // payment-page.tsx
 // SECURITY: Using apiClient for consistent cookie-based authentication
 //
-// FLUJO dLOCAL GO — SMARTFIELDS (actualizado 2026-08-14):
+// FLUJO NeoNet / Cybersource — TARJETA EN ESTA PÁGINA (18-ago-2026):
 //
-//   PÚBLICO   datos del asistente → crear orden → se muestra el FORMULARIO DE
-//             TARJETA aquí mismo (componente SmartFieldsCard) → al pagar, se
-//             va a /order/payment-success.
+//   PÚBLICO   datos del asistente + tarjeta aquí → crear orden → POST
+//             /orders/pay → el backend COBRA en la misma petición → se va a
+//             /order/payment-success con las entradas ya emitidas.
 //
-//   PRIVADO   datos del asistente → crear orden → el backend responde
-//             `requires_approval: true` → NO se pide tarjeta: se muestra
-//             "solicitud enviada". Si el local la aprueba, llega un correo con
-//             un ENLACE DE PAGO (?order_id=…&code=…) que vuelve a esta misma
-//             página en modo "retomar orden", y ahí sí se pide la tarjeta.
+//   PRIVADO   EL MISMO FORMULARIO. La tarjeta se pide al SOLICITAR: el backend
+//             autoriza sin capturar y el importe queda RETENIDO
+//             (orden en `payment_authorized`). Si el local aprueba, se cobra;
+//             si rechaza o pasan 48 h, se libera. NO hay enlace de pago
+//             posterior — pedir la tarjeta dos veces sería el bug.
 //
-// POR QUÉ YA NO SE REDIRIGE: antes se mandaba al comprador a la página alojada
-// de dLocal. En Guatemala esa página NO ofrece tarjeta —la cobertura de la
-// cuenta solo tiene efectivo— y mostraba la lista de métodos VACÍA: nadie
-// podía pagar. SmartFields no consulta esa lista.
+// POR QUÉ VOLVIÓ ASÍ: con dLocal se probó "solicitar sin tarjeta → aprobar →
+// pagar por enlace" y una redirección a su checkout alojado. Se abandonó
+// dLocal, y con ella los dos desvíos. El componente SmartFields sigue en el
+// repo (components/smartfields-card) pero YA NO SE USA desde aquí.
 //
-// La tarjeta se teclea en un iframe SERVIDO POR dLOCAL y nunca pasa por
-// nuestro servidor: solo viaja un token de un solo uso.
+// TRAMPA: la tarjeta sí pasa por nuestro servidor en este flujo (el backend la
+// reenvía a Cybersource y no la guarda). No la metas en logs, ni en estado
+// global, ni en la URL.
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Layout } from "../../components/layout/layout";
 import "./payment-page.css";
 import { TicketReceipt } from "../../components/ticket-receipt/ticket-receipt";
 import { UserDetailsForm } from "../../components/user-details-form/user-details-form";
-import SmartFieldsCard from '../../components/smartfields-card/smartfields-card';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   getTicketInfo,
   getEventDetailedInfo,
   createPendingOrder,
+  payOrder,
   getOrderDetails,
   getOrderDataAfterCancel,
 } from "../../controller/purchase-pages-controller";
 import type { TicketType, EventDetailedInfo } from "../../types/types";
-import { AlertCircle, CheckCircle, Clock, Lock, ShieldCheck } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, CreditCard } from "lucide-react";
 import { EventInfoCard } from "../../components/event-info-card/event-info-card";
 import { apiClient } from "../../utils/axios";
 import { validateUUID } from "../../utils/security";
@@ -44,12 +45,16 @@ import { classifyOrderStatus, validatePaymentLinkCode, type OrderStage } from ".
 
 type ResumeState =
   | { phase: 'loading' }
-  | { phase: 'ready'; stage: OrderStage; orderNumber: string }
+  // `approvedUnpaid` no se deduce del stage: `approved_unpaid` cae en
+  // 'payable' como una `pending` cualquiera, pero esa YA está aprobada, así
+  // que al pagarla se cobra de verdad en vez de retener. Se guarda aparte
+  // para no prometer una retención que no va a pasar.
+  | { phase: 'ready'; stage: OrderStage; orderNumber: string; approvedUnpaid: boolean }
   | { phase: 'notFound' };
 
-// Panel centrado para los estados que NO son un formulario: solicitud
-// enviada, orden ya pagada, solicitud caducada… Fuera del componente para no
-// remontarlo en cada render.
+// Panel centrado para los estados que NO son un formulario: solicitud enviada,
+// orden ya pagada, solicitud caducada… Fuera del componente para no remontarlo
+// en cada render.
 const StatusPanel = ({
   icon,
   tone,
@@ -74,6 +79,78 @@ const StatusPanel = ({
   </div>
 );
 
+// Campos de tarjeta. TIENE que vivir fuera del componente: si se declara
+// dentro, cada tecleo lo remonta y el input pierde el foco tras cada dígito.
+const CardFields = ({
+  number,
+  expiry,
+  cvv,
+  onNumber,
+  onExpiry,
+  onCvv,
+  disabled,
+  title,
+  note,
+  labels,
+}: {
+  number: string;
+  expiry: string;
+  cvv: string;
+  onNumber: (v: string) => void;
+  onExpiry: (v: string) => void;
+  onCvv: (v: string) => void;
+  disabled: boolean;
+  title: string;
+  note: string;
+  labels: { number: string; expiry: string; cvv: string };
+}) => (
+  <div className="payment-card-section">
+    <div className="payment-card-header">
+      <CreditCard size={18} />
+      <span>{title}</span>
+    </div>
+    <div className="payment-card-fields">
+      <input
+        className="payment-card-input payment-card-number"
+        type="text"
+        inputMode="numeric"
+        autoComplete="cc-number"
+        placeholder={labels.number}
+        aria-label={labels.number}
+        value={number}
+        onChange={(e) => onNumber(e.target.value)}
+        disabled={disabled}
+      />
+      <div className="payment-card-row">
+        <input
+          className="payment-card-input"
+          type="text"
+          inputMode="numeric"
+          autoComplete="cc-exp"
+          placeholder={labels.expiry}
+          aria-label={labels.expiry}
+          value={expiry}
+          onChange={(e) => onExpiry(e.target.value)}
+          disabled={disabled}
+        />
+        <input
+          className="payment-card-input"
+          type="password"
+          inputMode="numeric"
+          autoComplete="cc-csc"
+          placeholder={labels.cvv}
+          aria-label={labels.cvv}
+          maxLength={4}
+          value={cvv}
+          onChange={(e) => onCvv(e.target.value)}
+          disabled={disabled}
+        />
+      </div>
+    </div>
+    <p className="payment-card-note">{note}</p>
+  </div>
+);
+
 export const PaymentPage = () => {
   const { t, i18n } = useTranslation('payment');
   const { lang, eventId, ticketTypeId, quantity } = useParams<{
@@ -93,39 +170,68 @@ export const PaymentPage = () => {
   const codeParam = useMemo(() => validatePaymentLinkCode(searchParams.get("code")), [searchParams]);
   const cancelled = searchParams.get("cancelled") === "true";
 
-  // RETOMAR ORDEN: el enlace de pago del correo de aprobación trae
-  // ?order_id=…&code=…. Antes la página IGNORABA order_id fuera de la rama
-  // `cancelled=true` y creaba una orden NUEVA (reservando plaza otra vez).
-  // Ahora, con order_id y sin `cancelled`, se retoma esa orden tal cual.
+  // RETOMAR ORDEN: con order_id y sin `cancelled` se retoma esa orden en vez de
+  // crear una nueva (que volvería a reservar aforo). En el flujo actual esto
+  // solo pasa con órdenes ANTIGUAS del desvío de dLocal (`approved_unpaid`) o
+  // con una `pending` que se quedó a medias: los eventos privados de hoy ya no
+  // generan enlaces de pago.
   const resuming = Boolean(orderIdParam) && !cancelled;
 
   const formRef = useRef<{ submit: (onSubmit: any) => void }>(null);
   // Orden ya creada, reutilizada entre reintentos: recrearla en cada intento
-  // generaba una orden (y una reserva de aforo) nueva por reintento tras un
-  // timeout de red. Con esto, un reintento reusa la misma orden.
+  // generaba una orden (y un cargo) nueva por reintento tras un timeout de red
+  // → doble cobro. Con esto, un reintento reusa la misma orden y el backend
+  // (claim atómico) lo resuelve sin recobrar.
   const orderRef = useRef<{ orderId: string; code: string } | null>(null);
   const navigate = useNavigate();
+
+  // Datos de tarjeta. Estado local y nada más: no se persiste, no se loguea.
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+
+  const formatCardNumber = (v: string) =>
+    v.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
+
+  const formatExpiry = (v: string) => {
+    const digits = v.replace(/\D/g, "").slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return digits.slice(0, 2) + "/" + digits.slice(2);
+  };
+
+  // Validación de mínimos ANTES de tocar la red: una tarjeta a medias gastaría
+  // un intento contra la pasarela y sumaría al contador anti-carding del
+  // backend (429) sin que el comprador haya hecho nada raro.
+  const cardValid = (): boolean => {
+    const num = cardNumber.replace(/\s/g, "");
+    const [mm, yy] = cardExpiry.split("/");
+    return Boolean(
+      num.length >= 12 &&
+      mm && Number(mm) >= 1 && Number(mm) <= 12 &&
+      yy && yy.length === 2 &&
+      cardCvv.length >= 3
+    );
+  };
 
   const [ticketDetails, setTicketDetails] = useState<TicketType>({} as TicketType);
   const [eventInfo, setEventInfo] = useState<EventDetailedInfo | null>(null);
   const [loading, setIsLoading] = useState<boolean>(true);
   const [processing, setProcessing] = useState<boolean>(false);
-  // Ya no se redirige a ninguna pasarela: el pago ocurre en esta misma
-  // página con SmartFields. Se conserva la variable porque el overlay de
-  // carga la lee; siempre false.
-  const redirecting = false;
-  // Cobro con tarjeta EN ESTA PÁGINA (SmartFields). Sustituye a la
-  // redirección: en Guatemala el checkout alojado de dLocal no ofrece tarjeta.
-  const [cardPayment, setCardPayment] = useState<{ orderId: string; code: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cancelledOrderData, setCancelledOrderData] = useState<any>(null);
-  // Evento privado: la solicitud se envió (sin cobro, sin tarjeta).
-  const [requestSent, setRequestSent] = useState<{ orderNumber: string } | null>(null);
+  // Público: cobrado y confirmado.
+  const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  // Privado: solicitud enviada con el importe RETENIDO (no cobrado).
+  const [requestSent, setRequestSent] = useState<{ orderNumber: string; orderId: string } | null>(null);
   const [resumeState, setResumeState] = useState<ResumeState>({ phase: 'loading' });
   // Consentimiento explícito para eventos privados: el usuario debe leer y
-  // aceptar cómo funciona (solicitud gratis → si aprueban, pagas) ANTES de
-  // ver el formulario. Transparencia.
+  // aceptar el flujo de aprobación (retención sin cobro hasta que el local
+  // acepte) ANTES de ver el formulario de datos. Transparencia.
   const [approvalAccepted, setApprovalAccepted] = useState<boolean>(false);
+
+  // Evento privado: se cobra RETENIENDO y el local aprueba o rechaza. Se
+  // calcula arriba porque lo leen tanto el render como los handlers de cobro.
+  const requiresApproval = Boolean(eventInfo?.is_private || eventInfo?.require_approval);
 
   const getTicketGender = (ticketName: string): 'male' | 'female' | null => {
     const nameLower = ticketName.toLowerCase();
@@ -177,9 +283,9 @@ export const PaymentPage = () => {
       });
   }, [eventId, ticketTypeId, orderIdParam, cancelled, t]);
 
-  // Modo "retomar orden": leer el estado REAL antes de ofrecer pagar. Una
-  // orden ya pagada, rechazada o caducada no debe volver a mandar a la
-  // pasarela.
+  // Modo "retomar orden": leer el estado REAL antes de ofrecer pagar. Una orden
+  // ya pagada, con el importe retenido, rechazada o caducada NO debe volver a
+  // pasar por la pasarela.
   useEffect(() => {
     if (!resuming || !orderIdParam) return;
 
@@ -192,6 +298,7 @@ export const PaymentPage = () => {
           phase: 'ready',
           stage: classifyOrderStatus(order.status),
           orderNumber: order.order_number || '',
+          approvedUnpaid: String(order.status || '').toLowerCase() === 'approved_unpaid',
         });
       })
       .catch(() => {
@@ -201,38 +308,111 @@ export const PaymentPage = () => {
     return () => { alive = false; };
   }, [resuming, orderIdParam]);
 
-  // Manda al comprador a la página de pago de dLocal. A partir de aquí el
-  // pago ocurre FUERA de nuestra web; volverá por success_url (o back_url si
-  // se echa atrás).
-  // Antes esto mandaba al comprador a la página de dLocal. Ya no: en Guatemala
-  // esa página no ofrece tarjeta (solo efectivo) y salía la lista vacía. Ahora
-  // el formulario se pinta AQUÍ con SmartFields; la tarjeta se tokeniza contra
-  // dLocal desde el navegador y nunca pasa por nuestro servidor.
-  const goToCheckout = async (orderId: string, code: string) => {
-    setCardPayment({ orderId, code });
-    setProcessing(false);
+  const clearCard = () => {
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvv("");
   };
 
-  const onCardPaid = () => {
-    const oid = cardPayment?.orderId || orderIdParam || '';
-    window.location.assign(buildUrl(`/order/payment-success?order_id=${oid}`));
+  // Un 409 de "esta orden ya no es pagable" trae el estado REAL de la orden
+  // (`{error, status}`). Con él se lleva al comprador a la pantalla que le
+  // corresponde en vez de soltarle el "Order is not payable" del backend, que
+  // además está en inglés. PASA DE VERDAD: si el cobro se autoriza y la
+  // respuesta se pierde (red móvil), el reintento cae aquí con la orden ya en
+  // `payment_authorized` y dinero retenido — lo último que ese comprador debe
+  // leer es un error técnico que le invite a pagar otra vez.
+  const settledElsewhere = (err: unknown, orderId: string): boolean => {
+    const data = (err as { response?: { data?: { status?: string } } })?.response?.data;
+    switch (classifyOrderStatus(data?.status)) {
+      case 'authorizedHold':
+        clearCard();
+        // Sin `order_number` en el error: el panel omite la referencia si va
+        // vacía, mejor eso que inventarse una.
+        setRequestSent({ orderNumber: '', orderId });
+        return true;
+      case 'confirmed':
+        clearCard();
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          navigate(buildUrl(`/order/payment-success?order_id=${orderId}`));
+        }, 3000);
+        return true;
+      default:
+        return false;
+    }
   };
 
   const describeError = (err: unknown): string => {
     const e = (err || {}) as { response?: { data?: { error?: string } }; message?: string };
-    // El mensaje del BACKEND primero (402/403/409 traen error.response.data).
+    // El mensaje del BACKEND primero (402 declinada, 403 código inválido, 409
+    // ya pagada, 429 demasiados intentos… todos traen error.response.data).
     if (e.response?.data?.error) return e.response.data.error;
-    if (e.message === 'MISSING_REDIRECT_URL' || e.message === 'CHECKOUT_UNAVAILABLE') {
-      return t('page.checkoutFailed');
-    }
-    // Sin `response` no hubo respuesta del servidor (timeout / red móvil).
+    // Sin `response` no hubo respuesta del servidor (timeout / red móvil). Con
+    // un cobro síncrono como este el cargo PUDO pasar: se pide NO reintentar,
+    // en vez de soltar el "Request failed with status code…" en inglés.
     if (!e.response) return t('page.networkError');
     if (e.message) return e.message;
     return t('page.unexpectedError');
   };
 
+  // Cobro real con tarjeta. En público captura; en privado el backend autoriza
+  // y RETIENE (responde `pending_approval: true`). Mismo endpoint, misma
+  // llamada: la decisión de capturar o retener es del servidor, que mira el
+  // evento — la web no puede ni debe elegirla. Si la web mandara un flag de
+  // "reténmelo", cualquiera podría pedir retención en un evento público.
+  const chargeCard = async (orderId: string, linkCode: string) => {
+    const num = cardNumber.replace(/\s/g, "");
+    const [mm, yy] = cardExpiry.split("/");
+    // `linkCode` es el anti-carding: sin él el backend responde 403 y no toca
+    // la pasarela.
+    const paymentResponse = await payOrder(orderId, linkCode, {
+      number: num,
+      exp_month: mm,
+      exp_year: yy,
+      cvv: cardCvv,
+    });
+
+    if (paymentResponse?.success === false) {
+      throw new Error(paymentResponse.error || t('page.paymentFailed'));
+    }
+
+    // La tarjeta ya no hace falta: fuera del estado en cuanto se resuelve.
+    clearCard();
+    setProcessing(false);
+
+    // `pending_approval:true` SOLO lo manda la rama de retención, así que es
+    // señal positiva y fiable. Se compara contra `true` a propósito.
+    if (paymentResponse?.pending_approval === true) {
+      setRequestSent({ orderNumber: paymentResponse?.order_number || '', orderId });
+      return;
+    }
+
+    // Sin flag: en un evento público es el cobro normal. En uno PRIVADO no se
+    // adivina. TRAMPA: el backend también responde sin flag cuando la orden ya
+    // estaba `confirmed` ("Order already confirmed"), y ahí deducir "retenido"
+    // del hecho de que el evento sea privado le diría "tu dinero está
+    // bloqueado" a quien ya tiene las entradas emitidas. La página de éxito lee
+    // el estado REAL de la orden y dice lo que toque, así que se delega en ella.
+    if (requiresApproval) {
+      navigate(buildUrl(`/order/payment-success?order_id=${orderId}`));
+      return;
+    }
+
+    setPaymentSuccess(true);
+    // Los 3 s son para que dé tiempo a LEER que el pago salió bien antes de
+    // que la página cambie sola; saltar de golpe parece que se ha roto algo.
+    setTimeout(() => {
+      navigate(buildUrl(`/order/payment-success?order_id=${orderId}`));
+    }, 3000);
+  };
+
   const onSubmit = async (formData: any) => {
     if (processing) return;
+
+    if (!cardValid()) {
+      setError(t('page.card.incomplete'));
+      return;
+    }
 
     setProcessing(true);
     setError(null);
@@ -275,8 +455,6 @@ export const PaymentPage = () => {
       // Crear la orden UNA sola vez; en reintentos se reusa la existente.
       let orderId: string | undefined = orderRef.current?.orderId;
       let linkCode: string | undefined = orderRef.current?.code;
-      let needsApproval = false;
-
       if (!orderId) {
         const orderResponse = await createPendingOrder(
           realEventID!, // ← ID REAL del evento
@@ -294,50 +472,43 @@ export const PaymentPage = () => {
         orderId = newId;
         linkCode = newCode;
         orderRef.current = { orderId: newId, code: newCode };
-
-        // EVENTO PRIVADO: el backend crea la SOLICITUD (awaiting_approval) sin
-        // mover dinero. No hay tarjeta, no hay redirección — se acabó el flujo
-        // aquí hasta que el local decida.
-        //
-        // La fuente de verdad es `requires_approval` de la respuesta. Si el
-        // backend no lo manda (versión antigua), se cae al flag del evento:
-        // mandar a pagar una solicitud privada sería un 409 y una pantalla
-        // rota.
-        const eventIsPrivate = Boolean(eventInfo.is_private || eventInfo.require_approval);
-        needsApproval = orderResponse.requires_approval === undefined
-          ? eventIsPrivate
-          : Boolean(orderResponse.requires_approval);
-        if (needsApproval) {
-          setRequestSent({ orderNumber: orderResponse.order_number || '' });
-          setProcessing(false);
-          return;
-        }
       }
 
       if (!orderId || !linkCode) {
         throw new Error(t('page.failedToCreateOrder'));
       }
 
-      // EVENTO PÚBLICO: a la pasarela de dLocal.
-      await goToCheckout(orderId, linkCode);
-    } catch (error) {
-      setError(describeError(error));
+      await chargeCard(orderId, linkCode);
+    } catch (error: unknown) {
+      const known = orderRef.current?.orderId;
+      if (!known || !settledElsewhere(error, known)) {
+        setError(describeError(error));
+      }
       setProcessing(false);
     }
   };
 
+  // Retomar una orden vieja que sigue siendo pagable (enlace de aprobación del
+  // desvío de dLocal, o una `pending` a medias): mismo formulario, misma
+  // llamada, pero el código viene de la URL en vez de la orden recién creada.
   const onResumePay = async () => {
     if (processing || !orderIdParam) return;
     if (!codeParam) {
       setError(t('page.resume.missingCode'));
       return;
     }
+    if (!cardValid()) {
+      setError(t('page.card.incomplete'));
+      return;
+    }
     setProcessing(true);
     setError(null);
     try {
-      await goToCheckout(orderIdParam, codeParam);
-    } catch (error) {
-      setError(describeError(error));
+      await chargeCard(orderIdParam, codeParam);
+    } catch (error: unknown) {
+      if (!settledElsewhere(error, orderIdParam)) {
+        setError(describeError(error));
+      }
       setProcessing(false);
     }
   };
@@ -358,8 +529,29 @@ export const PaymentPage = () => {
 
   const ticketGender = getTicketGender(ticketDetails.ticket_name || '');
 
-  // Evento privado: se solicita sin pagar y el local aprueba o rechaza.
-  const requiresApproval = Boolean(eventInfo?.is_private || eventInfo?.require_approval);
+  const cardLabels = {
+    number: t('page.card.number'),
+    expiry: t('page.card.expiry'),
+    cvv: t('page.card.cvv'),
+  };
+
+  // `hold` = a esta tarjeta se le va a RETENER el importe, no cobrar. El aviso
+  // va PEGADO a los campos a propósito: es el último sitio donde el comprador
+  // mira antes de teclear la tarjeta.
+  const renderCardFields = (hold: boolean) => (
+    <CardFields
+      number={cardNumber}
+      expiry={cardExpiry}
+      cvv={cardCvv}
+      onNumber={(v) => setCardNumber(formatCardNumber(v))}
+      onExpiry={(v) => setCardExpiry(formatExpiry(v))}
+      onCvv={(v) => setCardCvv(v.replace(/\D/g, ""))}
+      disabled={processing}
+      title={t('page.card.title')}
+      note={hold ? t('page.card.holdNote') : t('page.card.secureNote')}
+      labels={cardLabels}
+    />
+  );
 
   const backToEvent = () => navigate(buildUrl(`/event/${eventId}`));
 
@@ -390,7 +582,7 @@ export const PaymentPage = () => {
       );
     }
 
-    const { stage, orderNumber } = resumeState;
+    const { stage, orderNumber, approvedUnpaid } = resumeState;
     const reference = orderNumber ? (
       <p className="payment-status-panel-reference">
         {t('page.requestSent.reference')}: <strong>{orderNumber}</strong>
@@ -398,7 +590,32 @@ export const PaymentPage = () => {
     ) : undefined;
 
     switch (stage) {
-      case 'payable':
+      case 'payable': {
+        // HISTÓRICO dLocal: `approved_unpaid` se clasifica como pagable, pero
+        // con NeoNet NO se puede cobrar: `POST /orders/pay` solo acepta órdenes
+        // `pending` (y el claim atómico pending→processing tampoco engancharía),
+        // así que responde 409 "Order is not payable". Pedir aquí la tarjeta
+        // sería mandar al comprador a un callejón sin salida CON el PAN ya
+        // tecleado. Se le dice la verdad y se le manda al local.
+        // Si algún día /orders/pay vuelve a aceptar `approved_unpaid`, borra
+        // este bloque y vuelve a caer en el formulario de abajo.
+        if (approvedUnpaid) {
+          return (
+            <StatusPanel
+              icon={<AlertCircle size={52} />}
+              tone="bad"
+              title={t('page.resume.approvedUnpaidTitle')}
+              body={t('page.resume.approvedUnpaidBody')}
+              extra={reference}
+              action={backButton}
+            />
+          );
+        }
+
+        // Orden `pending` de un evento privado: al pagarla se RETIENE, no se
+        // cobra. El aviso de arriba tiene que decir lo mismo que la nota de la
+        // tarjeta, o el comprador lee dos cosas distintas en la misma pantalla.
+        const holdPayable = requiresApproval;
         return (
           <>
             <EventInfoCard eventInfo={eventInfo} />
@@ -406,27 +623,14 @@ export const PaymentPage = () => {
               <div className="payment-page-left">
                 <div className="payment-approval-notice">
                   <div className="payment-approval-notice-title">
-                    ✅ {t('page.resume.payableTitle')}
+                    {holdPayable ? '🔒' : '✅'}{' '}
+                    {holdPayable ? t('page.private.noticeTitle') : t('page.resume.payableTitle')}
                   </div>
-                  <p>{t('page.resume.payableBody')}</p>
+                  <p>{holdPayable ? t('page.private.noticeBody') : t('page.resume.payableBody')}</p>
                   {reference}
                 </div>
 
-                {/* Formulario de tarjeta aquí mismo, igual que en la compra
-                    pública: el enlace de pago del correo cae en esta rama. */}
-                {cardPayment ? (
-                  <SmartFieldsCard
-                    orderId={cardPayment.orderId}
-                    paymentLinkCode={cardPayment.code}
-                    onPaid={onCardPaid}
-                    onAlreadyPaid={onCardPaid}
-                  />
-                ) : (
-                  <div className="payment-redirect-notice">
-                    <ShieldCheck size={18} />
-                    <span>{t('page.redirectNotice')}</span>
-                  </div>
-                )}
+                {renderCardFields(holdPayable)}
 
                 {!codeParam && (
                   <div className="payment-approval-notice payment-approval-notice-warn">
@@ -438,19 +642,36 @@ export const PaymentPage = () => {
                 <TicketReceipt
                   quantity={Number(quantity!)}
                   ticketDetails={ticketDetails}
-                  buttonText={processing ? t('page.processing') : t('page.resume.payNow')}
+                  buttonText={
+                    processing
+                      ? t('page.processing')
+                      : (holdPayable ? t('page.requestTicket') : t('page.resume.payNow'))
+                  }
                   onConfirm={onResumePay}
-                  // Con el formulario ya en pantalla se paga desde ahí; dejar
-                  // este botón activo abriría un segundo cobro en dLocal.
-                  disabled={processing || !codeParam || Boolean(cardPayment)}
+                  disabled={processing || !codeParam}
                 />
               </div>
             </div>
           </>
         );
+      }
 
+      // Flujo vigente: el importe está RETENIDO esperando la decisión del
+      // local. No se vuelve a pedir tarjeta — ya hay dinero bloqueado.
+      case 'authorizedHold':
+        return (
+          <StatusPanel
+            icon={<Clock size={52} />}
+            tone="wait"
+            title={t('page.resume.holdTitle')}
+            body={t('page.resume.holdBody')}
+            extra={reference}
+            action={backButton}
+          />
+        );
+
+      // HISTÓRICO dLocal: solicitud sin tarjeta, sin nada retenido.
       case 'awaitingApproval':
-      case 'legacyHold':
         return (
           <StatusPanel
             icon={<Clock size={52} />}
@@ -517,8 +738,8 @@ export const PaymentPage = () => {
         />
         <div className="payment-page-bg-overlay" />
 
-        {/* Consentimiento del flujo privado: solo al CREAR una solicitud. */}
-        {requiresApproval && !approvalAccepted && !resuming && !requestSent && (
+        {/* Consentimiento del flujo privado: solo antes de crear la solicitud. */}
+        {requiresApproval && !approvalAccepted && !resuming && !requestSent && !paymentSuccess && (
           <div
             role="dialog"
             aria-modal="true"
@@ -622,9 +843,12 @@ export const PaymentPage = () => {
             )}
 
             {requestSent ? (
+              // PRIVADO: no es "pagado", es "solicitud enviada con el importe
+              // retenido". El texto lo dice sin rodeos para que nadie crea que
+              // ya tiene entrada.
               <StatusPanel
-                icon={<CheckCircle size={52} />}
-                tone="ok"
+                icon={<Clock size={52} />}
+                tone="wait"
                 title={t('page.requestSent.title')}
                 body={t('page.requestSent.body')}
                 extra={
@@ -638,9 +862,33 @@ export const PaymentPage = () => {
                   </>
                 }
                 action={
-                  <button className="payment-status-panel-button" onClick={backToEvent}>
-                    {t('page.requestSent.backToEvent')}
-                  </button>
+                  <>
+                    <button
+                      className="payment-status-panel-button"
+                      onClick={() => navigate(buildUrl(`/order/payment-success?order_id=${requestSent.orderId}`))}
+                    >
+                      {t('page.requestSent.viewStatus')}
+                    </button>
+                    <button
+                      className="payment-status-panel-button payment-status-panel-button-ghost"
+                      onClick={backToEvent}
+                    >
+                      {t('page.requestSent.backToEvent')}
+                    </button>
+                  </>
+                }
+              />
+            ) : paymentSuccess ? (
+              <StatusPanel
+                icon={<CheckCircle size={52} />}
+                tone="ok"
+                title={t('page.paidTitle')}
+                body={t('page.paidBody')}
+                extra={
+                  <>
+                    <div className="payment-page-loading-spinner" style={{ margin: "1.5rem auto 0" }}></div>
+                    <p className="payment-status-panel-reference">{t('page.redirecting')}</p>
+                  </>
                 }
               />
             ) : resuming ? (
@@ -676,26 +924,9 @@ export const PaymentPage = () => {
                       minAge={eventInfo?.min_age}
                     />
 
-                    {/* Formulario de tarjeta de dLocal (SmartFields), aquí
-                        mismo. Antes se redirigía a la página de dLocal, pero
-                        en Guatemala esa página no ofrece tarjeta: mostraba la
-                        lista de métodos vacía. Los campos viven en un iframe
-                        de dLocal — la tarjeta no toca nuestro servidor. */}
-                    {!requiresApproval && cardPayment && (
-                      <SmartFieldsCard
-                        orderId={cardPayment.orderId}
-                        paymentLinkCode={cardPayment.code}
-                        onPaid={onCardPaid}
-                        onAlreadyPaid={onCardPaid}
-                      />
-                    )}
-
-                    {!requiresApproval && !cardPayment && (
-                      <div className="payment-redirect-notice">
-                        <ShieldCheck size={18} />
-                        <span>{t('page.redirectNotice')}</span>
-                      </div>
-                    )}
+                    {/* Público y privado usan EL MISMO formulario: la
+                        diferencia (cobrar vs retener) la decide el backend. */}
+                    {renderCardFields(requiresApproval)}
                   </div>
 
                   <div className="payment-page-right">
@@ -708,17 +939,14 @@ export const PaymentPage = () => {
                           : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
                       }
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
-                      // Con el formulario de tarjeta ya en pantalla, este botón
-                      // sobra: pagar se hace desde el propio formulario. Dejarlo
-                      // activo crearía un segundo cobro en dLocal.
-                      disabled={processing || Boolean(cardPayment)}
+                      disabled={processing}
                     />
                   </div>
                 </div>
               </>
             )}
 
-            {(processing || redirecting) && (
+            {processing && (
               <div style={{
                 position: "fixed",
                 inset: 0,
@@ -738,12 +966,9 @@ export const PaymentPage = () => {
                   maxWidth: "26rem",
                 }}>
                   <div className="payment-page-loading-spinner" style={{ margin: "0 auto 1rem" }}></div>
-                  <p style={{ color: "white", margin: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                    {redirecting && <Lock size={16} />}
-                    {redirecting ? t('page.redirectTitle') : t('page.processingOrder')}
-                  </p>
+                  <p style={{ color: "white", margin: 0 }}>{t('page.processingOrder')}</p>
                   <p style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.875rem", margin: "0.5rem 0 0" }}>
-                    {redirecting ? t('page.redirectBody') : t('page.processingWait')}
+                    {t('page.processingWait')}
                   </p>
                 </div>
               </div>

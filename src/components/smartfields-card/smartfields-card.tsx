@@ -1,5 +1,22 @@
 // components/smartfields-card/smartfields-card.tsx
 //
+// ⚠️ FUERA DE USO DESDE EL 18-AGO-2026. NINGUNA PÁGINA MONTA ESTE COMPONENTE.
+//
+// Se abandonó dLocal y se volvió a NeoNet/Cybersource: la tarjeta se teclea en
+// nuestro propio formulario (`pages/payment-page`) y la cobra el backend con
+// POST /orders/pay. Con NeoNet vuelve además la RETENCIÓN de los eventos
+// privados, que este componente no sabe hacer: SmartFields cobra o no cobra,
+// no autoriza sin capturar.
+//
+// SE CONSERVA A PROPÓSITO, sin borrar, junto a `startSmartFieldsSession` /
+// `confirmSmartFieldsPayment` (controller/purchase-pages-controller.ts) y a su
+// CSS. Montarlo de nuevo desde cero costaría días, y dLocal sigue siendo el
+// plan B si NeoNet vuelve a caerse.
+//
+// TRAMPA si alguien lo reactiva: los endpoints `/orders/smartfields/*` del
+// backend siguen existiendo, pero el venue tiene que estar configurado con la
+// pasarela dLocal — si no, cobrará (o fallará) contra la pasarela equivocada.
+//
 // Formulario de tarjeta de dLocal (SmartFields) embebido en nuestra web.
 //
 // POR QUÉ EXISTE: en Guatemala la cuenta de dLocal no ofrece tarjeta en su
