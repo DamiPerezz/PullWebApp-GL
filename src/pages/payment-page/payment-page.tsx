@@ -228,6 +228,10 @@ export const PaymentPage = () => {
   // aceptar el flujo de aprobación (retención sin cobro hasta que el local
   // acepte) ANTES de ver el formulario de datos. Transparencia.
   const [approvalAccepted, setApprovalAccepted] = useState<boolean>(false);
+  // Casilla del aviso. Separada de `approvalAccepted` a propósito: una cosa es
+  // haber marcado que lo entiendes y otra haber continuado. Sin marcarla, el
+  // botón de continuar está deshabilitado.
+  const [approvalConsent, setApprovalConsent] = useState<boolean>(false);
 
   // Evento privado: se cobra RETENIENDO y el local aprueba o rechaza. Se
   // calcula arriba porque lo leen tanto el render como los handlers de cobro.
@@ -775,9 +779,44 @@ export const PaymentPage = () => {
                 <li>{t('page.private.step3')}</li>
                 <li>{t('page.private.step4')}</li>
               </ul>
-              <p style={{ margin: "0 0 1.25rem", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)" }}>
+              <p style={{ margin: "0 0 1rem", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)" }}>
                 {t('page.private.foot')}
               </p>
+
+              {/* CASILLA OBLIGATORIA. Antes bastaba con pulsar "Entendido", y
+                  eso se pulsa sin leer. Marcar una casilla exige un gesto
+                  distinto y deja constancia de que el comprador aceptó ESTE
+                  texto — que es el que le explica que en su banco puede verlo
+                  como un cargo normal, no como algo pendiente. Sin eso, la
+                  llamada de "me habéis cobrado" es cuestión de tiempo.
+                  Toda la fila es pulsable: en móvil dar solo a la casilla es
+                  incómodo. */}
+              <label
+                htmlFor="approval-consent"
+                style={{
+                  display: "flex", alignItems: "flex-start", gap: "0.7rem",
+                  margin: "0 0 1.25rem", padding: "0.85rem",
+                  borderRadius: "12px", cursor: "pointer",
+                  background: approvalConsent ? "rgba(139, 92, 246, 0.12)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${approvalConsent ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.12)"}`,
+                  transition: "background 0.15s, border-color 0.15s",
+                }}
+              >
+                <input
+                  id="approval-consent"
+                  type="checkbox"
+                  checked={approvalConsent}
+                  onChange={(e) => setApprovalConsent(e.target.checked)}
+                  style={{
+                    width: "20px", height: "20px", marginTop: "1px",
+                    accentColor: "#8b5cf6", cursor: "pointer", flexShrink: 0,
+                  }}
+                />
+                <span style={{ fontSize: "0.85rem", lineHeight: 1.5, color: "rgba(255,255,255,0.85)" }}>
+                  {t('page.private.consent')}
+                </span>
+              </label>
+
               <div style={{ display: "flex", gap: "0.75rem" }}>
                 <button
                   onClick={() => navigate(-1)}
@@ -791,10 +830,17 @@ export const PaymentPage = () => {
                 </button>
                 <button
                   onClick={() => setApprovalAccepted(true)}
+                  disabled={!approvalConsent}
+                  aria-disabled={!approvalConsent}
                   style={{
                     flex: 2, padding: "0.75rem", borderRadius: "10px", border: "none",
-                    background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-                    color: "#fff", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer",
+                    background: approvalConsent
+                      ? "linear-gradient(135deg, #8b5cf6, #7c3aed)"
+                      : "rgba(255,255,255,0.1)",
+                    color: approvalConsent ? "#fff" : "rgba(255,255,255,0.4)",
+                    fontSize: "0.95rem", fontWeight: 600,
+                    cursor: approvalConsent ? "pointer" : "not-allowed",
+                    transition: "background 0.15s, color 0.15s",
                   }}
                 >
                   {t('page.private.accept')}

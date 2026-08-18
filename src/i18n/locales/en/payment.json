@@ -36,16 +36,17 @@
     "networkError": "The connection dropped before reaching the payment page. Wait a few seconds and try again; if you already got an email, your order was registered.",
     "private": {
       "title": "Private event — approval required",
-      "intro": "Before you continue, here's how tickets work for this event:",
-      "step1": "You enter your card and the amount is HELD: nothing is charged yet.",
-      "step2": "The venue team reviews your request (up to 48 h).",
-      "step3": "If they accept, the hold is charged and you get your tickets with the QR by email.",
-      "step4": "If they decline or 48 h pass with no answer, the hold is released and nothing is charged.",
-      "foot": "We'll email you at every step. No need to call.",
-      "back": "Go back",
-      "accept": "Got it, continue",
+      "intro": "This event charges on approval. Here is how it works:",
+      "step1": "When you send your request, your bank authorises the charge. It may show up in your banking app or statement as a normal purchase (not as “pending”) — this is expected, not an error.",
+      "step2": "The venue reviews your request (up to 48 h).",
+      "step3": "If they accept: the charge is confirmed and you get your tickets with a QR by email.",
+      "step4": "If they decline, or 48 h pass: the charge is reversed. Depending on your bank it may take a few business days to show up — this is normal for card reversals.",
+      "foot": "We will email you at every step.",
+      "back": "Back",
+      "accept": "Continue",
       "noticeTitle": "Private event — approval required",
-      "noticeBody": "Sending the request holds the amount on your card, but you are NOT charged yet."
+      "noticeBody": "When you send your request your bank authorises the charge. If the venue accepts it is confirmed; if they decline or 48 h pass, it is reversed.",
+      "consent": "I understand that sending this request will place a charge on my card, which may appear as a normal purchase (not as “pending”) in my bank. If my request is declined or gets no answer within 48 h, it will be reversed, which may take several business days to show up."
     },
     "requestSent": {
       "title": "Request sent!",

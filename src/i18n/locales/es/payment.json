@@ -36,16 +36,17 @@
     "networkError": "Se perdió la conexión antes de llegar a la pasarela. Espera unos segundos y vuelve a intentarlo; si ya recibiste un correo, tu pedido se registró.",
     "private": {
       "title": "Evento privado — requiere aprobación",
-      "intro": "Antes de continuar, así funciona la entrada a este evento:",
-      "step1": "Introduces tu tarjeta y se RETIENE el importe: aún no se te cobra nada.",
-      "step2": "El equipo del local revisa tu solicitud (hasta 48 h).",
-      "step3": "Si te aceptan, se cobra la retención y recibes tus entradas con el QR por correo.",
-      "step4": "Si te rechazan o pasan 48 h sin respuesta, se libera la retención y no se te cobra nada.",
-      "foot": "Te avisaremos por correo en cada paso. No hace falta que llames.",
+      "intro": "Este evento cobra por aprobación. Así funciona:",
+      "step1": "Al enviar tu solicitud, tu banco autoriza el cargo. Es posible que aparezca en tu app bancaria o estado de cuenta como un consumo normal (no como “pendiente”) — esto es esperado, no es un error.",
+      "step2": "El local revisa tu solicitud (hasta 48 h).",
+      "step3": "Si te aceptan: el cargo queda confirmado y recibes tus entradas con QR por correo.",
+      "step4": "Si te rechazan o pasan las 48 h: se hace una reversión del cargo. Puede tardar algunos días hábiles en reflejarse en tu banco, dependiendo de tu entidad — esto es normal en reversiones de tarjeta.",
+      "foot": "Te avisaremos por correo en cada paso.",
       "back": "Volver",
-      "accept": "Entendido, continuar",
+      "accept": "Continuar",
       "noticeTitle": "Evento privado — requiere aprobación",
-      "noticeBody": "Al enviar la solicitud se retiene el importe en tu tarjeta, pero NO se te cobra todavía."
+      "noticeBody": "Al enviar tu solicitud tu banco autoriza el cargo. Si el local te acepta queda confirmado; si te rechaza o pasan 48 h, se revierte.",
+      "consent": "Entiendo que al enviar esta solicitud se realizará un cargo a mi tarjeta que puede aparecer como un consumo normal (no como “pendiente”) en mi banco. Si mi solicitud es rechazada o no recibe respuesta en 48 h, se hará una reversión, que puede tardar varios días hábiles en reflejarse."
     },
     "requestSent": {
       "title": "¡Solicitud enviada!",
