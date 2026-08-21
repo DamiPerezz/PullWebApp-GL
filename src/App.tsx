@@ -58,6 +58,7 @@ const WalletPage = lazy(() => import("./pages/wallet-page/wallet-page").then(m =
 const CookiePolicyPage = lazy(() => import("./pages/cookie-policy-page/cookie-policy-page").then(m => ({ default: m.CookiePolicyPage })));
 const PrivacyPolicyPage = lazy(() => import("./pages/privacy-policy-page/privacy-policy-page").then(m => ({ default: m.PrivacyPolicyPage })));
 const TermsOfServicePage = lazy(() => import("./pages/terms-of-service-page/terms-of-service-page").then(m => ({ default: m.TermsOfServicePage })));
+const PrivateEventTermsPage = lazy(() => import("./pages/private-event-terms-page/private-event-terms-page").then(m => ({ default: m.PrivateEventTermsPage })));
 // AboutUsPage - Not implemented yet
 const NotFoundPage = lazy(() => import("./pages/not-found-page/not-found-page").then(m => ({ default: m.NotFoundPage })));
 
@@ -399,6 +400,7 @@ const AppRoutes = () => {
       <Route path="/cookie-policy" element={<CookiePolicyPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/terms" element={<TermsOfServicePage />} />
+      <Route path="/private-event-terms" element={<PrivateEventTermsPage />} />
 
       {/* 404 NOT FOUND */}
       <Route path="*" element={<NotFoundPage />} />

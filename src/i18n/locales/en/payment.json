@@ -46,7 +46,11 @@
       "accept": "Continue",
       "noticeTitle": "Private event — approval required",
       "noticeBody": "When you send your request your bank authorises the charge. If the venue accepts it is confirmed; if they decline or 48 h pass, it is reversed.",
-      "consent": "I understand that sending this request will place a charge on my card, which may appear as a normal purchase (not as “pending”) in my bank. If my request is declined or gets no answer within 48 h, it will be reversed, which may take several business days to show up."
+      "consent": "I understand that sending this request will place a charge on my card, which may appear as a normal purchase (not as “pending”) in my bank. If my request is declined or gets no answer within 48 h, it will be reversed, which may take several business days to show up.",
+      "leadShort": "This event is confirmed once the venue approves your request. When you send it, your bank authorises the amount and it may appear as a normal purchase (not as “pending”).",
+      "consentShort": "I understand that sending my request will authorise a charge on my card —which may appear as a normal purchase in my bank— under the %TERMS% of the private event.",
+      "termsLink": "terms and conditions",
+      "termsPageSubtitle": "How approval charging works"
     },
     "requestSent": {
       "title": "Request sent!",

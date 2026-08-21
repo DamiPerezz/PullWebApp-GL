@@ -46,7 +46,11 @@
       "accept": "Continuar",
       "noticeTitle": "Evento privado — requiere aprobación",
       "noticeBody": "Al enviar tu solicitud tu banco autoriza el cargo. Si el local te acepta queda confirmado; si te rechaza o pasan 48 h, se revierte.",
-      "consent": "Entiendo que al enviar esta solicitud se realizará un cargo a mi tarjeta que puede aparecer como un consumo normal (no como “pendiente”) en mi banco. Si mi solicitud es rechazada o no recibe respuesta en 48 h, se hará una reversión, que puede tardar varios días hábiles en reflejarse."
+      "consent": "Entiendo que al enviar esta solicitud se realizará un cargo a mi tarjeta que puede aparecer como un consumo normal (no como “pendiente”) en mi banco. Si mi solicitud es rechazada o no recibe respuesta en 48 h, se hará una reversión, que puede tardar varios días hábiles en reflejarse.",
+      "leadShort": "Este evento se confirma cuando el local aprueba tu solicitud. Al enviarla, tu banco autoriza el importe y puede aparecer como un cargo normal (no como “pendiente”).",
+      "consentShort": "Entiendo que al enviar mi solicitud se autorizará un cargo en mi tarjeta —que puede verse como un consumo normal en mi banco— bajo los %TERMS% del evento privado.",
+      "termsLink": "términos y condiciones",
+      "termsPageSubtitle": "Cómo funciona el cobro por aprobación"
     },
     "requestSent": {
       "title": "¡Solicitud enviada!",

@@ -749,14 +749,22 @@ export const PaymentPage = () => {
             aria-modal="true"
             aria-labelledby="approval-modal-title"
             style={{
-              position: "fixed", inset: 0, zIndex: 1000,
+              // zIndex 2000: por ENCIMA de MobileTabBar (fixed, bottom:0,
+              // z-index:1000). Con el mismo z-index la barra se pintaba encima
+              // y tapaba el botón Continuar en móvil. overflowY:auto +
+              // alignItems:flex-start para que en pantallas bajas el modal
+              // haga scroll en vez de empujar los botones fuera de la vista.
+              position: "fixed", inset: 0, zIndex: 2000,
               background: "rgba(3, 3, 8, 0.82)", backdropFilter: "blur(4px)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "1rem",
+              display: "flex", alignItems: "flex-start", justifyContent: "center",
+              padding: "1rem", overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
             }}
           >
             <div style={{
               maxWidth: "460px", width: "100%",
+              maxHeight: "calc(100dvh - 2rem)", overflowY: "auto",
+              margin: "auto",
               background: "#14141c",
               border: "1px solid rgba(139, 92, 246, 0.35)",
               borderRadius: "16px", padding: "1.5rem",
@@ -770,29 +778,22 @@ export const PaymentPage = () => {
               }}>
                 {t('page.private.title')}
               </h3>
-              <p style={{ margin: "0 0 0.75rem", fontSize: "0.95rem", lineHeight: 1.55, color: "rgba(255,255,255,0.8)" }}>
-                {t('page.private.intro')}
-              </p>
-              <ul style={{ margin: "0 0 0.75rem", paddingLeft: "1.1rem", fontSize: "0.92rem", lineHeight: 1.6, color: "rgba(255,255,255,0.78)" }}>
-                <li>{t('page.private.step1')}</li>
-                <li>{t('page.private.step2')}</li>
-                <li>{t('page.private.step3')}</li>
-                <li>{t('page.private.step4')}</li>
-              </ul>
-              <p style={{ margin: "0 0 1rem", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)" }}>
-                {t('page.private.foot')}
+              {/* Modal compacto: una sola línea que CONSERVA el aviso del
+                  "cargo normal (no pendiente)" — la regla de siempre para
+                  evitar la llamada de "me habéis cobrado". El detalle completo
+                  (los 4 pasos, la reversión, las 48 h) vive en la pestaña de
+                  términos que abre el enlace del checkbox. */}
+              <p style={{ margin: "0 0 1rem", fontSize: "0.92rem", lineHeight: 1.55, color: "rgba(255,255,255,0.8)" }}>
+                {t('page.private.leadShort')}
               </p>
 
-              {/* CASILLA OBLIGATORIA. Antes bastaba con pulsar "Entendido", y
-                  eso se pulsa sin leer. Marcar una casilla exige un gesto
-                  distinto y deja constancia de que el comprador aceptó ESTE
-                  texto — que es el que le explica que en su banco puede verlo
-                  como un cargo normal, no como algo pendiente. Sin eso, la
-                  llamada de "me habéis cobrado" es cuestión de tiempo.
-                  Toda la fila es pulsable: en móvil dar solo a la casilla es
-                  incómodo. */}
-              <label
-                htmlFor="approval-consent"
+              {/* CASILLA OBLIGATORIA. Marcar exige un gesto distinto a pulsar
+                  un botón "entendido", y deja constancia de que el comprador
+                  aceptó el aviso del cargo. Fila pulsable (onClick) en vez de
+                  <label> envolvente para que tocar el enlace de términos NO
+                  marque/desmarque la casilla. */}
+              <div
+                onClick={() => setApprovalConsent((v) => !v)}
                 style={{
                   display: "flex", alignItems: "flex-start", gap: "0.7rem",
                   margin: "0 0 1.25rem", padding: "0.85rem",
@@ -807,15 +808,33 @@ export const PaymentPage = () => {
                   type="checkbox"
                   checked={approvalConsent}
                   onChange={(e) => setApprovalConsent(e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
                   style={{
                     width: "20px", height: "20px", marginTop: "1px",
                     accentColor: "#8b5cf6", cursor: "pointer", flexShrink: 0,
                   }}
                 />
                 <span style={{ fontSize: "0.85rem", lineHeight: 1.5, color: "rgba(255,255,255,0.85)" }}>
-                  {t('page.private.consent')}
+                  {(() => {
+                    const parts = t('page.private.consentShort').split('%TERMS%');
+                    return (
+                      <>
+                        {parts[0]}
+                        <a
+                          href={`/${currentLang}/private-event-terms`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ color: "#a78bfa", textDecoration: "underline", fontWeight: 600 }}
+                        >
+                          {t('page.private.termsLink')}
+                        </a>
+                        {parts[1] ?? ''}
+                      </>
+                    );
+                  })()}
                 </span>
-              </label>
+              </div>
 
               <div style={{ display: "flex", gap: "0.75rem" }}>
                 <button
