@@ -284,11 +284,27 @@ const WalletFields = ({
     </div>
 
     <div
-      className="payment-wallet-stage"
+      className={`payment-wallet-stage${
+        phase === 'idle' ? '' : ' payment-wallet-stage--reserva'
+      }`}
       aria-live="polite"
       aria-busy={phase === 'preparing'}
     >
-      {phase === 'idle' && <p className="payment-wallet-idle">{idleBody}</p>}
+      {/* Estado inicial: compacto y con los métodos anunciados. Antes esto era
+          un cajón vacío de 280px con una frase suelta en medio y parecía roto.
+          La altura solo se reserva cuando el widget está en camino. */}
+      {phase === 'idle' && (
+        <>
+          <p className="payment-wallet-idle">{idleBody}</p>
+          <div className="payment-wallet-anticipo" aria-hidden="true">
+            <span>Google&nbsp;Pay</span>
+            <span>Apple&nbsp;Pay</span>
+            <span>
+              <CreditCard size={13} /> Tarjeta
+            </span>
+          </div>
+        </>
+      )}
 
       {phase === 'preparing' && (
         <div className="payment-wallet-loading">

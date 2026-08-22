@@ -405,6 +405,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+/* La altura SOLO se reserva cuando el widget está a punto de aparecer. Antes
+   se reservaba siempre, y en el estado inicial dejaba un cajón vacío de 280px
+   con una frase flotando en medio: parecía que algo se había roto. Ahora la
+   tarjeta es compacta hasta que hay algo real que enseñar, y el hueco se
+   reserva justo antes de que llegue el iframe — que es cuando de verdad
+   importa, para que la lista de métodos no empuje la página hacia abajo con
+   el dedo del comprador ya en camino. */
+.payment-wallet-stage--reserva {
   min-height: 280px;
 }
 
@@ -413,6 +423,31 @@
   font-size: 0.9rem;
   line-height: 1.55;
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* Anticipo de los métodos que van a salir. Con esto el estado inicial dice
+   algo en vez de ser un hueco: el comprador ya sabe que podrá pagar con
+   Google Pay o Apple Pay antes de rellenar sus datos. */
+.payment-wallet-anticipo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+}
+
+.payment-wallet-anticipo span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .payment-wallet-loading {
@@ -429,9 +464,22 @@
 }
 
 /* El iframe de Cybersource se pinta dentro. Sin ancho completo, la lista de
-   métodos sale estrecha en móvil. */
+   métodos sale estrecha en móvil.
+
+   EL MARCO NO ES ADORNO. El widget llega con FONDO BLANCO desde Cybersource
+   (el color se configura en su Business Center → Unified Checkout → My
+   Customer Experience, no desde aquí). Sobre una página casi negra, ese blanco
+   sin enmarcar se veía como franjas sueltas y daba sensación de error. Con un
+   contenedor propio —fondo claro, esquinas redondeadas y `overflow:hidden`—
+   pasa a leerse como un panel deliberado. Si algún día se pone el widget en
+   oscuro desde su panel, esto sigue funcionando: el contenedor queda debajo. */
 .payment-wallet-container {
   width: 100%;
+  padding: 0.5rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  overflow: hidden;
 }
 
 .payment-wallet-escape {
