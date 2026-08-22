@@ -83,6 +83,10 @@ import {
   waitForElement,
   withTimeout,
 } from "../../utils/unifiedCheckout";
+import {
+  getDeviceFingerprintSessionId,
+  startDeviceProfiling,
+} from "../../utils/deviceFingerprint";
 
 // ===========================================================================
 // INTERRUPTOR DEL WIDGET, lado navegador. Apagado si la variable no existe:
@@ -435,6 +439,26 @@ export const PaymentPage = () => {
     return () => { walletAliveRef.current = false; };
   }, []);
 
+  // ==========================================================================
+  // HUELLA DE DISPOSITIVO — se arranca al ABRIR la página, no al pulsar pagar.
+  //
+  // El script de Cybersource tarda unos segundos en recoger sus señales.
+  // Lanzarlo aquí le da todo el rato que el comprador pasa tecleando sus datos;
+  // lanzarlo en `chargeCard` llegaría tarde y la huella saldría vacía, que es
+  // justo el problema que esto arregla (ver utils/deviceFingerprint.ts).
+  //
+  // Se arranca en LOS DOS carriles aunque solo lo use el de tarjeta: el
+  // formulario de tarjeta es la red de seguridad del widget y puede aparecer en
+  // cualquier momento, así que para entonces la huella tiene que estar hecha.
+  //
+  // NO SE ESPERA A NADA: no devuelve promesa, no bloquea el render y no tiene
+  // rama de error que pueda impedir un pago. Mientras falte el `org_id` de
+  // NeoNet esto es literalmente un no-op.
+  // ==========================================================================
+  useEffect(() => {
+    startDeviceProfiling();
+  }, []);
+
   // El carril del widget solo está en juego con el interruptor encendido y en
   // el flujo normal. `resuming` (enlaces viejos) se queda con la tarjeta.
   const walletMode = UNIFIED_CHECKOUT_ENABLED && !resuming;
@@ -597,12 +621,18 @@ export const PaymentPage = () => {
     const [mm, yy] = cardExpiry.split("/");
     // `linkCode` es el anti-carding: sin él el backend responde 403 y no toca
     // la pasarela.
+    // La huella de dispositivo va SOLO por aquí: este es el carril que Decision
+    // Manager estaba viendo a ciegas (el widget perfila el suyo aparte). Sale
+    // cadena vacía —y entonces el campo ni viaja— si no está configurado el
+    // `org_id` o si el script no llegó a cargar; en ninguno de los dos casos se
+    // interrumpe el cobro.
+    const deviceFingerprintId = getDeviceFingerprintSessionId();
     const paymentResponse = await payOrder(orderId, linkCode, {
       number: num,
       exp_month: mm,
       exp_year: yy,
       cvv: cardCvv,
-    });
+    }, undefined, deviceFingerprintId);
 
     if (paymentResponse?.success === false) {
       throw new Error(paymentResponse.error || t('page.paymentFailed'));

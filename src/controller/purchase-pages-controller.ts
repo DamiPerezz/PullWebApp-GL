@@ -117,17 +117,28 @@ export const simulateStripePayment = async (orderId: string) => {
 //        tarjeta cruda (pasa si el venue vuelve a quedar apuntando a dLocal)
 // ============================================================================
 
+// `deviceFingerprintId` es la HUELLA DE DISPOSITIVO para el antifraude
+// (Decision Manager). Va vacía mientras NeoNet no nos dé el `org_id` del script
+// de profiling — ver utils/deviceFingerprint.ts, que es quien decide si hay algo
+// que mandar. Aquí solo se reenvía si trae valor: con cadena vacía el cuerpo de
+// la petición sale idéntico al de antes de que esto existiera.
+//
+// Es OPCIONAL en los dos sentidos: el backend lo valida y, si no le gusta la
+// forma, lo DESCARTA y cobra igual (pay_controller.go). Ninguna compra se cae
+// por la huella.
 export const payOrder = async (
   orderId: string,
   paymentLinkCode: string,
   card: { number: string; exp_month: string; exp_year: string; cvv: string },
-  turnstileToken?: string
+  turnstileToken?: string,
+  deviceFingerprintId?: string
 ) => {
   const response = await apiClient.post(`/orders/pay`, {
     order_id: orderId,
     payment_link_code: paymentLinkCode,
     card,
     ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
+    ...(deviceFingerprintId ? { device_fingerprint_id: deviceFingerprintId } : {}),
   });
   return response.data;
 };
@@ -213,6 +224,14 @@ export const startUnifiedCheckoutSession = async (
  *
  * `card` NO se manda: si viajaran las dos cosas, Cybersource rechazaría la
  * petición por ambigua.
+ *
+ * TAMPOCO se manda `device_fingerprint_id`, y es a propósito: con la sesión
+ * abierta con `completeMandate.decisionManager: true`, Unified Checkout perfila
+ * el dispositivo ÉL MISMO y mete su `fingerprintSessionId` dentro del transient
+ * token. Añadir aquí una segunda huella —la nuestra, con otro id— sería mandarle
+ * al antifraude dos identidades para el mismo dispositivo. La huella de este
+ * carril ya está resuelta en el backend; la que falta es la del formulario de
+ * tarjeta, y esa va en `payOrder`.
  */
 export const payOrderWithTransientToken = async (
   orderId: string,
