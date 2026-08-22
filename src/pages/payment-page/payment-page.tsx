@@ -21,6 +21,37 @@
 // TRAMPA: la tarjeta sí pasa por nuestro servidor en este flujo (el backend la
 // reenvía a Cybersource y no la guarda). No la metas en logs, ni en estado
 // global, ni en la URL.
+//
+// -----------------------------------------------------------------------------
+// WIDGET NATIVO (Unified Checkout) — añadido en agosto 2026, DETRÁS DE UN
+// INTERRUPTOR (`VITE_UNIFIED_CHECKOUT_ENABLED`)
+//
+// Encendido, el formulario de arriba se sustituye por el componente de
+// Cybersource, que pinta la lista de métodos —Google Pay, Apple Pay y tarjeta,
+// en el orden que manda el backend— y devuelve un "transient token" en lugar
+// del PAN. Ese token va al MISMO `/orders/pay` de siempre; público vs privado,
+// cobrar vs retener, emisión de entradas: todo idéntico, lo decide el servidor
+// leyendo el evento.
+//
+// EL FORMULARIO DE TARJETA NO SE BORRA. Es la red de seguridad, y vuelve solo
+// —sin que el comprador vea ningún error— cuando:
+//   · el interruptor está apagado (entonces esta página es la de siempre,
+//     literalmente: `showCardForm` sale true por la primera condición);
+//   · la sesión de pago no se abre (backend apagado, pasarela sin wallets…);
+//   · el SDK no carga o tarda más de la cuenta;
+//   · el widget no llega a pintarse;
+//   · el cobro con el token falla (el token es de un solo uso: no se reintenta).
+// Eso es lo que hace verdad el "nivel 1" de ROLLBACK-WALLETS.md: apagar la
+// variable en Cloudflare Pages y redeployar devuelve el checkout de siempre.
+//
+// ⚠️ EL CONSENTIMIENTO DEL EVENTO PRIVADO NO SE PUENTEA. La casilla obligatoria
+// del modal sigue bloqueando antes de pagar, también con wallet — ver el guard
+// al principio de `prepareWallet`.
+//
+// DÓNDE NO ESTÁ: en el modo "retomar orden" (`resuming`). Ese carril es para
+// enlaces viejos del desvío de dLocal y se queda con la tarjeta de siempre, que
+// es exactamente el comportamiento que ya estaba probado.
+// -----------------------------------------------------------------------------
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Layout } from "../../components/layout/layout";
@@ -35,13 +66,72 @@ import {
   payOrder,
   getOrderDetails,
   getOrderDataAfterCancel,
+  startUnifiedCheckoutSession,
+  payOrderWithTransientToken,
 } from "../../controller/purchase-pages-controller";
 import type { TicketType, EventDetailedInfo } from "../../types/types";
-import { AlertCircle, CheckCircle, Clock, CreditCard } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, CreditCard, Wallet } from "lucide-react";
 import { EventInfoCard } from "../../components/event-info-card/event-info-card";
 import { apiClient } from "../../utils/axios";
 import { validateUUID } from "../../utils/security";
 import { classifyOrderStatus, validatePaymentLinkCode, type OrderStage } from "../../utils/orderStatus";
+import {
+  clientLibraryFromCaptureContext,
+  createUnifiedPayments,
+  extractTransientToken,
+  loadUnifiedCheckoutSdk,
+  waitForElement,
+  withTimeout,
+} from "../../utils/unifiedCheckout";
+
+// ===========================================================================
+// INTERRUPTOR DEL WIDGET, lado navegador. Apagado si la variable no existe:
+// cualquier valor que no sea exactamente "true" deja la página como está hoy.
+//
+// Encender:  Cloudflare Pages → proyecto pull-511-events → Settings →
+//            Environment variables → VITE_UNIFIED_CHECKOUT_ENABLED=true →
+//            Redeploy. (En el backend hace falta además
+//            UNIFIED_CHECKOUT_ENABLED=true; si solo está encendido aquí, la
+//            sesión responde 501 y se cae al formulario de tarjeta.)
+// Apagar:    borrar la variable (o ponerla a false) y redeployar. 30 segundos.
+//
+// Es una constante de módulo, no estado: Vite la resuelve al construir el
+// bundle, así que con el interruptor apagado el código del widget ni siquiera
+// puede llegar a ejecutarse.
+// ===========================================================================
+const UNIFIED_CHECKOUT_ENABLED =
+  String(import.meta.env.VITE_UNIFIED_CHECKOUT_ENABLED ?? '').trim().toLowerCase() === 'true';
+
+// Id del hueco donde Cybersource pinta la lista de métodos. `show()` lo busca
+// por selector, así que tiene que ser único en la página.
+const UC_CONTAINER_ID = 'unified-checkout-payment-selection';
+
+// Plazos. Ninguno es cosmético: pasado cualquiera de ellos vuelve el formulario
+// de tarjeta. Un comprador esperando delante de un hueco en blanco abandona.
+const UC_SESSION_TIMEOUT_MS = 8000;  // abrir la sesión contra nuestro backend
+const UC_SDK_TIMEOUT_MS = 10000;     // descargar el SDK de Cybersource
+const UC_INIT_TIMEOUT_MS = 8000;     // Accept() + unifiedPayments()
+const UC_PAINT_TIMEOUT_MS = 5000;    // que React pinte el contenedor
+const UC_MOUNT_TIMEOUT_MS = 8000;    // que el widget pinte ALGO dentro
+
+// idle      → aún no se ha pedido nada; el hueco explica qué va a pasar.
+// preparing → sesión + SDK en marcha.
+// ready     → el widget está en pantalla y el comprador elige.
+// fallback  → formulario de tarjeta de siempre. Estado terminal de esta página:
+//             una vez aquí no se reintenta el widget solo, para no quitarle al
+//             comprador un formulario que ya podía estar rellenando.
+type WalletPhase = 'idle' | 'preparing' | 'ready' | 'fallback';
+
+// Lo que devuelve `/orders/pay`, por los dos carriles (tarjeta y wallet). Solo
+// los campos que esta página lee: el resto del cuerpo (tickets, mensajes) lo
+// consume la página de éxito leyendo el estado REAL de la orden.
+type PayResponse = {
+  success?: boolean;
+  error?: string;
+  /** `true` SOLO en la rama de retención: el importe está bloqueado, no cobrado. */
+  pending_approval?: boolean;
+  order_number?: string;
+};
 
 type ResumeState =
   | { phase: 'loading' }
@@ -151,6 +241,72 @@ const CardFields = ({
   </div>
 );
 
+// Hueco del widget nativo. Ocupa EL MISMO sitio que el formulario de tarjeta y
+// reserva altura desde el primer render (`payment-wallet-stage`), para que
+// pasar de "preparando" a la lista de métodos no empuje la página hacia abajo
+// mientras el comprador está leyendo.
+//
+// Fuera del componente por el mismo motivo que CardFields: si se declara
+// dentro, cada render lo remonta — y remontar el contenedor MATARÍA el iframe
+// de Cybersource a media transacción.
+const WalletFields = ({
+  phase,
+  containerId,
+  title,
+  idleBody,
+  preparing,
+  note,
+  useCardLabel,
+  onUseCard,
+}: {
+  phase: WalletPhase;
+  containerId: string;
+  title: string;
+  idleBody: string;
+  preparing: string;
+  note: string;
+  useCardLabel: string;
+  onUseCard: () => void;
+}) => (
+  <div className="payment-card-section">
+    <div className="payment-card-header">
+      <Wallet size={18} />
+      <span>{title}</span>
+    </div>
+
+    <div
+      className="payment-wallet-stage"
+      aria-live="polite"
+      aria-busy={phase === 'preparing'}
+    >
+      {phase === 'idle' && <p className="payment-wallet-idle">{idleBody}</p>}
+
+      {phase === 'preparing' && (
+        <div className="payment-wallet-loading">
+          <div className="payment-page-loading-spinner" />
+          <p className="payment-wallet-loading-text">{preparing}</p>
+        </div>
+      )}
+
+      {/* Solo existe en 'ready': `waitForElement` se apoya en eso para saber
+          que React ya pintó el hueco antes de llamar a show(). */}
+      {phase === 'ready' && <div id={containerId} className="payment-wallet-container" />}
+    </div>
+
+    <p className="payment-card-note">{note}</p>
+
+    {/* Salida manual. El widget YA trae tarjeta, así que esto no es "otra forma
+        de pagar": es el cable de emergencia para el caso en que la lista se
+        quede pillada y la promesa de Cybersource no resuelva nunca. Sin él ese
+        comprador no tendría ninguna salida. */}
+    {phase !== 'idle' && (
+      <button type="button" className="payment-wallet-escape" onClick={onUseCard}>
+        {useCardLabel}
+      </button>
+    )}
+  </div>
+);
+
 export const PaymentPage = () => {
   const { t, i18n } = useTranslation('payment');
   const { lang, eventId, ticketTypeId, quantity } = useParams<{
@@ -236,6 +392,53 @@ export const PaymentPage = () => {
   // Evento privado: se cobra RETENIENDO y el local aprueba o rechaza. Se
   // calcula arriba porque lo leen tanto el render como los handlers de cobro.
   const requiresApproval = Boolean(eventInfo?.is_private || eventInfo?.require_approval);
+
+  // ===== WIDGET NATIVO (Unified Checkout) =====
+  const [walletPhase, setWalletPhase] = useState<WalletPhase>('idle');
+  // Vivo mientras la página esté montada. Sin esto, un comprador que se va a
+  // otra pantalla mientras carga el SDK provoca setState sobre un componente
+  // muerto.
+  const walletAliveRef = useRef(true);
+  // Se levanta cuando abandonamos el widget (vigilante de montaje o botón de
+  // salida). A partir de ahí se ignora lo que devuelva `show()`: el comprador
+  // ya está en el formulario de tarjeta y meterle un cobro por detrás sería lo
+  // peor que podría pasar aquí.
+  const walletAbortedRef = useRef(false);
+
+  useEffect(() => {
+    walletAliveRef.current = true;
+    return () => { walletAliveRef.current = false; };
+  }, []);
+
+  // El carril del widget solo está en juego con el interruptor encendido y en
+  // el flujo normal. `resuming` (enlaces viejos) se queda con la tarjeta.
+  const walletMode = UNIFIED_CHECKOUT_ENABLED && !resuming;
+  // ⚠️ LA LÍNEA QUE SOSTIENE TODO: con el interruptor apagado esto es `true`
+  // siempre, así que cada sitio que la consulta se comporta como el día antes
+  // de que el widget existiera.
+  const showCardForm = !walletMode || walletPhase === 'fallback';
+  const walletPreparing = walletMode && walletPhase === 'preparing';
+  const walletReady = walletMode && walletPhase === 'ready';
+
+  // Al caer al formulario de tarjeta, llevarlo a la vista. No es un error ni
+  // se le enseña ninguno: simplemente ahí está la forma de pagar de siempre.
+  const scrollToCardForm = () => {
+    window.setTimeout(() => {
+      const el = document.querySelector('.payment-card-section');
+      if (!el) return;
+      const smooth = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
+    }, 80);
+  };
+
+  // Salida al formulario de tarjeta. Un único sitio para no dejarse el
+  // `walletAbortedRef` en alguna rama.
+  const fallbackToCard = () => {
+    walletAbortedRef.current = true;
+    setWalletPhase('fallback');
+    setProcessing(false);
+    scrollToCardForm();
+  };
 
   const getTicketGender = (ticketName: string): 'male' | 'female' | null => {
     const nameLower = ticketName.toLowerCase();
@@ -383,7 +586,15 @@ export const PaymentPage = () => {
     // La tarjeta ya no hace falta: fuera del estado en cuanto se resuelve.
     clearCard();
     setProcessing(false);
+    finishPayment(orderId, paymentResponse);
+  };
 
+  // Qué hacer con la respuesta de `/orders/pay`. Está extraído de `chargeCard`
+  // para que el cobro con wallet lea la respuesta EXACTAMENTE igual: es el
+  // mismo endpoint y la misma semántica, y duplicar esta lectura sería la
+  // forma más fácil de acabar diciéndole a un comprador que su dinero está
+  // retenido cuando ya se le cobró (o al revés).
+  const finishPayment = (orderId: string, paymentResponse: PayResponse) => {
     // `pending_approval:true` SOLO lo manda la rama de retención, así que es
     // señal positiva y fiable. Se compara contra `true` a propósito.
     if (paymentResponse?.pending_approval === true) {
@@ -410,10 +621,150 @@ export const PaymentPage = () => {
     }, 3000);
   };
 
+  // ==========================================================================
+  // COBRO CON EL TOKEN DEL WIDGET
+  //
+  // Mismo endpoint, mismo guard anti-carding, misma lectura de la respuesta que
+  // con tarjeta. Lo único que cambia es que el PAN no ha pasado por nuestro
+  // servidor: Cybersource nos dio un token de un solo uso que lo representa.
+  //
+  // Y por eso mismo, si el cobro falla NO se puede reintentar con ese token:
+  // se acabó de gastar. Se cae al formulario de tarjeta, que sí puede.
+  //
+  // No lanza: quien lo llama está dentro del flujo del widget y un throw aquí
+  // acabaría tapado por el catch genérico de `prepareWallet`, que no sabría si
+  // hubo cargo o no.
+  // ==========================================================================
+  const chargeWithToken = async (orderId: string, linkCode: string, token: string) => {
+    setProcessing(true);
+    setError(null);
+    try {
+      const paymentResponse = await payOrderWithTransientToken(orderId, linkCode, token);
+      if (paymentResponse?.success === false) {
+        throw new Error(paymentResponse.error || t('page.paymentFailed'));
+      }
+      setProcessing(false);
+      finishPayment(orderId, paymentResponse);
+    } catch (err: unknown) {
+      setProcessing(false);
+      // Aquí SÍ se enseña el error: el comprador pulsó pagar y no se pagó.
+      // `settledElsewhere` cubre el caso de que el cobro sí cuajara y se
+      // perdiera la respuesta — ahí no hay error que enseñar, hay una orden.
+      if (!settledElsewhere(err, orderId)) {
+        setError(describeError(err));
+      }
+      fallbackToCard();
+    }
+  };
+
+  // ==========================================================================
+  // MONTAR EL WIDGET
+  //
+  // Se llama DESPUÉS de crear la orden, porque la sesión de pago se abre contra
+  // una orden concreta: el importe va firmado dentro del JWT y sale de la fila
+  // de la base de datos, no del navegador.
+  //
+  // No cobra nada. Hasta que `show()` no devuelve un token y `chargeWithToken`
+  // no llama a `/orders/pay`, no se ha movido un quetzal — por eso abandonar
+  // este camino en cualquier punto es seguro.
+  //
+  // No lanza: todo lo que sale mal acaba en el formulario de tarjeta.
+  // ==========================================================================
+  const prepareWallet = async (orderId: string, linkCode: string) => {
+    // ⚠️ CONSENTIMIENTO DEL EVENTO PRIVADO — NO TOCAR.
+    // La casilla obligatoria vive en un modal que tapa la página (commit
+    // 8887224), así que hasta aquí no se debería poder llegar sin marcarla. Se
+    // comprueba IGUAL: que el comprador vea el aviso de que se le va a retener
+    // el importe no puede depender de un z-index. Si falla, formulario de
+    // tarjeta — que vuelve a pasar por el mismo modal.
+    if (requiresApproval && !(approvalAccepted && approvalConsent)) {
+      fallbackToCard();
+      return;
+    }
+
+    walletAbortedRef.current = false;
+    setWalletPhase('preparing');
+    // Se quita el overlay de pantalla completa: a partir de aquí el estado de
+    // carga vive DENTRO del hueco del widget, que ya tiene la altura reservada.
+    setProcessing(false);
+
+    try {
+      const session = await withTimeout(
+        startUnifiedCheckoutSession(orderId, linkCode),
+        UC_SESSION_TIMEOUT_MS,
+        'UC_SESSION_TIMEOUT'
+      );
+
+      // La orden ya estaba pagada (reintento, pestaña vieja). No se pinta
+      // ningún widget: se le lleva a su pedido, que dice la verdad.
+      if (session.alreadyPaid) {
+        navigate(buildUrl(`/order/payment-success?order_id=${orderId}`));
+        return;
+      }
+
+      // La URL del SDK viaja DENTRO del capture context, con su hash de
+      // integridad. Ver `clientLibraryFromCaptureContext`: solo se aceptan
+      // URLs https de Cybersource.
+      const lib = clientLibraryFromCaptureContext(session.captureContext);
+      if (!lib) throw new Error('UC_NO_CLIENT_LIBRARY');
+
+      const accept = await loadUnifiedCheckoutSdk(lib, UC_SDK_TIMEOUT_MS);
+      const up = await withTimeout(
+        createUnifiedPayments(accept, session.captureContext),
+        UC_INIT_TIMEOUT_MS,
+        'UC_INIT_TIMEOUT'
+      );
+
+      if (!walletAliveRef.current || walletAbortedRef.current) return;
+
+      setWalletPhase('ready');
+      await waitForElement(UC_CONTAINER_ID, UC_PAINT_TIMEOUT_MS);
+
+      // VIGILANTE DE MONTAJE. `show()` devuelve una promesa que solo resuelve
+      // cuando el comprador termina, así que no sirve para saber si el widget
+      // llegó a pintarse. Si pasado el plazo el hueco sigue VACÍO, no arrancó
+      // — y dejar a alguien mirando un rectángulo en blanco en la página de
+      // pago es peor que no haberlo intentado.
+      //
+      // Solo dispara con el contenedor vacío: si hay algo pintado, el
+      // comprador puede estar a mitad de la hoja del wallet y arrancársela
+      // sería un destrozo.
+      const watchdog = window.setTimeout(() => {
+        const el = document.getElementById(UC_CONTAINER_ID);
+        if (!el || el.childElementCount === 0) fallbackToCard();
+      }, UC_MOUNT_TIMEOUT_MS);
+
+      let result: unknown;
+      try {
+        result = await up.show({ containers: { paymentSelection: `#${UC_CONTAINER_ID}` } });
+      } finally {
+        window.clearTimeout(watchdog);
+      }
+
+      if (!walletAliveRef.current || walletAbortedRef.current) return;
+
+      const token = extractTransientToken(result);
+      if (!token) throw new Error('UC_NO_TOKEN');
+
+      await chargeWithToken(orderId, linkCode, token);
+    } catch {
+      // TODO lo que falle aquí acaba igual: formulario de tarjeta, SIN enseñar
+      // ningún error. Y es honesto — sesión caída, SDK que no descarga, widget
+      // que no monta, comprador que cierra la hoja del wallet: en ninguno de
+      // esos casos hay nada roto para él ni ningún cargo hecho. Hay una forma
+      // de pagar, la de siempre, y aparece donde estaba mirando.
+      if (!walletAliveRef.current) return;
+      fallbackToCard();
+    }
+  };
+
   const onSubmit = async (formData: any) => {
     if (processing) return;
 
-    if (!cardValid()) {
+    // Con el widget en pantalla no hay tarjeta que validar: el medio de pago lo
+    // recoge Cybersource. Con el interruptor apagado `showCardForm` vale
+    // SIEMPRE true y esta comprobación es literalmente la de antes.
+    if (showCardForm && !cardValid()) {
       setError(t('page.card.incomplete'));
       return;
     }
@@ -482,7 +833,14 @@ export const PaymentPage = () => {
         throw new Error(t('page.failedToCreateOrder'));
       }
 
-      await chargeCard(orderId, linkCode);
+      // Aquí se bifurca, y solo aquí. Con el interruptor apagado (o ya caídos
+      // al formulario de tarjeta) se cobra igual que siempre; si no, se monta
+      // el widget — que NO cobra: solo recoge el medio de pago.
+      if (showCardForm) {
+        await chargeCard(orderId, linkCode);
+      } else {
+        await prepareWallet(orderId, linkCode);
+      }
     } catch (error: unknown) {
       const known = orderRef.current?.orderId;
       if (!known || !settledElsewhere(error, known)) {
@@ -554,6 +912,27 @@ export const PaymentPage = () => {
       title={t('page.card.title')}
       note={hold ? t('page.card.holdNote') : t('page.card.secureNote')}
       labels={cardLabels}
+    />
+  );
+
+  // Widget nativo. Ocupa el sitio del formulario de tarjeta cuando el
+  // interruptor está encendido; en cuanto la fase es 'fallback' desaparece y
+  // vuelve `renderCardFields` sin más ceremonia.
+  //
+  // `hold` dice lo mismo que en la tarjeta: en un evento privado el importe se
+  // RETIENE, no se cobra. Google Pay y Apple Pay son tarjetas y van por el
+  // mismo carril, así que el aviso es idéntico — y tiene que serlo, o el
+  // comprador leería una cosa distinta según cómo pague.
+  const renderWalletFields = (hold: boolean) => (
+    <WalletFields
+      phase={walletPhase}
+      containerId={UC_CONTAINER_ID}
+      title={t('page.wallet.title')}
+      idleBody={t('page.wallet.idleBody')}
+      preparing={t('page.wallet.preparing')}
+      note={hold ? t('page.card.holdNote') : t('page.wallet.secureNote')}
+      useCardLabel={t('page.wallet.useCardInstead')}
+      onUseCard={fallbackToCard}
     />
   );
 
@@ -990,8 +1369,12 @@ export const PaymentPage = () => {
                     />
 
                     {/* Público y privado usan EL MISMO formulario: la
-                        diferencia (cobrar vs retener) la decide el backend. */}
-                    {renderCardFields(requiresApproval)}
+                        diferencia (cobrar vs retener) la decide el backend.
+                        Y con el interruptor apagado `showCardForm` es true
+                        siempre: esto es exactamente lo que se pintaba antes. */}
+                    {showCardForm
+                      ? renderCardFields(requiresApproval)
+                      : renderWalletFields(requiresApproval)}
                   </div>
 
                   <div className="payment-page-right">
@@ -1001,10 +1384,17 @@ export const PaymentPage = () => {
                       buttonText={
                         processing
                           ? t('page.processing')
-                          : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
+                          // Con el widget delante, este botón ya no cobra: el
+                          // que cobra es el de Cybersource. Decirlo en vez de
+                          // dejar un "Continuar al pago" que no hace nada.
+                          : walletPreparing
+                            ? t('page.wallet.preparing')
+                            : walletReady
+                              ? t('page.wallet.chooseAbove')
+                              : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
                       }
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
-                      disabled={processing}
+                      disabled={processing || walletPreparing || walletReady}
                     />
                   </div>
                 </div>

@@ -23,6 +23,14 @@
       "holdNote": "Private event: sending the request will HOLD the amount on your card, and it's only charged if the venue approves your request. If they decline or 48 h pass, the hold is released and nothing is charged.",
       "incomplete": "Complete your card details (number, MM/YY expiry and CVV)."
     },
+    "wallet": {
+      "title": "Payment methods",
+      "idleBody": "On the next step you'll be able to pay with Google Pay, Apple Pay or card. Pick whichever you prefer.",
+      "preparing": "Loading payment methods...",
+      "chooseAbove": "Pick a payment method above",
+      "useCardInstead": "Prefer to pay by card? Tap here",
+      "secureNote": "Secure payment processed by Cybersource. If you pay with Google Pay or Apple Pay, your card details never reach our servers."
+    },
     "processingOrder": "Processing your order...",
     "processingWait": "One moment, we're preparing your payment",
     "failedToLoad": "Failed to load event information. Please try again.",

@@ -23,6 +23,14 @@
       "holdNote": "Evento privado: al enviar la solicitud se RETENDRÁ el importe en tu tarjeta, pero solo se cobrará si el local aprueba tu solicitud. Si te rechazan o pasan 48 h, se libera y no se te cobra nada.",
       "incomplete": "Completa los datos de la tarjeta (número, vencimiento MM/AA y CVV)."
     },
+    "wallet": {
+      "title": "Métodos de pago",
+      "idleBody": "Al continuar podrás pagar con Google Pay, Apple Pay o tarjeta. Elige el que prefieras en el siguiente paso.",
+      "preparing": "Preparando los métodos de pago...",
+      "chooseAbove": "Elige un método de pago arriba",
+      "useCardInstead": "¿Prefieres pagar con tarjeta? Pulsa aquí",
+      "secureNote": "Pago seguro procesado por Cybersource. Si pagas con Google Pay o Apple Pay, los datos de tu tarjeta no pasan por nuestros servidores."
+    },
     "processingOrder": "Procesando tu pedido...",
     "processingWait": "Un momento, estamos preparando tu pago",
     "failedToLoad": "Error al cargar la información del evento. Por favor intenta de nuevo.",

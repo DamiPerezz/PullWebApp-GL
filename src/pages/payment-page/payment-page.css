@@ -394,6 +394,63 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
+/* ===== Widget nativo (Unified Checkout) — solo con el interruptor encendido
+   Reutiliza el marco de `.payment-card-section` a propósito: cuando el widget
+   se cae al formulario de tarjeta, el bloque no cambia de forma ni de sitio.
+
+   `min-height` NO es decoración: reserva la altura del widget desde el primer
+   render, para que pasar de "preparando" a la lista de métodos no empuje la
+   página hacia abajo justo cuando el comprador va a pulsar. */
+.payment-wallet-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 280px;
+}
+
+.payment-wallet-idle {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.payment-wallet-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.payment-wallet-loading-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* El iframe de Cybersource se pinta dentro. Sin ancho completo, la lista de
+   métodos sale estrecha en móvil. */
+.payment-wallet-container {
+  width: 100%;
+}
+
+.payment-wallet-escape {
+  display: block;
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: rgba(216, 180, 254, 0.85);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.payment-wallet-escape:hover {
+  color: rgb(216, 180, 254);
+}
+
 /* ===== Aviso de redirección (checkout alojado dLocal) — FUERA DE USO =====
    Lo usaba la variante de dLocal, que sustituía el formulario de tarjeta por
    un aviso de "te llevamos a la pasarela". Desde el 18-ago-2026 ninguna página

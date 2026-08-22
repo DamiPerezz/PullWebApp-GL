@@ -133,6 +133,103 @@ export const payOrder = async (
 };
 
 // ============================================================================
+// UNIFIED CHECKOUT (widget nativo de Cybersource: Google Pay / Apple Pay /
+// tarjeta) — detrás de interruptor, ver payment-page.tsx
+//
+// Son DOS llamadas y ninguna de las dos mueve dinero por sí sola:
+//
+//   1. `startUnifiedCheckoutSession` abre la sesión. El backend valida la orden
+//      con el MISMO guard que el pago (`payment_link_code`) y devuelve un JWT
+//      firmado con el importe dentro. El importe NO viaja desde aquí: sale de
+//      la orden en el servidor.
+//   2. `payOrderWithTransientToken` cobra. Es el MISMO endpoint `/orders/pay`
+//      de siempre, con `transient_token` en lugar de `card`. Todo lo demás
+//      —claim atómico, retención en evento privado, emisión de entradas— es
+//      idéntico: el token solo sustituye al PAN.
+//
+// PÚBLICO vs PRIVADO lo decide el BACKEND leyendo el evento, igual que con
+// tarjeta. `requires_approval` viene informativo, para poder avisar de que el
+// importe se retiene; no es un permiso y la web no puede elegir.
+//
+// Respuestas propias de este carril:
+//   200 {capture_context, amount, currency, order_number, requires_approval,
+//        complete_mandate, wallets_eligible:true}
+//   200 {success, already_paid:true, order_number} → la orden ya estaba pagada
+//   501 {error, enabled:false}          → interruptor APAGADO en el backend
+//   501 {error, wallets_eligible:false} → la pasarela del venue no ofrece wallets
+//   502 {error}                         → Cybersource no abrió la sesión
+// Cualquiera de esas es motivo para caerse al formulario de tarjeta, nunca para
+// dejar al comprador sin forma de pagar.
+// ============================================================================
+
+export type UnifiedCheckoutSession = {
+  captureContext: string;
+  amount: number;
+  currency: string;
+  orderNumber?: string;
+  /** El importe se RETENDRÁ en vez de cobrarse (evento privado). */
+  requiresApproval: boolean;
+  /** "CAPTURE" (cobrar ya) o "AUTH" (retener). Lo declara el backend. */
+  completeMandate?: string;
+  /** La orden ya estaba pagada: no hay nada que cobrar ni que pintar. */
+  alreadyPaid?: boolean;
+};
+
+export const startUnifiedCheckoutSession = async (
+  orderId: string,
+  paymentLinkCode: string
+): Promise<UnifiedCheckoutSession> => {
+  const { data } = await apiClient.post('/payments/capture-context', {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+  });
+
+  if (data?.already_paid) {
+    return {
+      captureContext: '', amount: 0, currency: '',
+      orderNumber: data.order_number, requiresApproval: false, alreadyPaid: true,
+    };
+  }
+  if (!data?.capture_context) {
+    // 200 sin JWT = integración mal configurada. Se trata como fallo para caer
+    // al formulario de tarjeta, no como "sesión vacía pero válida".
+    throw new Error('UC_SESSION_INCOMPLETE');
+  }
+  return {
+    captureContext: String(data.capture_context),
+    amount: Number(data.amount) || 0,
+    currency: data.currency || 'GTQ',
+    orderNumber: data.order_number,
+    requiresApproval: data.requires_approval === true,
+    completeMandate: data.complete_mandate,
+  };
+};
+
+/**
+ * Cobro con el token del widget. MISMO endpoint y MISMA semántica de respuesta
+ * que `payOrder` (ver arriba): `pending_approval:true` = retenido, sin flag =
+ * cobrado. La única diferencia es que aquí el PAN no ha pasado nunca por
+ * nuestro servidor.
+ *
+ * `card` NO se manda: si viajaran las dos cosas, Cybersource rechazaría la
+ * petición por ambigua.
+ */
+export const payOrderWithTransientToken = async (
+  orderId: string,
+  paymentLinkCode: string,
+  transientToken: string,
+  turnstileToken?: string
+) => {
+  const response = await apiClient.post(`/orders/pay`, {
+    order_id: orderId,
+    payment_link_code: paymentLinkCode,
+    transient_token: transientToken,
+    ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
+  });
+  return response.data;
+};
+
+// ============================================================================
 // dLocal Go — CHECKOUT ALOJADO  ·  FUERA DEL FLUJO desde el 18-ago-2026
 //
 // Se abandonó dLocal y se volvió a NeoNet (arriba). Nada de este bloque se
