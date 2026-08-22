@@ -88,12 +88,21 @@ import {
 // INTERRUPTOR DEL WIDGET, lado navegador. Apagado si la variable no existe:
 // cualquier valor que no sea exactamente "true" deja la página como está hoy.
 //
-// Encender:  Cloudflare Pages → proyecto pull-511-events → Settings →
-//            Environment variables → VITE_UNIFIED_CHECKOUT_ENABLED=true →
-//            Redeploy. (En el backend hace falta además
+// ⚠️ NO SE ENCIENDE DESDE EL PANEL DE CLOUDFLARE. Los scripts de deploy
+// construyen el bundle EN LOCAL (`npm run build:staging` / `npm run build`) y
+// `wrangler pages deploy dist` sube ese bundle ya construido. Vite incrusta las
+// `VITE_*` al construir, así que las "Environment variables" del panel de Pages
+// no intervienen: solo alimentan las Functions en ejecución y las builds que
+// hace Cloudflare desde git, y aquí no se usa ninguna de las dos.
+//
+// Encender:  `VITE_UNIFIED_CHECKOUT_ENABLED=true` en el fichero de entorno
+//            COMMITEADO del entorno que toque —`.env.staging` para staging,
+//            `.env.production` para producción— y volver a lanzar el script de
+//            deploy correspondiente. (En el backend hace falta además
 //            UNIFIED_CHECKOUT_ENABLED=true; si solo está encendido aquí, la
 //            sesión responde 501 y se cae al formulario de tarjeta.)
-// Apagar:    borrar la variable (o ponerla a false) y redeployar. 30 segundos.
+// Apagar:    poner `false` (o borrar la línea) y volver a deployar. Ver
+//            ROLLBACK-WALLETS.md, nivel 1.
 //
 // Es una constante de módulo, no estado: Vite la resuelve al construir el
 // bundle, así que con el interruptor apagado el código del widget ni siquiera
