@@ -324,11 +324,13 @@ const WalletFields = ({
 
     <p className="payment-card-note">{note}</p>
 
-    {/* Salida manual. El widget YA trae tarjeta, así que esto no es "otra forma
-        de pagar": es el cable de emergencia para el caso en que la lista se
-        quede pillada y la promesa de Cybersource no resuelva nunca. Sin él ese
-        comprador no tendría ninguna salida. */}
-    {phase !== 'idle' && (
+    {/* Salida manual, SOLO mientras se prepara. Es el cable de emergencia para
+        cuando la lista se queda pillada y la promesa de Cybersource no resuelve
+        nunca; sin él ese comprador no tendría salida.
+        En 'ready' ya no hace falta: el formulario de tarjeta está justo debajo,
+        a la vista, y un botón que diga "usar tarjeta" teniéndola delante solo
+        confunde. */}
+    {phase === 'preparing' && (
       <button type="button" className="payment-wallet-escape" onClick={onUseCard}>
         {useCardLabel}
       </button>
@@ -465,7 +467,23 @@ export const PaymentPage = () => {
   // ⚠️ LA LÍNEA QUE SOSTIENE TODO: con el interruptor apagado esto es `true`
   // siempre, así que cada sitio que la consulta se comporta como el día antes
   // de que el widget existiera.
-  const showCardForm = !walletMode || walletPhase === 'fallback';
+  // ¿Se pinta NUESTRO formulario de tarjeta?
+  //
+  // Cambió el 2026-08-23. Antes era un RESPALDO: solo aparecía si los wallets
+  // estaban apagados o el widget se caía, porque el propio widget traía su
+  // formulario de tarjeta (PANENTRY). Ahora el widget se configura SOLO con
+  // wallets y la tarjeta vuelve a ser nuestra, debajo.
+  //
+  // Los tres casos en los que se enseña:
+  //   - wallets apagados     → como toda la vida
+  //   - fase 'fallback'      → el widget falló, es la red de seguridad
+  //   - fase 'ready'         → NUEVO: el widget ya pintó Apple/Google Pay, y
+  //                            justo debajo va la tarjeta como tercera opción
+  //
+  // En 'idle' y 'preparing' NO se pinta: todavía no hay orden creada, así que
+  // un formulario de tarjeta ahí no podría cobrar nada.
+  const showCardForm =
+    !walletMode || walletPhase === 'fallback' || walletPhase === 'ready';
   const walletPreparing = walletMode && walletPhase === 'preparing';
   const walletReady = walletMode && walletPhase === 'ready';
 
@@ -1427,9 +1445,14 @@ export const PaymentPage = () => {
                         diferencia (cobrar vs retener) la decide el backend.
                         Y con el interruptor apagado `showCardForm` es true
                         siempre: esto es exactamente lo que se pintaba antes. */}
-                    {showCardForm
-                      ? renderCardFields(requiresApproval)
-                      : renderWalletFields(requiresApproval)}
+                    {/* WALLETS ARRIBA, TARJETA DEBAJO.
+                        Ya no es un o-uno-o-el-otro: en la fase 'ready' se
+                        pintan LOS DOS. El widget trae Apple Pay y Google Pay,
+                        y nuestro formulario de siempre queda justo debajo como
+                        tercera opción. El comprador elige viéndolo todo. */}
+                    {walletMode && walletPhase !== 'fallback' &&
+                      renderWalletFields(requiresApproval)}
+                    {showCardForm && renderCardFields(requiresApproval)}
                   </div>
 
                   <div className="payment-page-right">
@@ -1439,17 +1462,21 @@ export const PaymentPage = () => {
                       buttonText={
                         processing
                           ? t('page.processing')
-                          // Con el widget delante, este botón ya no cobra: el
-                          // que cobra es el de Cybersource. Decirlo en vez de
-                          // dejar un "Continuar al pago" que no hace nada.
                           : walletPreparing
                             ? t('page.wallet.preparing')
+                            // Con el widget YA pintado, este botón cobra con la
+                            // tarjeta del formulario de abajo — los wallets
+                            // tienen su propio botón dentro del widget. Antes
+                            // aquí ponía "elige arriba" y el botón se quedaba
+                            // muerto, porque la tarjeta vivía dentro del widget.
                             : walletReady
-                              ? t('page.wallet.chooseAbove')
+                              ? t('page.wallet.payWithCardBelow')
                               : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
                       }
                       onConfirm={() => !processing && formRef.current?.submit(onSubmit)}
-                      disabled={processing || walletPreparing || walletReady}
+                      // Ya NO se desactiva en 'ready': ahí es justo cuando sirve
+                      // para pagar con tarjeta. Solo mientras se prepara.
+                      disabled={processing || walletPreparing}
                     />
                   </div>
                 </div>

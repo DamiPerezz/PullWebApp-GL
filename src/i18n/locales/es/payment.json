@@ -27,7 +27,7 @@
       "title": "Métodos de pago",
       "idleBody": "Al continuar podrás pagar con Google Pay, Apple Pay o tarjeta. Elige el que prefieras en el siguiente paso.",
       "preparing": "Preparando los métodos de pago...",
-      "chooseAbove": "Elige un método de pago arriba",
+      "payWithCardBelow": "Pagar con tarjeta",
       "useCardInstead": "¿Prefieres pagar con tarjeta? Pulsa aquí",
       "secureNote": "Pago seguro procesado por Cybersource. Si pagas con Google Pay o Apple Pay, los datos de tu tarjeta no pasan por nuestros servidores."
     },
