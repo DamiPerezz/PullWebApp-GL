@@ -1445,14 +1445,19 @@ export const PaymentPage = () => {
                         diferencia (cobrar vs retener) la decide el backend.
                         Y con el interruptor apagado `showCardForm` es true
                         siempre: esto es exactamente lo que se pintaba antes. */}
-                    {/* WALLETS ARRIBA, TARJETA DEBAJO.
-                        Ya no es un o-uno-o-el-otro: en la fase 'ready' se
-                        pintan LOS DOS. El widget trae Apple Pay y Google Pay,
-                        y nuestro formulario de siempre queda justo debajo como
-                        tercera opción. El comprador elige viéndolo todo. */}
+                    {/* TARJETA ARRIBA, WALLETS DEBAJO.
+                        No es un o-uno-o-el-otro: en la fase 'ready' se pintan
+                        LOS DOS. Arriba el formulario de tarjeta de siempre y
+                        debajo el widget con Apple Pay y Google Pay. El
+                        comprador elige viéndolo todo.
+
+                        El orden es SOLO visual: los dos carriles son
+                        independientes (el widget cobra con su propio botón, el
+                        formulario con el del resumen), así que intercambiarlos
+                        no toca la lógica de pago. */}
+                    {showCardForm && renderCardFields(requiresApproval)}
                     {walletMode && walletPhase !== 'fallback' &&
                       renderWalletFields(requiresApproval)}
-                    {showCardForm && renderCardFields(requiresApproval)}
                   </div>
 
                   <div className="payment-page-right">
@@ -1464,11 +1469,12 @@ export const PaymentPage = () => {
                           ? t('page.processing')
                           : walletPreparing
                             ? t('page.wallet.preparing')
-                            // Con el widget YA pintado, este botón cobra con la
-                            // tarjeta del formulario de abajo — los wallets
-                            // tienen su propio botón dentro del widget. Antes
-                            // aquí ponía "elige arriba" y el botón se quedaba
-                            // muerto, porque la tarjeta vivía dentro del widget.
+                            // Con el widget YA pintado, este botón cobra con el
+                            // formulario de tarjeta (que va ARRIBA del widget)
+                            // — los wallets tienen su propio botón dentro del
+                            // widget. Antes aquí ponía "elige arriba" y el
+                            // botón se quedaba muerto, porque la tarjeta vivía
+                            // dentro del widget.
                             : walletReady
                               ? t('page.wallet.payWithCardBelow')
                               : (requiresApproval ? t('page.requestTicket') : t('page.proceedToPayment'))
