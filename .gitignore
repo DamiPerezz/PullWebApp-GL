@@ -41,3 +41,6 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+# Caché local de wrangler (la genera `wrangler pages dev` al probar las
+# Functions en local). No es código: no va a git.
+.wrangler/
