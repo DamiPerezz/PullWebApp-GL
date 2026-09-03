@@ -67,6 +67,12 @@ export type EventInfo = {
   event_slug: string;
   event_name: string;
   venue_name: string;
+  // Sitio concreto donde se hace ESTE evento ("Fenix Speakeasy", "La Noria").
+  // Es la columna `location` de la tabla events, y es lo que se ensena en la
+  // tarjeta: `venue_name` es la promotora (siempre "511 Events") y decirle eso
+  // al comprador no le dice donde tiene que ir. Opcional porque los eventos
+  // viejos la tienen vacia.
+  location?: string;
   start_time: string;
   end_time: string;
   event_date: string;

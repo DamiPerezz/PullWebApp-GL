@@ -63,7 +63,12 @@ export const EventCard = memo(({ event, isVenueEventPage }: { event: EventInfo, 
                             <div className="event-card-details">
                                 <div className="event-card-detail-item">
                                     <LocationIcon strokeColor="rgb(52, 211, 153)" />
-                                    <span>{event.venue_name}</span>
+                                    {/* El SITIO del evento, no la promotora. Antes aqui iba
+                                        `venue_name`, que para 511 es siempre "511 Events" y no
+                                        le dice al comprador donde ir. Se cae a `venue_name`
+                                        solo si el evento no tiene sitio puesto, para no dejar
+                                        el icono suelto sin texto. */}
+                                    <span>{event.location || event.venue_name}</span>
                                 </div>
 
                                 <div className="event-card-detail-item">
